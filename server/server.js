@@ -4,6 +4,7 @@ const sharp = require("sharp");
 const path = require("path");
 const cors = require("cors");
 const fs = require("fs").promises;
+const os = require("os");
 const { exec } = require("child_process");
 const util = require("util");
 const execPromise = util.promisify(exec);
@@ -25,7 +26,7 @@ let mapYamlInfoProcessed = {};
 // const MAX_DIMENSION = 2000;
 const MAX_DIMENSION = 750;
 
-const MYPATH = process.env.MYPATH || "/home/zealzel/fitrobot_db";
+const MYPATH = process.env.MYPATH || path.join(os.homedir(), "fitrobot_db");
 console.log("MYPATH:", MYPATH);
 
 // 創建一個目錄來存儲轉換後的圖片
