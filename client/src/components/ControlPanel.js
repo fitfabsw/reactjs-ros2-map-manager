@@ -1,5 +1,6 @@
 import React from "react";
 import MetadataDisplay from "./MetadataDisplay";
+import "./MapEditor.css";
 
 const ControlPanel = ({
   processedImageUrl,

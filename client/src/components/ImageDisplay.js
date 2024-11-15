@@ -1,3 +1,37 @@
+// import React from "react";
+//
+// function ImageDisplay({ selectedFile, processedImage }) {
+//   if (!selectedFile && !processedImage) {
+//     return <div className="image-display">No image selected</div>;
+//   }
+//
+//   return (
+//     <div className="image-display">
+//       {processedImage ? (
+//         <img
+//           src={`data:image/png;base64,${processedImage}`}
+//           alt="Processed"
+//           style={{ maxWidth: "100%", height: "auto" }}
+//         />
+//       ) : selectedFile?.convertedImage ? (
+//         <img
+//           src={`data:image/png;base64,${selectedFile.convertedImage}`}
+//           alt={selectedFile.name}
+//           style={{ maxWidth: "100%", height: "auto" }}
+//           onError={(e) => {
+//             console.error("Error loading image:", e);
+//             e.target.style.display = "none";
+//           }}
+//         />
+//       ) : (
+//         <div className="image-display">Loading image...</div>
+//       )}
+//     </div>
+//   );
+// }
+//
+// export default ImageDisplay;
+
 import React, { useEffect, useState } from "react";
 import ReactCrop from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
@@ -50,7 +84,7 @@ const ImageDisplay = ({
 
   return (
     <div>
-      <div className="image-container">
+      <div className="image-display">
         {isCropping ? (
           <ReactCrop
             crop={crop}

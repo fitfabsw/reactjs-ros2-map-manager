@@ -16,6 +16,20 @@ module.exports = function (app) {
     }),
   );
   app.use(
+    "/api",
+    legacyCreateProxyMiddleware({
+      target: "http://127.0.0.1:5000",
+      changeOrigin: true,
+    }),
+  );
+  app.use(
+    "/file",
+    legacyCreateProxyMiddleware({
+      target: "http://127.0.0.1:5000",
+      changeOrigin: true,
+    }),
+  );
+  app.use(
     "/files",
     legacyCreateProxyMiddleware({
       target: "http://127.0.0.1:5000",
