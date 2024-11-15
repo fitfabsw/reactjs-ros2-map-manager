@@ -4,6 +4,9 @@ node_modules/
 images/
 converted/
 
+.sql
+.sqlite
+
 # dependencies
 node_modules
 .pnp

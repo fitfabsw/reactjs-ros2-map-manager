@@ -9,6 +9,8 @@ const { exec } = require("child_process");
 const util = require("util");
 const execPromise = util.promisify(exec);
 const yaml = require("js-yaml"); // 需要安裝: npm install js-yaml
+const db = require('./models');
+const apiRoutes = require('./routes/api');
 
 const app = express();
 app.use(cors());
@@ -524,6 +526,14 @@ app.post("/crop-image", async (req, res) => {
   }
 });
 
-app.listen(5000, () => {
-  console.log("Server is running on port 5000");
+// 添加 API 路由
+app.use('/api', apiRoutes);
+
+// 同步數據庫並啟動服務器
+db.sequelize.sync().then(() => {
+  app.listen(5000, () => {
+    console.log("Server is running on port 5000");
+  });
+}).catch(err => {
+  console.error('Unable to connect to the database:', err);
 });

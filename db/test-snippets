@@ -1,0 +1,41 @@
+
+# robottypes
+http http://172.20.10.2:5000/api/robottypes
+http http://172.20.10.2:5000/api/robottypes/3
+http post http://172.20.10.2:5000/api/robottypes name='Tom Hc'
+http put http://172.20.10.2:5000/api/robottypes/68 name='Snow White'
+http delete http://172.20.10.2:5000/api/robottypes/68
+
+
+# robots
+http http://172.20.10.2:5000/api/robots
+http http://172.20.10.2:5000/api/robots/2
+http post http://172.20.10.2:5000/api/robots rt_id=3 sn='1234'
+http put http://172.20.10.2:5000/api/robots/2 rt_id=3 sn='qu94'
+http delete http://172.20.10.2:5000/api/robots/2
+http http://172.20.10.2:5000/api/robots/find/3/1234
+http http://172.20.10.2:5000/api/robots/bytype/2
+
+
+# stations
+http http://172.20.10.2:5000/api/stations
+http http://172.20.10.2:5000/api/stations/2
+http post http://172.20.10.2:5000/api/stations st_name='Tom Hc' type='home' stl_id=1 x=0 y=0 z=0 w=0
+http put http://172.20.10.2:5000/api/stations/2 st_name='Tom Hc' type='home' stl_id=1 x=0 y=0 z=0 w=0
+http delete http://172.20.10.2:5000/api/stations/2
+
+
+# stationlists
+http http://172.20.10.2:5000/api/stationlists
+http http://172.20.10.2:5000/api/stationlists/1
+http post http://172.20.10.2:5000/api/stationlists stl_name='Tom Hc' mid=1
+http put http://172.20.10.2:5000/api/stationlists/1 stl_name='Tom Hc' mid=1
+http delete http://172.20.10.2:5000/api/stationlists/1
+
+
+# maps
+http put http://172.20.10.2:5000/api/maps/3 map='turtlebot3_world' rt_id=2 mappath='/home/pi/fitrobot_db/maps/sim' mapname='turtlebot3_world' real=0
+http http://172.20.10.2:5000/api/maps
+http http://172.20.10.2:5000/api/maps/3
+http post http://172.20.10.2:5000/api/maps map='turtlebot3_world' rt_id=1 mapname='turtlebot3_world'
+http delete http://172.20.10.2:5000/api/maps/3
