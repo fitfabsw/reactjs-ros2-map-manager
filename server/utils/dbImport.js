@@ -27,6 +27,10 @@ async function importData() {
     await db.Station.bulkCreate(seedData.stations, {
       ignoreDuplicates: true
     });
+    
+    await db.Mask.bulkCreate(seedData.masks, {
+      ignoreDuplicates: true
+    });
 
     console.log('Data imported successfully');
   } catch (error) {

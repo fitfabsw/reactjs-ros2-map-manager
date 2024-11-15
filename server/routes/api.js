@@ -235,12 +235,12 @@ router.get("/stationlists", async (req, res) => {
       include: [
         {
           model: db.Map,
-          include: [db.Robottype]
+          include: [db.Robottype],
         },
         {
-          model: db.Station
-        }
-      ]
+          model: db.Station,
+        },
+      ],
     });
     res.json(stationLists);
   } catch (error) {
@@ -254,12 +254,12 @@ router.get("/stationlists/:id", async (req, res) => {
       include: [
         {
           model: db.Map,
-          include: [db.Robottype]
+          include: [db.Robottype],
         },
         {
-          model: db.Station
-        }
-      ]
+          model: db.Station,
+        },
+      ],
     });
     if (stationList) {
       res.json(stationList);
@@ -312,13 +312,17 @@ router.delete("/stationlists/:id", async (req, res) => {
 router.get("/stations", async (req, res) => {
   try {
     const stations = await db.Station.findAll({
-      include: [{
-        model: db.StationList,
-        include: [{
-          model: db.Map,
-          include: [db.Robottype]
-        }]
-      }]
+      include: [
+        {
+          model: db.StationList,
+          include: [
+            {
+              model: db.Map,
+              include: [db.Robottype],
+            },
+          ],
+        },
+      ],
     });
     res.json(stations);
   } catch (error) {
@@ -329,13 +333,17 @@ router.get("/stations", async (req, res) => {
 router.get("/stations/:id", async (req, res) => {
   try {
     const station = await db.Station.findByPk(req.params.id, {
-      include: [{
-        model: db.StationList,
-        include: [{
-          model: db.Map,
-          include: [db.Robottype]
-        }]
-      }]
+      include: [
+        {
+          model: db.StationList,
+          include: [
+            {
+              model: db.Map,
+              include: [db.Robottype],
+            },
+          ],
+        },
+      ],
     });
     if (station) {
       res.json(station);
@@ -389,15 +397,19 @@ router.get("/stationlists/:id/stations", async (req, res) => {
   try {
     const stations = await db.Station.findAll({
       where: {
-        stl_id: req.params.id
+        stl_id: req.params.id,
       },
-      include: [{
-        model: db.StationList,
-        include: [{
-          model: db.Map,
-          include: [db.Robottype]
-        }]
-      }]
+      include: [
+        {
+          model: db.StationList,
+          include: [
+            {
+              model: db.Map,
+              include: [db.Robottype],
+            },
+          ],
+        },
+      ],
     });
     res.json(stations);
   } catch (error) {
@@ -410,19 +422,113 @@ router.get("/maps/:id/stationlists", async (req, res) => {
   try {
     const stationLists = await db.StationList.findAll({
       where: {
-        mid: req.params.id
+        mid: req.params.id,
       },
       include: [
         {
           model: db.Map,
-          include: [db.Robottype]
+          include: [db.Robottype],
         },
         {
-          model: db.Station
-        }
-      ]
+          model: db.Station,
+        },
+      ],
     });
     res.json(stationLists);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Mask CRUD
+router.get("/masks", async (req, res) => {
+  try {
+    const masks = await db.Mask.findAll({
+      include: [
+        {
+          model: db.Map,
+          include: [db.Robottype],
+        },
+      ],
+    });
+    res.json(masks);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get("/masks/:id", async (req, res) => {
+  try {
+    const mask = await db.Mask.findByPk(req.params.id, {
+      include: [
+        {
+          model: db.Map,
+          include: [db.Robottype],
+        },
+      ],
+    });
+    if (mask) {
+      res.json(mask);
+    } else {
+      res.status(404).json({ error: "Mask not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post("/masks", async (req, res) => {
+  try {
+    const mask = await db.Mask.create(req.body);
+    res.status(201).json(mask);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.put("/masks/:id", async (req, res) => {
+  try {
+    const mask = await db.Mask.findByPk(req.params.id);
+    if (mask) {
+      await mask.update(req.body);
+      res.json(mask);
+    } else {
+      res.status(404).json({ error: "Mask not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.delete("/masks/:id", async (req, res) => {
+  try {
+    const mask = await db.Mask.findByPk(req.params.id);
+    if (mask) {
+      await mask.destroy();
+      res.status(204).send();
+    } else {
+      res.status(404).json({ error: "Mask not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 根據地圖 ID 獲取所有遮罩
+router.get("/maps/:id/masks", async (req, res) => {
+  try {
+    const masks = await db.Mask.findAll({
+      where: {
+        mid: req.params.id,
+      },
+      include: [
+        {
+          model: db.Map,
+          include: [db.Robottype],
+        },
+      ],
+    });
+    res.json(masks);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

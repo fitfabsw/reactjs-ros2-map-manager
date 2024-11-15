@@ -17,6 +17,7 @@ db.Robot = require("./robot")(sequelize, Sequelize);
 db.Map = require("./map")(sequelize, Sequelize);
 db.StationList = require("./stationList")(sequelize, Sequelize);
 db.Station = require("./station")(sequelize, Sequelize);
+db.Mask = require("./mask")(sequelize, Sequelize);
 
 // 設置關聯關係
 db.Robottype.hasMany(db.Robot, { foreignKey: "rt_id" });
@@ -30,5 +31,8 @@ db.StationList.belongsTo(db.Map, { foreignKey: "mid" });
 
 db.StationList.hasMany(db.Station, { foreignKey: "stl_id" });
 db.Station.belongsTo(db.StationList, { foreignKey: "stl_id" });
+
+db.Map.hasMany(db.Mask, { foreignKey: "mid" });
+db.Mask.belongsTo(db.Map, { foreignKey: "mid" });
 
 module.exports = db;

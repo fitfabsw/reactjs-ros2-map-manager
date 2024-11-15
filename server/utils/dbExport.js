@@ -8,6 +8,7 @@ async function exportData() {
       robottypes: await db.Robottype.findAll({ raw: true }),
       robots: await db.Robot.findAll({ raw: true }),
       maps: await db.Map.findAll({ raw: true }),
+      masks: await db.Mask.findAll({ raw: true }),
       stationLists: await db.StationList.findAll({ raw: true }),
       stations: await db.Station.findAll({ raw: true })
     };
