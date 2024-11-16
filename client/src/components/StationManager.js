@@ -18,7 +18,7 @@ function StationManager() {
   useEffect(() => {
     if (selectedMap) {
       // 載入選定地圖的站點列表
-      fetch(`http://localhost:5000/api/maps/${selectedMap}/stationlists`)
+      fetch(`/api/maps/${selectedMap}/stationlists`)
         .then((res) => res.json())
         .then((data) => setStationLists(data))
         .catch((err) => console.error("Error loading station lists:", err));
@@ -29,13 +29,16 @@ function StationManager() {
 
   return (
     <div className="station-manager">
-      <h1>Stations</h1>
-      <table>
+      <h1>Maps</h1>
+      <table className="table">
         <thead>
           <tr>
             <th>ID</th>
             <th>map</th>
-            <th>name</th>
+            <th>robot</th>
+            <th>map path</th>
+            <th>map file (pgm, yaml)</th>
+            <th>type</th>
           </tr>
         </thead>
         <tbody>
@@ -43,7 +46,10 @@ function StationManager() {
             <tr key={map.id}>
               <td>{map.id}</td>
               <td>{map.map}</td>
+              <td>{map.Robottype?.name}</td>
+              <td>{map.mappath}</td>
               <td>{map.mapname}</td>
+              <td>{map.real ? "real" : "sim"}</td>
             </tr>
           ))}
         </tbody>
@@ -63,7 +69,7 @@ function StationManager() {
           ))}
         </select>
       </div>
-
+      <p> selectedMap: {selectedMap}</p>
       {selectedMap && (
         <div className="station-lists">
           <h2>Station Lists</h2>
