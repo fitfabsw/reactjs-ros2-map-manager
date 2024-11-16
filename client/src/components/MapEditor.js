@@ -283,6 +283,14 @@ function MapEditor() {
     ],
   );
 
+  // 添加和移除鍵盤事件監聽器
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyPress);
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [handleKeyPress]);
+
   return (
     <div className="map-editor">
       <div className="map-editor-container">
