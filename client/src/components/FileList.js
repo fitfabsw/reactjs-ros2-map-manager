@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-// import "./FileList.css";
 import "./MapEditor.css";
 
 function FileList({
@@ -11,13 +10,12 @@ function FileList({
   setImageProcessedMetadata,
   setOriginPixelPos,
   setRotationAngle,
-  setSelectedFile,
   isCropping,
   isRotating,
   selectedFilePath,
 }) {
   const [files, setFiles] = useState([]);
-  const [error, setError] = useState(null);
+  // const [error, setError] = useState(null);
 
   const fetchFiles = async (path = null) => {
     try {
@@ -33,24 +31,6 @@ function FileList({
       console.error("Error fetching files:", error);
     }
   };
-
-  // const fetchFiles = async (path = "") => {
-  //   try {
-  //     const url = path ? `/files?path=${encodeURIComponent(path)}` : "/files";
-  //     const response = await fetch(url);
-  //     if (!response.ok) {
-  //       throw new Error("Failed to fetch files");
-  //     }
-  //     const data = await response.json();
-  //     setFiles(data.files || []);
-  //     if (data.currentPath !== undefined) {
-  //       setCurrentPath(data.currentPath);
-  //     }
-  //   } catch (error) {
-  //     setError("無法載入文件列表");
-  //     console.error("Error fetching files:", error);
-  //   }
-  // };
 
   useEffect(() => {
     fetchFiles(currentPath);
@@ -107,18 +87,10 @@ function FileList({
 
       setOriginPixelPos({ x: pixelX, y: pixelY });
       console.log(`scale: ${scale}`);
-      setSelectedFile(file);
       setRotationAngle(0);
     } catch (error) {
       console.error("Error processing file:", error);
       alert(`Error processing file: ${error.message}`);
-    }
-  };
-
-  const handleBackClick = () => {
-    if (currentPath) {
-      const parentPath = currentPath.split("/").slice(0, -1).join("/");
-      fetchFiles(parentPath);
     }
   };
 

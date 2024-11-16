@@ -1,17 +1,12 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import FileList from "./FileList";
-import ImageDisplay from "./ImageDisplay";
-import MetadataDisplay from "./MetadataDisplay";
 import ImageProcessingArea from "./ImageProcessingArea";
 import ControlPanel from "./ControlPanel";
 import "./MapEditor.css";
 
 function MapEditor() {
-  const [selectedFile, setSelectedFile] = useState(null);
   const [selectedFilePath, setSelectedFilePath] = useState(null);
-  const [processedImage, setProcessedImage] = useState(null);
   const [processedImageUrl, setProcessedImageUrl] = useState(null);
-  const [metadata, setMetadata] = useState(null);
   const [currentPath, setCurrentPath] = useState("");
   const [imageMetadata, setImageMetadata] = useState(null);
   const [saveMessage, setSaveMessage] = useState("");
@@ -181,7 +176,6 @@ function MapEditor() {
         (res) => res.blob(),
       );
       setProcessedImageUrl(URL.createObjectURL(blob));
-      // setImageMetadata(data.metadata);
       setImageProcessedMetadata(data.metadata);
 
       console.log(`imageProcessedMetadata: ${JSON.stringify(data.metadata)}`);
@@ -297,6 +291,7 @@ function MapEditor() {
         <FileList
           setSelectedFilePath={setSelectedFilePath}
           currentPath={currentPath}
+          setCurrentPath={setCurrentPath}
           selectedFilePath={selectedFilePath}
           isRotating={isRotating}
           isCropping={isCropping}
@@ -305,7 +300,6 @@ function MapEditor() {
           setImageProcessedMetadata={setImageProcessedMetadata}
           setRotationAngle={setRotationAngle}
           setOriginPixelPos={setOriginPixelPos}
-          setSelectedFile={setSelectedFile}
         />
 
         <div className="main-content">

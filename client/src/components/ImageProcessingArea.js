@@ -3,7 +3,6 @@ import ImageDisplay from "./ImageDisplay";
 
 const ImageProcessingArea = ({
   saveMessage,
-  selectedFilePath,
   isRotating,
   rotationAngle,
   handleRotationChange,
@@ -17,7 +16,6 @@ const ImageProcessingArea = ({
   return (
     <>
       {saveMessage && <div className="save-message">{saveMessage}</div>}
-      {/* <p>{selectedFilePath}</p> */}
 
       {isRotating && (
         <div className="rotation-control">

@@ -8,7 +8,6 @@ const ImageDisplay = ({
   crop,
   setCrop,
   originPixelPos,
-  rotationAngle,
   imageMetadata,
 }) => {
   const [imageDimensions, setImageDimensions] = useState({
