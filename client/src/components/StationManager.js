@@ -5,6 +5,20 @@ function StationManager() {
   const [maps, setMaps] = useState([]);
   const [selectedMap, setSelectedMap] = useState(null);
   const [stationLists, setStationLists] = useState([]);
+  const [selectedMapPath, setSelectedMapPath] = useState(null);
+
+  function onChangeMap(e) {
+    setSelectedMap(e.target.value);
+    console.log("e.target.value", e.target.value);
+    console.log("typeof e.target.value", typeof e.target.value);
+    let found = maps.find((m) => {
+      return m.id === parseInt(e.target.value);
+    });
+    console.log("found", found);
+    let mapfile = `${found.mappath}/${found.mapname}.pgm`;
+    console.log("mapfile", mapfile);
+    setSelectedMapPath(mapfile);
+  }
 
   useEffect(() => {
     // 載入地圖列表
@@ -57,10 +71,7 @@ function StationManager() {
 
       <div className="map-selection">
         <h2>Select Map</h2>
-        <select
-          value={selectedMap || ""}
-          onChange={(e) => setSelectedMap(e.target.value)}
-        >
+        <select value={selectedMap || ""} onChange={onChangeMap}>
           <option value="">Select a map...</option>
           {maps.map((map) => (
             <option key={map.id} value={map.id}>
@@ -70,6 +81,7 @@ function StationManager() {
         </select>
       </div>
       <p> selectedMap: {selectedMap}</p>
+      <p> selectedMapPath: {selectedMapPath}</p>
       {selectedMap && (
         <div className="station-lists">
           <h2>Station Lists</h2>
