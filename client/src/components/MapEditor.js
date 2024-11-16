@@ -163,6 +163,7 @@ function MapEditor() {
   };
 
   const handleCropComplete = async () => {
+    console.log("ABC crop!!!", crop);
     if (!crop || !processedImageUrl) return;
     try {
       const response = await fetch("/crop-image", {
@@ -285,7 +286,8 @@ function MapEditor() {
   return (
     // <div className="App">
     <div className="map-editor">
-      <div className="app-container">
+      <div className="map-editor-container">
+        {/* <div className="left-panel"> */}
         <FileList
           setSelectedFilePath={setSelectedFilePath}
           currentPath={currentPath}
@@ -300,7 +302,9 @@ function MapEditor() {
           setSelectedFile={setSelectedFile}
         />
         {metadata && <MetadataDisplay metadata={metadata} />}
+        {/* </div> */}
 
+        {/* <div className="main-panel"> */}
         <div className="main-content">
           <h1>ROS2 Grid Map Editor</h1>
           <ControlPanel
