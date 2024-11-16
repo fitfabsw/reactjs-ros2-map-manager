@@ -8,7 +8,8 @@ function StationManager() {
 
   useEffect(() => {
     // 載入地圖列表
-    fetch("http://localhost:5000/api/maps")
+    console.log("AAAAAAAAAAAAA StationManager");
+    fetch("/api/maps")
       .then((res) => res.json())
       .then((data) => setMaps(data))
       .catch((err) => console.error("Error loading maps:", err));
@@ -24,8 +25,30 @@ function StationManager() {
     }
   }, [selectedMap]);
 
+  console.log("maps", maps);
+
   return (
     <div className="station-manager">
+      <h1>Stations</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>map</th>
+            <th>name</th>
+          </tr>
+        </thead>
+        <tbody>
+          {maps.map((map) => (
+            <tr key={map.id}>
+              <td>{map.id}</td>
+              <td>{map.map}</td>
+              <td>{map.mapname}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
       <div className="map-selection">
         <h2>Select Map</h2>
         <select
