@@ -6,6 +6,7 @@ function StationManager() {
   const [selectedMap, setSelectedMap] = useState(null);
   const [stationLists, setStationLists] = useState([]);
   const [selectedMapPath, setSelectedMapPath] = useState(null);
+  const [imageData, setImageData] = useState(null);
 
   function onChangeMap(e) {
     setSelectedMap(e.target.value);
@@ -17,8 +18,30 @@ function StationManager() {
     console.log("found", found);
     let mapfile = `${found.mappath}/${found.mapname}.pgm`;
     console.log("mapfile", mapfile);
+    mapfile = mapfile.replace("/home/pi", "/home/zealzel");
     setSelectedMapPath(mapfile);
+    fetchImage(mapfile);
   }
+
+  const fetchImage = async (mapfile) => {
+    try {
+      const response = await fetch("/convert-pgm", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ filePath: mapfile }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setImageData(data.image);
+      } else {
+        console.error("Error fetching image:", data.error);
+      }
+    } catch (error) {
+      console.error("Error fetching image:", error);
+    }
+  };
 
   useEffect(() => {
     // 載入地圖列表
@@ -96,6 +119,12 @@ function StationManager() {
               </div>
             ))}
           </div>
+        </div>
+      )}
+      {imageData && (
+        <div className="image-display">
+          <h2>Map Image</h2>
+          <img src={`data:image/png;base64,${imageData}`} alt="Map" />
         </div>
       )}
     </div>
