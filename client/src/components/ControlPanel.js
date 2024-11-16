@@ -14,8 +14,6 @@ const ControlPanel = ({
   toggleRotating,
   handleCropComplete,
   handleRotationComplete,
-  rotationAngle,
-  handleRotationChange,
 }) => {
   return (
     <div className="control-section">

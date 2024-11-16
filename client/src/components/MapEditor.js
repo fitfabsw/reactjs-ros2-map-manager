@@ -284,10 +284,8 @@ function MapEditor() {
   );
 
   return (
-    // <div className="App">
     <div className="map-editor">
       <div className="map-editor-container">
-        {/* <div className="left-panel"> */}
         <FileList
           setSelectedFilePath={setSelectedFilePath}
           currentPath={currentPath}
@@ -301,17 +299,14 @@ function MapEditor() {
           setOriginPixelPos={setOriginPixelPos}
           setSelectedFile={setSelectedFile}
         />
-        {metadata && <MetadataDisplay metadata={metadata} />}
-        {/* </div> */}
 
-        {/* <div className="main-panel"> */}
         <div className="main-content">
           <h1>ROS2 Grid Map Editor</h1>
           <ControlPanel
             processedImageUrl={processedImageUrl}
             isRotating={isRotating}
             isCropping={isCropping}
-            imageMetadata={metadata}
+            imageMetadata={imageMetadata}
             originPixelPos={originPixelPos}
             imageProcessedMetadata={imageProcessedMetadata}
             handleSave={handleSave}
