@@ -63,7 +63,8 @@ function StationManager() {
         width: imgRef.current.width,
         height: imgRef.current.height,
       });
-      getOrigin(originImageMeta);
+      getOrigin();
+      // getOrigin(originImageMeta);
     }
   };
 
@@ -82,23 +83,25 @@ function StationManager() {
     }
   };
 
-  // const getOrigin = (metadata) => {
-  const getOrigin = async (metadata) => {
-    const { resolution } = metadata;
-    const { mapWidth, mapHeight, origin } = metadata;
-    const scale = imgRef.current.width / originImageMeta.mapWidth;
-    console.log(`width: ${imgRef.current.width}, scale: ${scale}`);
+  const getOrigin = async () => {
+    const { mapWidth, mapHeight, origin, resolution } = originImageMeta;
+    const [W, H] = [imgRef.current.width, imgRef.current.height]; // actual size in pixels
+    const [w, h] = [mapWidth, mapHeight]; // original size in pixels
+    const scale = H / h;
     const [originX, originY] = origin;
-    const [H, W] = [mapHeight, mapWidth].map((v) => v * resolution);
-    const pixelX = Math.round((originX / resolution) * scale);
-    const pixelY = Math.round(((H - originY) / resolution) * scale);
-    setOriginPixelPos({ x: pixelX, y: pixelY });
-    console.log(`resolution: ${resolution}`);
     console.log(
-      `mapWidth: ${mapWidth}, mapHeight: ${mapHeight}, origin: ${origin}, scale: ${scale}`,
+      `mapWidth: ${mapWidth}, mapHeight: ${mapHeight}, origin: ${origin}`,
     );
+    console.log(`scale: ${scale}`);
+    console.log(`width: ${w}, height: ${h}`);
+    console.log(`Width: ${W}, Height: ${H}`);
+    console.log(`originX: ${originX}, originY: ${originY}`);
+    const pixelX = Math.round(
+      (originX / resolution) * scale + (W - w * scale) / 2,
+    );
+    const pixelY = Math.round((h - originY / resolution) * scale);
+    setOriginPixelPos({ x: pixelX, y: pixelY });
     console.log(`PixelX: ${pixelX}, PixelY: ${pixelY}`);
-    console.log(`originPixelPos: ${originPixelPos}`);
   };
 
   useEffect(() => {
@@ -186,39 +189,56 @@ function StationManager() {
         )}
       </div>
       <div className="station-content">
-        {imageData && (
-          <div className="image-display">
+        <div
+          className="image-display"
+          style={{ position: "relative", display: "inline-block" }}
+        >
+          {imageData && (
             <img
               ref={imgRef}
               src={`data:image/png;base64,${imageData}`}
               alt="Map"
               onLoad={handleGetImageElement} // 在圖片加載後獲取元素
+              style={{
+                maxWidth: "100%",
+                height: "auto",
+                display: "block",
+              }}
             />
-          </div>
-        )}
-        {imageData && originPixelPos && (
-          <div className="pixel-info">
-            <p>
-              <b>Original</b> size: {originImageMeta.mapWidth} x{" "}
-              {originImageMeta.mapHeight} pixels
-              {", "}
-              map origin: ({originImageMeta.origin[0].toFixed(2)},{" "}
-              {originImageMeta.origin[1].toFixed(2)}) (m) (image
-              origin@bottom-left)
-            </p>
-            <p>
-              <b>Real</b> size: {realDimensions.width} x {realDimensions.height}{" "}
-              pixels
-              {", "}
-              map origin: ({originPixelPos.x}, {originPixelPos.y}) pixels (image
-              origin@top-left)
-            </p>
-            <p>
-              <b>scale </b>
-              {(realDimensions.width / originImageMeta.mapWidth).toFixed(4)}
-            </p>
-          </div>
-        )}
+          )}
+          {originPixelPos && (
+            <div
+              className="origin-marker"
+              style={{
+                left: `${originPixelPos.x}px`,
+                top: `${originPixelPos.y}px`,
+              }}
+            />
+          )}
+          {imageData && originPixelPos && (
+            <div className="pixel-info">
+              <p>
+                <b>Original</b> size: {originImageMeta.mapWidth} x{" "}
+                {originImageMeta.mapHeight} pixels
+                {", "}
+                map origin: ({originImageMeta.origin[0].toFixed(2)},{" "}
+                {originImageMeta.origin[1].toFixed(2)}) (m) (image
+                origin@bottom-left)
+              </p>
+              <p>
+                <b>Real</b> size: {realDimensions.width} x{" "}
+                {realDimensions.height} pixels
+                {", "}
+                map origin: ({originPixelPos.x}, {originPixelPos.y}) pixels
+                (image origin@top-left)
+              </p>
+              <p>
+                <b>scale </b>
+                {(realDimensions.height / originImageMeta.mapHeight).toFixed(4)}
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
