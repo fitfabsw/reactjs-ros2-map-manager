@@ -30,7 +30,7 @@ function StationManager() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ filePath: mapfile }),
+        body: JSON.stringify({ filePath: mapfile, max_dimension: 0 }),
       });
       const data = await response.json();
       if (response.ok) {

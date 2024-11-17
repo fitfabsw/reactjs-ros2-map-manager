@@ -140,10 +140,12 @@ async function saveYamlFile(filePath, content) {
 
 app.post("/convert-pgm", async (req, res) => {
   try {
-    const { filePath } = req.body;
+    const { filePath, max_dimension } = req.body;
     if (!filePath) {
       throw new Error("File path is required");
     }
+
+    console.log(`max_dimension: ${max_dimension}`);
 
     if (!filePath.toLowerCase().endsWith(".pgm")) {
       throw new Error("Only PGM files are supported");
@@ -173,7 +175,10 @@ app.post("/convert-pgm", async (req, res) => {
     const metadata = await sharp(outputPath).metadata();
     console.log("Original image metadata:", metadata);
 
-    let { scaledWidth, scaledHeight, scale } = resizeImage(metadata);
+    let { scaledWidth, scaledHeight, scale } = resizeImage(
+      metadata,
+      max_dimension,
+    );
     scaleProcessed = scale;
     console.log(`scale: ${scale}`);
     console.log(`scaleProcessed: ${scaleProcessed}`);
@@ -350,25 +355,21 @@ app.post("/rotate", async (req, res) => {
   }
 });
 
-function resizeImage(metadata) {
-  let width = metadata.width;
-  let height = metadata.height;
+function resizeImage(metadata, max_dimension = MAX_DIMENSION) {
+  const { width, height } = metadata;
   let scale = 1;
-  let scaledWidth = width;
-  let scaledHeight = height;
-
-  if (width > height && width > MAX_DIMENSION) {
-    scale = MAX_DIMENSION / width;
-    scaledHeight = Math.round(height * scale);
-    scaledWidth = MAX_DIMENSION;
-  } else if (height > MAX_DIMENSION) {
-    scale = MAX_DIMENSION / height;
-    scaledWidth = Math.round(width * scale);
-    scaledHeight = MAX_DIMENSION;
+  // if max_dimension is 0, do not resize
+  if (max_dimension != 0) {
+    if (width > height && width > max_dimension) {
+      scale = max_dimension / width;
+    } else if (height > max_dimension) {
+      scale = max_dimension / height;
+    }
   }
-
+  const scaledWidth = Math.round(width * scale);
+  const scaledHeight = Math.round(height * scale);
   console.log(`scale: ${scale}, Resizing to: ${scaledWidth}x${scaledHeight}`);
-  return { scaledWidth: scaledWidth, scaledHeight: scaledHeight, scale };
+  return { scaledWidth, scaledHeight, scale };
 }
 
 app.post("/save-image", async (req, res) => {
