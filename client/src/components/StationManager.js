@@ -66,67 +66,73 @@ function StationManager() {
 
   return (
     <div className="station-manager">
-      <h1>Maps</h1>
-      <table className="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>map</th>
-            <th>robot</th>
-            <th>map path</th>
-            <th>map file (pgm, yaml)</th>
-            <th>type</th>
-          </tr>
-        </thead>
-        <tbody>
-          {maps.map((map) => (
-            <tr key={map.id}>
-              <td>{map.id}</td>
-              <td>{map.map}</td>
-              <td>{map.Robottype?.name}</td>
-              <td>{map.mappath}</td>
-              <td>{map.mapname}</td>
-              <td>{map.real ? "real" : "sim"}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="station-container">
+        <div className="station-left-pandel">
+          {false && (
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>map</th>
+                  <th>robot</th>
+                  <th>map path</th>
+                  <th>map file (pgm, yaml)</th>
+                  <th>type</th>
+                </tr>
+              </thead>
+              <tbody>
+                {maps.map((map) => (
+                  <tr key={map.id}>
+                    <td>{map.id}</td>
+                    <td>{map.map}</td>
+                    <td>{map.Robottype?.name}</td>
+                    <td>{map.mappath}</td>
+                    <td>{map.mapname}</td>
+                    <td>{map.real ? "real" : "sim"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
 
-      <div className="map-selection">
-        <h2>Select Map</h2>
-        <select value={selectedMap || ""} onChange={onChangeMap}>
-          <option value="">Select a map...</option>
-          {maps.map((map) => (
-            <option key={map.id} value={map.id}>
-              {map.map} ({map.Robottype?.name})
-            </option>
-          ))}
-        </select>
-      </div>
-      <p> selectedMap: {selectedMap}</p>
-      <p> selectedMapPath: {selectedMapPath}</p>
-      {selectedMap && (
-        <div className="station-lists">
-          <h2>Station Lists</h2>
-          <div className="station-lists-grid">
-            {stationLists.map((list) => (
-              <div key={list.id} className="station-list-card">
-                <h3>{list.stl_name}</h3>
-                <div className="station-count">
-                  Stations: {list.Stations?.length || 0}
-                </div>
-                {/* Add edit/delete buttons here */}
-              </div>
-            ))}
+          <div className="map-selection">
+            <h2>Select Map</h2>
+            <select value={selectedMap || ""} onChange={onChangeMap}>
+              <option value="">Select a map...</option>
+              {maps.map((map) => (
+                <option key={map.id} value={map.id}>
+                  {map.map} ({map.Robottype?.name})
+                </option>
+              ))}
+            </select>
           </div>
+          {/* <p> selectedMap: {selectedMap}</p> */}
+          {/* <p> selectedMapPath: {selectedMapPath}</p> */}
+          {selectedMap && (
+            <div className="station-lists">
+              <h2>Station Lists</h2>
+              <div className="station-lists-grid">
+                {stationLists.map((list) => (
+                  <div key={list.id} className="station-list-card">
+                    <h3>{list.stl_name}</h3>
+                    <div className="station-count">
+                      Stations: {list.Stations?.length || 0}
+                    </div>
+                    {/* Add edit/delete buttons here */}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-      )}
-      {imageData && (
-        <div className="image-display">
-          <h2>Map Image</h2>
-          <img src={`data:image/png;base64,${imageData}`} alt="Map" />
+        <div className="station-content">
+          {imageData && (
+            <div className="image-display">
+              <img src={`data:image/png;base64,${imageData}`} alt="Map" />
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
