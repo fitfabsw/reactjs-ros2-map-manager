@@ -12,6 +12,7 @@ function StationManager() {
     height: 0,
   });
   const [realDimensions, setRealDimensions] = useState({ width: 0, height: 0 });
+  const [stationDetails, setStationDetails] = useState(null);
   const imgRef = useRef(null);
 
   function onChangeMap(e) {
@@ -62,6 +63,21 @@ function StationManager() {
         width: imgRef.current.width,
         height: imgRef.current.height,
       });
+    }
+  };
+
+  const fetchStationDetails = async (stl_id) => {
+    try {
+      const response = await fetch(`/api/stationlists/${stl_id}`);
+      const data = await response.json();
+      if (response.ok) {
+        console.log("Station Details:", data);
+        setStationDetails(data);
+      } else {
+        console.error("Error fetching station details:", data.error);
+      }
+    } catch (error) {
+      console.error("Error fetching station details:", error);
     }
   };
 
@@ -123,19 +139,29 @@ function StationManager() {
         </div>
         {/* <p> selectedMap: {selectedMap}</p> */}
         {/* <p> selectedMapPath: {selectedMapPath}</p> */}
-        {selectedMap && (
+        {stationLists.length > 0 && (
           <div className="station-lists">
             <h2>Station Lists</h2>
             <div className="station-lists-grid">
               {stationLists.map((list) => (
-                <div key={list.id} className="station-list-card">
+                <button
+                  key={list.id}
+                  className="station-list-card"
+                  onClick={() => fetchStationDetails(list.id)}
+                >
                   <h3>{list.stl_name}</h3>
                   <div className="station-count">
                     Stations: {list.Stations?.length || 0}
                   </div>
-                </div>
+                </button>
               ))}
             </div>
+          </div>
+        )}
+        {stationLists.length > 0 && stationDetails && (
+          <div className="station-details">
+            <h2>Station Details</h2>
+            <pre>{JSON.stringify(stationDetails, null, 2)}</pre>
           </div>
         )}
       </div>
