@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./StationManager.css";
 
 function StationManager() {
@@ -7,17 +7,17 @@ function StationManager() {
   const [stationLists, setStationLists] = useState([]);
   const [selectedMapPath, setSelectedMapPath] = useState(null);
   const [imageData, setImageData] = useState(null);
+  const [originalDimensions, setOriginalDimensions] = useState({
+    width: 0,
+    height: 0,
+  });
+  const [realDimensions, setRealDimensions] = useState({ width: 0, height: 0 });
+  const imgRef = useRef(null);
 
   function onChangeMap(e) {
     setSelectedMap(e.target.value);
-    console.log("e.target.value", e.target.value);
-    console.log("typeof e.target.value", typeof e.target.value);
-    let found = maps.find((m) => {
-      return m.id === parseInt(e.target.value);
-    });
-    console.log("found", found);
+    let found = maps.find((m) => m.id === parseInt(e.target.value));
     let mapfile = `${found.mappath}/${found.mapname}.pgm`;
-    console.log("mapfile", mapfile);
     mapfile = mapfile.replace("/home/pi", "/home/zealzel");
     setSelectedMapPath(mapfile);
     fetchImage(mapfile);
@@ -30,11 +30,21 @@ function StationManager() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ filePath: mapfile, max_dimension: 0 }),
+        body: JSON.stringify({ filePath: mapfile }),
       });
       const data = await response.json();
       if (response.ok) {
+        console.log("Image Data:", data.image);
         setImageData(data.image);
+        setOriginalDimensions({
+          width: data.metadata.mapWidth,
+          height: data.metadata.mapHeight,
+        });
+        console.log(
+          "Original Dimensions:",
+          data.metadata.mapWidth,
+          data.metadata.mapHeight,
+        );
       } else {
         console.error("Error fetching image:", data.error);
       }
@@ -43,9 +53,19 @@ function StationManager() {
     }
   };
 
+  const handleGetImageElement = () => {
+    if (imgRef.current) {
+      console.log("Image Element:", imgRef.current); // 獲取 img 元素
+      console.log("Image Width:", imgRef.current.width); // 獲取圖片寬度
+      console.log("Image Height:", imgRef.current.height); // 獲取圖片高度
+      setRealDimensions({
+        width: imgRef.current.width,
+        height: imgRef.current.height,
+      });
+    }
+  };
+
   useEffect(() => {
-    // 載入地圖列表
-    console.log("AAAAAAAAAAAAA StationManager");
     fetch("/api/maps")
       .then((res) => res.json())
       .then((data) => setMaps(data))
@@ -54,7 +74,6 @@ function StationManager() {
 
   useEffect(() => {
     if (selectedMap) {
-      // 載入選定地圖的站點列表
       fetch(`/api/maps/${selectedMap}/stationlists`)
         .then((res) => res.json())
         .then((data) => setStationLists(data))
@@ -62,76 +81,87 @@ function StationManager() {
     }
   }, [selectedMap]);
 
-  console.log("maps", maps);
-
   return (
-    <div className="station-manager">
-      <div className="station-container">
-        <div className="station-left-pandel">
-          {false && (
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>map</th>
-                  <th>robot</th>
-                  <th>map path</th>
-                  <th>map file (pgm, yaml)</th>
-                  <th>type</th>
-                </tr>
-              </thead>
-              <tbody>
-                {maps.map((map) => (
-                  <tr key={map.id}>
-                    <td>{map.id}</td>
-                    <td>{map.map}</td>
-                    <td>{map.Robottype?.name}</td>
-                    <td>{map.mappath}</td>
-                    <td>{map.mapname}</td>
-                    <td>{map.real ? "real" : "sim"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-
-          <div className="map-selection">
-            <h2>Select Map</h2>
-            <select value={selectedMap || ""} onChange={onChangeMap}>
-              <option value="">Select a map...</option>
+    <div className="station-container">
+      <div className="station-left-pandel">
+        {false && (
+          <table className="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>map</th>
+                <th>robot</th>
+                <th>map path</th>
+                <th>map file (pgm, yaml)</th>
+                <th>type</th>
+              </tr>
+            </thead>
+            <tbody>
               {maps.map((map) => (
-                <option key={map.id} value={map.id}>
-                  {map.map} ({map.Robottype?.name})
-                </option>
+                <tr key={map.id}>
+                  <td>{map.id}</td>
+                  <td>{map.map}</td>
+                  <td>{map.Robottype?.name}</td>
+                  <td>{map.mappath}</td>
+                  <td>{map.mapname}</td>
+                  <td>{map.real ? "real" : "sim"}</td>
+                </tr>
               ))}
-            </select>
-          </div>
-          {/* <p> selectedMap: {selectedMap}</p> */}
-          {/* <p> selectedMapPath: {selectedMapPath}</p> */}
-          {selectedMap && (
-            <div className="station-lists">
-              <h2>Station Lists</h2>
-              <div className="station-lists-grid">
-                {stationLists.map((list) => (
-                  <div key={list.id} className="station-list-card">
-                    <h3>{list.stl_name}</h3>
-                    <div className="station-count">
-                      Stations: {list.Stations?.length || 0}
-                    </div>
-                    {/* Add edit/delete buttons here */}
+            </tbody>
+          </table>
+        )}
+        <div className="map-selection">
+          <h2>Select Map</h2>
+          <select value={selectedMap || ""} onChange={onChangeMap}>
+            <option value="">Select a map...</option>
+            {maps.map((map) => (
+              <option key={map.id} value={map.id}>
+                {map.map} ({map.Robottype?.name})
+              </option>
+            ))}
+          </select>
+        </div>
+        {/* <p> selectedMap: {selectedMap}</p> */}
+        {/* <p> selectedMapPath: {selectedMapPath}</p> */}
+        {selectedMap && (
+          <div className="station-lists">
+            <h2>Station Lists</h2>
+            <div className="station-lists-grid">
+              {stationLists.map((list) => (
+                <div key={list.id} className="station-list-card">
+                  <h3>{list.stl_name}</h3>
+                  <div className="station-count">
+                    Stations: {list.Stations?.length || 0}
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
-          )}
-        </div>
-        <div className="station-content">
-          {imageData && (
-            <div className="image-display">
-              <img src={`data:image/png;base64,${imageData}`} alt="Map" />
-            </div>
-          )}
-        </div>
+          </div>
+        )}
+      </div>
+      <div className="station-content">
+        {imageData && (
+          <div className="image-display">
+            <img
+              ref={imgRef}
+              src={`data:image/png;base64,${imageData}`}
+              alt="Map"
+              onLoad={handleGetImageElement} // 在圖片加載後獲取元素
+            />
+          </div>
+        )}
+        {imageData && (
+          <div className="pixel-info">
+            <p>
+              Original Dimensions: {originalDimensions.width} x{" "}
+              {originalDimensions.height} pixels
+            </p>
+            <p>
+              Real Dimensions: {realDimensions.width} x {realDimensions.height}{" "}
+              pixels
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
