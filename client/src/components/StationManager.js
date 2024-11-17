@@ -7,12 +7,14 @@ function StationManager() {
   const [stationLists, setStationLists] = useState([]);
   const [selectedMapPath, setSelectedMapPath] = useState(null);
   const [imageData, setImageData] = useState(null);
+  const [originImageMeta, setOriginImageMeta] = useState(null);
   const [originalDimensions, setOriginalDimensions] = useState({
     width: 0,
     height: 0,
   });
   const [realDimensions, setRealDimensions] = useState({ width: 0, height: 0 });
   const [stationDetails, setStationDetails] = useState(null);
+  const [originPixelPos, setOriginPixelPos] = useState(null);
   const imgRef = useRef(null);
 
   function onChangeMap(e) {
@@ -37,10 +39,11 @@ function StationManager() {
       if (response.ok) {
         console.log("Image Data:", data.image);
         setImageData(data.image);
-        setOriginalDimensions({
-          width: data.metadata.mapWidth,
-          height: data.metadata.mapHeight,
-        });
+        setOriginImageMeta(data.metadata);
+        // setOriginalDimensions({
+        //   width: data.metadata.mapWidth,
+        //   height: data.metadata.mapHeight,
+        // });
         console.log(
           "Original Dimensions:",
           data.metadata.mapWidth,
@@ -54,7 +57,8 @@ function StationManager() {
     }
   };
 
-  const handleGetImageElement = () => {
+  // const handleGetImageElement = () => {
+  const handleGetImageElement = async () => {
     if (imgRef.current) {
       console.log("Image Element:", imgRef.current); // 獲取 img 元素
       console.log("Image Width:", imgRef.current.width); // 獲取圖片寬度
@@ -63,6 +67,7 @@ function StationManager() {
         width: imgRef.current.width,
         height: imgRef.current.height,
       });
+      getOrigin(originImageMeta);
     }
   };
 
@@ -79,6 +84,24 @@ function StationManager() {
     } catch (error) {
       console.error("Error fetching station details:", error);
     }
+  };
+
+  // const getOrigin = (metadata) => {
+  const getOrigin = async (metadata) => {
+    const { resolution } = metadata;
+    const { mapWidth, mapHeight, origin } = metadata;
+    const scale = imgRef.current.width / originImageMeta.mapWidth;
+    console.log(`width: ${imgRef.current.width}, scale: ${scale}`);
+    const [originX, originY] = origin;
+    const [H, W] = [mapHeight, mapWidth].map((v) => v * resolution);
+    const pixelX = Math.round((originX / resolution) * scale);
+    const pixelY = Math.round(((H - originY) / resolution) * scale);
+    setOriginPixelPos({ x: pixelX, y: pixelY });
+    console.log(`resolution: ${resolution}`);
+    console.log(
+      `mapWidth: ${mapWidth}, mapHeight: ${mapHeight}, origin: ${origin}, scale: ${scale}`,
+    );
+    console.log(`PixelX: ${pixelX}, PixelY: ${pixelY}`);
   };
 
   useEffect(() => {
@@ -179,12 +202,23 @@ function StationManager() {
         {imageData && (
           <div className="pixel-info">
             <p>
-              Original Dimensions: {originalDimensions.width} x{" "}
-              {originalDimensions.height} pixels
+              <b>Original</b> size: {originImageMeta.mapWidth} x{" "}
+              {originImageMeta.mapHeight} pixels
+              {", "}
+              map origin: ({originImageMeta.origin[0].toFixed(2)},{" "}
+              {originImageMeta.origin[1].toFixed(2)}) (m) (image
+              origin@bottom-left)
             </p>
             <p>
-              Real Dimensions: {realDimensions.width} x {realDimensions.height}{" "}
+              <b>Real</b> size: {realDimensions.width} x {realDimensions.height}{" "}
               pixels
+              {", "}
+              map origin: {originPixelPos.x}, {originPixelPos.y} pixels (image
+              origin@top-left)
+            </p>
+            <p>
+              <b>scale </b>
+              {(realDimensions.width / originImageMeta.mapWidth).toFixed(4)}
             </p>
           </div>
         )}
