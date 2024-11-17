@@ -40,10 +40,6 @@ function StationManager() {
         console.log("Image Data:", data.image);
         setImageData(data.image);
         setOriginImageMeta(data.metadata);
-        // setOriginalDimensions({
-        //   width: data.metadata.mapWidth,
-        //   height: data.metadata.mapHeight,
-        // });
         console.log(
           "Original Dimensions:",
           data.metadata.mapWidth,
@@ -102,6 +98,7 @@ function StationManager() {
       `mapWidth: ${mapWidth}, mapHeight: ${mapHeight}, origin: ${origin}, scale: ${scale}`,
     );
     console.log(`PixelX: ${pixelX}, PixelY: ${pixelY}`);
+    console.log(`originPixelPos: ${originPixelPos}`);
   };
 
   useEffect(() => {
@@ -199,7 +196,7 @@ function StationManager() {
             />
           </div>
         )}
-        {imageData && (
+        {imageData && originPixelPos && (
           <div className="pixel-info">
             <p>
               <b>Original</b> size: {originImageMeta.mapWidth} x{" "}
@@ -213,7 +210,7 @@ function StationManager() {
               <b>Real</b> size: {realDimensions.width} x {realDimensions.height}{" "}
               pixels
               {", "}
-              map origin: {originPixelPos.x}, {originPixelPos.y} pixels (image
+              map origin: ({originPixelPos.x}, {originPixelPos.y}) pixels (image
               origin@top-left)
             </p>
             <p>
