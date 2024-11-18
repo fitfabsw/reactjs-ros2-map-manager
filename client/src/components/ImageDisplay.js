@@ -78,9 +78,6 @@ const ImageDisplay = ({
               display: "block",
             }}
           />
-          <div> {pixelsPerMeter * scale} </div>
-          <div> {originPixelPos.x} </div>
-          <div> {originPixelPos.x % (pixelsPerMeter * scale)} </div>
           {processedImageUrl && (
             <svg
               className="grid-overlay"

@@ -324,11 +324,6 @@ function MapEditor() {
 
         <div className="main-content">
           <h1>ROS2 Grid Map Editor</h1>
-          <div>
-            imageShowPixelSize={imageShowPixelSize.width},{" "}
-            {imageShowPixelSize.height}
-          </div>
-          <div>scale: {scale}</div>
           <ControlPanel
             processedImageUrl={processedImageUrl}
             isRotating={isRotating}

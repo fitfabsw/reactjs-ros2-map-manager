@@ -245,11 +245,11 @@ function StationManager() {
               }}
             />
           )}
-          {originPixelPos && <div>{pixelsPerMeter}</div>}
-          {originPixelPos && <div>{scale}</div>}
-          {originPixelPos && <div>{pixelsPerMeter * scale}</div>}
-          {originPixelPos && <div>{originPixelPos.x}</div>}
-          {originPixelPos && <div>{originPixelPos.y}</div>}
+          {/* {originPixelPos && <div>{pixelsPerMeter}</div>} */}
+          {/* {originPixelPos && <div>{scale}</div>} */}
+          {/* {originPixelPos && <div>{pixelsPerMeter * scale}</div>} */}
+          {/* {originPixelPos && <div>{originPixelPos.x}</div>} */}
+          {/* {originPixelPos && <div>{originPixelPos.y}</div>} */}
           {imageData && (
             <svg
               className="grid-overlay"
