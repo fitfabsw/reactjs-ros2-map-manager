@@ -78,6 +78,9 @@ const ImageDisplay = ({
               display: "block",
             }}
           />
+          <div> {pixelsPerMeter * scale} </div>
+          <div> {originPixelPos.x} </div>
+          <div> {-(originPixelPos.x % (pixelsPerMeter * scale))} </div>
           {processedImageUrl && (
             <svg
               className="grid-overlay"
@@ -92,30 +95,20 @@ const ImageDisplay = ({
               viewBox={`0 0 ${imageDimensions.width} ${imageDimensions.height}`}
               preserveAspectRatio="none"
             >
-              <line
-                x1={originPixelPos.x}
-                y1="0"
-                x2={originPixelPos.x}
-                y2={imageDimensions.height}
-                stroke="rgba(128,128,128,1.0)"
-                strokeWidth="1"
-              />
-              <line
-                x1="0"
-                y1={originPixelPos.y}
-                x2={imageDimensions.width}
-                y2={originPixelPos.y}
-                stroke="rgba(128,128,128,1.0)"
-                strokeWidth="1"
-              />
               {/* 水平線 */}
               {Array.from({ length: horizontalLines }).map((_, index) => (
                 <line
                   key={`h-${index}`}
                   x1="0"
-                  y1={index * pixelsPerMeter * scale}
+                  y1={
+                    (originPixelPos.y % (pixelsPerMeter * scale)) +
+                    index * pixelsPerMeter * scale
+                  }
                   x2={imageDimensions.width}
-                  y2={index * pixelsPerMeter * scale}
+                  y2={
+                    (originPixelPos.y % (pixelsPerMeter * scale)) +
+                    index * pixelsPerMeter * scale
+                  }
                   stroke="rgba(128,128,128,0.3)"
                   strokeWidth="1"
                 />
@@ -124,9 +117,15 @@ const ImageDisplay = ({
               {Array.from({ length: verticalLines }).map((_, index) => (
                 <line
                   key={`v-${index}`}
-                  x1={index * pixelsPerMeter * scale}
+                  x1={
+                    (originPixelPos.x % (pixelsPerMeter * scale)) +
+                    index * pixelsPerMeter * scale
+                  }
                   y1="0"
-                  x2={index * pixelsPerMeter * scale}
+                  x2={
+                    (originPixelPos.x % (pixelsPerMeter * scale)) +
+                    index * pixelsPerMeter * scale
+                  }
                   y2={imageDimensions.height}
                   stroke="rgba(128,128,128,0.3)"
                   strokeWidth="1"
