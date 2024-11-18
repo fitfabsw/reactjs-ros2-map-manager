@@ -1,0 +1,15 @@
+.station-card {
+  border: 1px solid #ccc;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
+.station-card h3 {
+  margin: 0 0 10px 0;
+}
+
+.station-card p {
+  margin: 5px 0;
+}

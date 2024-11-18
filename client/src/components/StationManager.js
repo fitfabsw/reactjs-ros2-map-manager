@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import "./StationManager.css";
 import StationManagerLeftNormal from "./StationManagerLeftNormal";
 import StationManagerInfo from "./StationManagerInfo";
+import StationCard from "./StationCard";
 
 function StationManager() {
   const [maps, setMaps] = useState([]);
@@ -15,6 +16,8 @@ function StationManager() {
   const imgRef = useRef(null);
   const [pixelsPerMeter, setPixelsPerMeter] = useState(null);
   const [scale, setScale] = useState(1);
+  const [mode, setMode] = useState("normal");
+
   // const [newStationListName, setNewStationListName] = useState("");
   // const [newStation, setNewStation] = useState({
   //   st_name: "",
@@ -92,6 +95,12 @@ function StationManager() {
       getOrigin();
     }
   };
+
+  useEffect(() => {
+    if (mode === "edit" && imageData) {
+      handleGetImageElement();
+    }
+  }, [mode, imageData]);
 
   const PixelToCoordinate = (
     pixel,
@@ -181,6 +190,7 @@ function StationManager() {
           );
         });
         setStationPoints(stationPoints_);
+        setMode("edit");
       } else {
         console.error("Error fetching station details:", data.error);
       }
@@ -225,17 +235,28 @@ function StationManager() {
 
   return (
     <div className="station-container">
-      <StationManagerLeftNormal
-        maps={maps}
-        selectedMap={selectedMap}
-        stationLists={stationLists}
-        setStationLists={setStationLists}
-        onChangeMap={onChangeMap}
-        setStationDetails={setStationDetails}
-        originImageMeta={originImageMeta}
-        CoordinateToPixel={CoordinateToPixel}
-        fetchStationDetails={fetchStationDetails}
-      />
+      {mode == "normal" && (
+        <StationManagerLeftNormal
+          maps={maps}
+          selectedMap={selectedMap}
+          stationLists={stationLists}
+          setStationLists={setStationLists}
+          onChangeMap={onChangeMap}
+          stationDetails={stationDetails}
+          fetchStationDetails={fetchStationDetails}
+        />
+      )}
+      {mode == "edit" && (
+        <div>
+          EDIT MODE
+          <button onClick={() => setMode("normal")}>Back to Normal Mode</button>
+          <div className="station-cards">
+            {stationDetails.Stations.map((station) => (
+              <StationCard key={station.id} station={station} />
+            ))}
+          </div>
+        </div>
+      )}
       <div className="station-content">
         <div className="image-display">
           {imageData && (
