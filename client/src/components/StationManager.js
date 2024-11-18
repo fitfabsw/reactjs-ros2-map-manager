@@ -5,15 +5,12 @@ function StationManager() {
   const [maps, setMaps] = useState([]);
   const [selectedMap, setSelectedMap] = useState(null);
   const [stationLists, setStationLists] = useState([]);
-  const [selectedMapPath, setSelectedMapPath] = useState(null);
   const [imageData, setImageData] = useState(null);
   const [originImageMeta, setOriginImageMeta] = useState(null);
   const [realDimensions, setRealDimensions] = useState({ width: 0, height: 0 });
   const [stationDetails, setStationDetails] = useState(null);
   const [originPixelPos, setOriginPixelPos] = useState(null);
   const imgRef = useRef(null);
-  // const pixelsPerMeter = originImageMeta ? 1 / originImageMeta.resolution : 50;
-  // const pixelsPerMeter = 50;
   const [pixelsPerMeter, setPixelsPerMeter] = useState(null);
   const [scale, setScale] = useState(1);
 
@@ -37,7 +34,6 @@ function StationManager() {
     let found = maps.find((m) => m.id === parseInt(e.target.value));
     let mapfile = `${found.mappath}/${found.mapname}.pgm`;
     mapfile = mapfile.replace("/home/pi", "/home/zealzel");
-    setSelectedMapPath(mapfile);
     fetchImage(mapfile);
   }
 
@@ -55,11 +51,6 @@ function StationManager() {
         console.log("Image Data:", data.image);
         setImageData(data.image);
         setOriginImageMeta(data.metadata);
-        console.log(
-          "Original Dimensions:",
-          data.metadata.mapWidth,
-          data.metadata.mapHeight,
-        );
       } else {
         console.error("Error fetching image:", data.error);
       }
@@ -101,32 +92,35 @@ function StationManager() {
     }
   };
 
+  const CoordinateToPixel = (
+    mapSizePixel,
+    imageSizePixel,
+    origin,
+    resolution,
+  ) => {
+    // 將原地圖座標轉換為像素位置
+    // origin 地圖原點: m
+    // mapSizePixel 原圖尺寸: pixels
+    // imageSizePixel 網圖尺寸: pixels
+    // resolution 地圖分辨率: m/pixel
+    const [w, h] = mapSizePixel; // original size in pixels
+    const [W, H] = imageSizePixel; // actual size in pixels
+    const [x, y] = origin; //
+    const scale = H / h;
+    return {
+      x: Math.round((x / resolution) * scale + (W - w * scale) / 2),
+      y: Math.round((h - y / resolution) * scale),
+    };
+  };
+
   const getOrigin = async () => {
     const { mapWidth, mapHeight, origin, resolution } = originImageMeta;
     const [W, H] = [imgRef.current.width, imgRef.current.height]; // actual size in pixels
     const [w, h] = [mapWidth, mapHeight]; // original size in pixels
     const scale = H / h;
     setScale(scale);
-    const [originX, originY] = origin;
-    console.log(
-      `mapWidth: ${mapWidth}, mapHeight: ${mapHeight}, origin: ${origin}`,
-    );
-    console.log(`scale: ${scale}`);
-    console.log(`width: ${w}, height: ${h}`);
-    console.log(`Width: ${W}, Height: ${H}`);
-    console.log(`originX: ${originX}, originY: ${originY}`);
-    const pixelX = Math.round(
-      (originX / resolution) * scale + (W - w * scale) / 2,
-    );
-    const pixelY = Math.round((h - originY / resolution) * scale);
-    setOriginPixelPos({ x: pixelX, y: pixelY });
-    console.log(`PixelX: ${pixelX}, PixelY: ${pixelY}`);
-    console.log("realDimensions:", realDimensions);
-    console.log("originImageMeta:", originImageMeta);
-    console.log("scale:", scale);
-    console.log("-->", 1 / originImageMeta.resolution);
-    console.log("-->", (1 / originImageMeta.resolution) * scale);
-    // setPixelsPerMeter((1 / originImageMeta.resolution) * scale);
+    const originPixel = CoordinateToPixel([w, h], [W, H], origin, resolution);
+    setOriginPixelPos(originPixel);
     setPixelsPerMeter(1 / originImageMeta.resolution);
   };
 
@@ -151,11 +145,12 @@ function StationManager() {
     if (!realDimensions.width || !realDimensions.height) return { h: 0, v: 0 };
 
     // 確保格線數量足夠覆蓋整個圖像
-    const horizontalLines = Math.ceil(realDimensions.height / pixelsPerMeter);
-    const verticalLines = Math.ceil(realDimensions.width / pixelsPerMeter);
-
-    console.log("pixelsPerMeter:", pixelsPerMeter);
-
+    const horizontalLines = Math.ceil(
+      realDimensions.height / (pixelsPerMeter * scale),
+    );
+    const verticalLines = Math.ceil(
+      realDimensions.width / (pixelsPerMeter * scale),
+    );
     return {
       h: horizontalLines,
       v: verticalLines,
@@ -250,6 +245,8 @@ function StationManager() {
           {/* {originPixelPos && <div>{pixelsPerMeter * scale}</div>} */}
           {/* {originPixelPos && <div>{originPixelPos.x}</div>} */}
           {/* {originPixelPos && <div>{originPixelPos.y}</div>} */}
+          {/* {originPixelPos && <div>{horizontalLines}</div>} */}
+          {/* {originPixelPos && <div>{verticalLines}</div>} */}
           {imageData && (
             <svg
               className="grid-overlay"
@@ -308,6 +305,7 @@ function StationManager() {
               style={{
                 left: `${originPixelPos.x}px`,
                 top: `${originPixelPos.y}px`,
+                backgroundColor: "black",
               }}
             />
           )}

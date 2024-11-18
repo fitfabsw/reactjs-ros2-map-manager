@@ -37,12 +37,6 @@ const ImageDisplay = ({
     console.log(
       `ABC width: ${imageDimensions.width}, height: ${imageDimensions.height}, pixelsPerMeter: ${pixelsPerMeter}, scale: ${scale}`,
     );
-    // const horizontalLines = Math.ceil(
-    //   (imageDimensions.height / pixelsPerMeter) * scale,
-    // );
-    // const verticalLines = Math.ceil(
-    //   (imageDimensions.width / pixelsPerMeter) * scale,
-    // );
     const horizontalLines = Math.ceil(
       imageDimensions.height / (pixelsPerMeter * scale),
     );
