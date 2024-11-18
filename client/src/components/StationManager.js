@@ -19,6 +19,9 @@ function StationManager() {
     height: 0,
   });
 
+  const [pixelLocation, setPixelLocation] = useState({ x: 0, y: 0 });
+  const [coordLocation, setCoordLocation] = useState({ x: 0, y: 0 });
+
   // useEffect(() => {
   //   if (processedImageUrl) {
   //     const img = new Image();
@@ -92,20 +95,43 @@ function StationManager() {
     }
   };
 
+  const PixelToCoordinate = (
+    pixel,
+    imageSizePixel,
+    mapSizePixel,
+    resolution,
+    mapCenter,
+  ) => {
+    // 將像素位置轉換為地圖座標 (m)
+    // pixel 像素位置: pixels
+    // imageSizePixel 網圖尺寸: pixels
+    // mapSizePixel 原圖尺寸: pixels
+    // resolution 地圖分辨率: m/pixel
+    // mapCenter 地圖原點座標: m
+    const [W, H] = imageSizePixel; // actual size in pixels
+    const [w, h] = mapSizePixel; //
+    const [x, y] = pixel;
+    const scale = H / h;
+    return {
+      x: ((x - (W - w * scale) / 2) * resolution) / scale - mapCenter[0],
+      y: (h - y / scale) * resolution - mapCenter[1],
+    };
+  };
+
   const CoordinateToPixel = (
     mapSizePixel,
     imageSizePixel,
-    origin,
+    mapPoint,
     resolution,
   ) => {
     // 將原地圖座標轉換為像素位置
-    // origin 地圖原點: m
+    // mapPoint 地圖座標: m
     // mapSizePixel 原圖尺寸: pixels
     // imageSizePixel 網圖尺寸: pixels
     // resolution 地圖分辨率: m/pixel
     const [w, h] = mapSizePixel; // original size in pixels
     const [W, H] = imageSizePixel; // actual size in pixels
-    const [x, y] = origin; //
+    const [x, y] = mapPoint; //
     const scale = H / h;
     return {
       x: Math.round((x / resolution) * scale + (W - w * scale) / 2),
@@ -158,6 +184,22 @@ function StationManager() {
   };
 
   const { h: horizontalLines, v: verticalLines } = calculateGridLines();
+
+  const handleMouseMove = (event) => {
+    const rect = event.target.getBoundingClientRect(); // 獲取圖片的邊界矩形
+    const x = Math.round(event.clientX - rect.left); // 計算 x 坐標
+    const y = Math.round(event.clientY - rect.top); // 計算 y 坐標
+    setPixelLocation({ x, y }); // 更新像素位置
+
+    const { mapWidth, mapHeight, origin, resolution } = originImageMeta;
+    const [W, H] = [imgRef.current.width, imgRef.current.height]; // actual size in pixels
+    const [w, h] = [mapWidth, mapHeight]; // original size in pixels
+    const scale = H / h;
+    setScale(scale);
+    setCoordLocation(
+      PixelToCoordinate([x, y], [W, H], [w, h], resolution, origin),
+    );
+  };
 
   return (
     <div className="station-container">
@@ -238,6 +280,7 @@ function StationManager() {
                 height: "auto",
                 display: "block",
               }}
+              onMouseMove={handleMouseMove}
             />
           )}
           {/* {originPixelPos && <div>{pixelsPerMeter}</div>} */}
@@ -329,6 +372,17 @@ function StationManager() {
               <p>
                 <b>scale </b>
                 {(realDimensions.height / originImageMeta.mapHeight).toFixed(4)}
+              </p>
+            </div>
+          )}
+          {pixelLocation && (
+            <div className="pixel-info">
+              <p>
+                Pixel Location: ({pixelLocation.x}, {pixelLocation.y})
+              </p>
+              <p>
+                Map Center Coordinate: ({coordLocation.x.toFixed(2)},{" "}
+                {coordLocation.y.toFixed(2)})
               </p>
             </div>
           )}
