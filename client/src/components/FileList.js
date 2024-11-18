@@ -13,6 +13,8 @@ function FileList({
   isCropping,
   isRotating,
   selectedFilePath,
+  setImageShowPixelSize,
+  setScale,
 }) {
   const [files, setFiles] = useState([]);
   // const [error, setError] = useState(null);
@@ -88,6 +90,11 @@ function FileList({
       setOriginPixelPos({ x: pixelX, y: pixelY });
       console.log(`scale: ${scale}`);
       setRotationAngle(0);
+      setScale(scale);
+      setImageShowPixelSize({
+        width: Math.round(mapWidth * scale),
+        height: Math.round(mapHeight * scale),
+      });
     } catch (error) {
       console.error("Error processing file:", error);
       alert(`Error processing file: ${error.message}`);

@@ -9,6 +9,7 @@ const ImageDisplay = ({
   setCrop,
   originPixelPos,
   imageMetadata,
+  scale,
 }) => {
   const [imageDimensions, setImageDimensions] = useState({
     width: 0,
@@ -33,8 +34,24 @@ const ImageDisplay = ({
       return { h: 0, v: 0 };
 
     // 確保格線數量足夠覆蓋整個圖像
-    const horizontalLines = Math.ceil(imageDimensions.height / pixelsPerMeter);
-    const verticalLines = Math.ceil(imageDimensions.width / pixelsPerMeter);
+    console.log(
+      `ABC width: ${imageDimensions.width}, height: ${imageDimensions.height}, pixelsPerMeter: ${pixelsPerMeter}, scale: ${scale}`,
+    );
+    // const horizontalLines = Math.ceil(
+    //   (imageDimensions.height / pixelsPerMeter) * scale,
+    // );
+    // const verticalLines = Math.ceil(
+    //   (imageDimensions.width / pixelsPerMeter) * scale,
+    // );
+    const horizontalLines = Math.ceil(
+      imageDimensions.height / (pixelsPerMeter * scale),
+    );
+    const verticalLines = Math.ceil(
+      imageDimensions.width / (pixelsPerMeter * scale),
+    );
+    console.log(
+      `horizontalLines: ${horizontalLines}, verticalLines: ${verticalLines}`,
+    );
 
     return {
       h: horizontalLines,
@@ -75,25 +92,41 @@ const ImageDisplay = ({
               viewBox={`0 0 ${imageDimensions.width} ${imageDimensions.height}`}
               preserveAspectRatio="none"
             >
+              <line
+                x1={originPixelPos.x}
+                y1="0"
+                x2={originPixelPos.x}
+                y2={imageDimensions.height}
+                stroke="rgba(128,128,128,1.0)"
+                strokeWidth="1"
+              />
+              <line
+                x1="0"
+                y1={originPixelPos.y}
+                x2={imageDimensions.width}
+                y2={originPixelPos.y}
+                stroke="rgba(128,128,128,1.0)"
+                strokeWidth="1"
+              />
               {/* 水平線 */}
               {Array.from({ length: horizontalLines }).map((_, index) => (
                 <line
                   key={`h-${index}`}
                   x1="0"
-                  y1={index * pixelsPerMeter}
+                  y1={index * pixelsPerMeter * scale}
                   x2={imageDimensions.width}
-                  y2={index * pixelsPerMeter}
+                  y2={index * pixelsPerMeter * scale}
                   stroke="rgba(128,128,128,0.3)"
                   strokeWidth="1"
                 />
               ))}
-              {/* 垂直線 */}
+              {/* origin垂直線 */}
               {Array.from({ length: verticalLines }).map((_, index) => (
                 <line
                   key={`v-${index}`}
-                  x1={index * pixelsPerMeter}
+                  x1={index * pixelsPerMeter * scale}
                   y1="0"
-                  x2={index * pixelsPerMeter}
+                  x2={index * pixelsPerMeter * scale}
                   y2={imageDimensions.height}
                   stroke="rgba(128,128,128,0.3)"
                   strokeWidth="1"

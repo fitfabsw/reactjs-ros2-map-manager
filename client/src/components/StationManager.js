@@ -8,14 +8,13 @@ function StationManager() {
   const [selectedMapPath, setSelectedMapPath] = useState(null);
   const [imageData, setImageData] = useState(null);
   const [originImageMeta, setOriginImageMeta] = useState(null);
-  const [originalDimensions, setOriginalDimensions] = useState({
-    width: 0,
-    height: 0,
-  });
   const [realDimensions, setRealDimensions] = useState({ width: 0, height: 0 });
   const [stationDetails, setStationDetails] = useState(null);
   const [originPixelPos, setOriginPixelPos] = useState(null);
   const imgRef = useRef(null);
+  // const pixelsPerMeter = originImageMeta ? 1 / originImageMeta.resolution : 50;
+  // const pixelsPerMeter = 50;
+  const [pixelsPerMeter, setPixelsPerMeter] = useState(null);
 
   function onChangeMap(e) {
     setSelectedMap(e.target.value);
@@ -64,7 +63,6 @@ function StationManager() {
         height: imgRef.current.height,
       });
       getOrigin();
-      // getOrigin(originImageMeta);
     }
   };
 
@@ -102,6 +100,13 @@ function StationManager() {
     const pixelY = Math.round((h - originY / resolution) * scale);
     setOriginPixelPos({ x: pixelX, y: pixelY });
     console.log(`PixelX: ${pixelX}, PixelY: ${pixelY}`);
+    //
+    console.log("realDimensions:", realDimensions);
+    console.log("originImageMeta:", originImageMeta);
+    console.log("scale:", scale);
+    console.log("-->", 1 / originImageMeta.resolution);
+    console.log("-->", (1 / originImageMeta.resolution) * scale);
+    setPixelsPerMeter((1 / originImageMeta.resolution) * scale);
   };
 
   useEffect(() => {
@@ -119,6 +124,24 @@ function StationManager() {
         .catch((err) => console.error("Error loading station lists:", err));
     }
   }, [selectedMap]);
+
+  // 計算需要的格線數量
+  const calculateGridLines = () => {
+    if (!realDimensions.width || !realDimensions.height) return { h: 0, v: 0 };
+
+    // 確保格線數量足夠覆蓋整個圖像
+    const horizontalLines = Math.ceil(realDimensions.height / pixelsPerMeter);
+    const verticalLines = Math.ceil(realDimensions.width / pixelsPerMeter);
+
+    console.log("pixelsPerMeter:", pixelsPerMeter);
+
+    return {
+      h: horizontalLines,
+      v: verticalLines,
+    };
+  };
+
+  const { h: horizontalLines, v: verticalLines } = calculateGridLines();
 
   return (
     <div className="station-container">
@@ -160,8 +183,6 @@ function StationManager() {
             ))}
           </select>
         </div>
-        {/* <p> selectedMap: {selectedMap}</p> */}
-        {/* <p> selectedMapPath: {selectedMapPath}</p> */}
         {stationLists.length > 0 && (
           <div className="station-lists">
             <h2>Station Lists</h2>
@@ -189,10 +210,7 @@ function StationManager() {
         )}
       </div>
       <div className="station-content">
-        <div
-          className="image-display"
-          style={{ position: "relative", display: "inline-block" }}
-        >
+        <div className="image-display">
           {imageData && (
             <img
               ref={imgRef}
@@ -206,6 +224,47 @@ function StationManager() {
               }}
             />
           )}
+          {imageData && (
+            <svg
+              className="grid-overlay"
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                pointerEvents: "none",
+              }}
+              viewBox={`0 0 ${realDimensions.width} ${realDimensions.height}`}
+              preserveAspectRatio="none"
+            >
+              {/* 水平線 */}
+              {Array.from({ length: horizontalLines }).map((_, index) => (
+                <line
+                  key={`h-${index}`}
+                  x1="0"
+                  y1={index * pixelsPerMeter}
+                  x2={realDimensions.width}
+                  y2={index * pixelsPerMeter}
+                  stroke="rgba(128,128,128,0.3)"
+                  strokeWidth="1"
+                />
+              ))}
+              {/* 垂直線 */}
+              {Array.from({ length: verticalLines }).map((_, index) => (
+                <line
+                  key={`v-${index}`}
+                  x1={index * pixelsPerMeter}
+                  y1="0"
+                  x2={index * pixelsPerMeter}
+                  y2={realDimensions.height}
+                  stroke="rgba(128,128,128,0.3)"
+                  strokeWidth="1"
+                />
+              ))}
+            </svg>
+          )}
+
           {originPixelPos && (
             <div
               className="origin-marker"

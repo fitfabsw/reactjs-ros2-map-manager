@@ -19,6 +19,8 @@ function MapEditor() {
   const [rotationAngle, setRotationAngle] = useState(0);
   const [originPixelPos, setOriginPixelPos] = useState(null);
   const [imageProcessedMetadata, setImageProcessedMetadata] = useState(null);
+  const [scale, setScale] = useState(1);
+  const [imageShowPixelSize, setImageShowPixelSize] = useState(false);
 
   const rotationTimeoutRef = useRef(null);
   const previousUrl = useRef(null);
@@ -144,6 +146,7 @@ function MapEditor() {
       // 更新原點位置
       const { resolution } = imageMetadata;
       const { mapWidth, mapHeight, origin, scale } = data.metadata;
+      setScale(scale);
 
       const [originX, originY] = origin;
       const [H, W] = [mapHeight, mapWidth].map((v) => v * resolution);
@@ -151,6 +154,13 @@ function MapEditor() {
       const pixelY = Math.round(((H - originY) / resolution) * scale);
       setOriginPixelPos({ x: pixelX, y: pixelY });
       setOriginalImageState(null); // 清除保存的原始狀態
+      setImageShowPixelSize({
+        width: Math.round(mapWidth * scale),
+        height: Math.round(mapHeight * scale),
+      });
+      // console.log(
+      //   `setImageShowPixelSize: width: ${imageShowPixelSize.width}, height: ${imageShowPixelSize.height}`,
+      // );
     } catch (error) {
       console.error("Error rotating image:", error);
       alert(`Error rotating image: ${error.message}`);
@@ -158,7 +168,6 @@ function MapEditor() {
   };
 
   const handleCropComplete = async () => {
-    console.log("ABC crop!!!", crop);
     if (!crop || !processedImageUrl) return;
     try {
       const response = await fetch("/crop-image", {
@@ -180,13 +189,17 @@ function MapEditor() {
 
       console.log(`imageProcessedMetadata: ${JSON.stringify(data.metadata)}`);
       const { resolution } = imageMetadata;
-      const { mapHeight, origin, scale } = data.metadata;
+      const { mapWidth, mapHeight, origin, scale } = data.metadata;
       const [originX, originY] = origin;
       const H = mapHeight * resolution; // m
       const pixelX = Math.round((originX / resolution) * scale);
       const pixelY = Math.round(((H - originY) / resolution) * scale);
       setOriginPixelPos({ x: pixelX, y: pixelY });
-
+      setImageShowPixelSize({
+        width: Math.round(mapWidth * scale),
+        height: Math.round(mapHeight * scale),
+      });
+      setScale(scale);
       setIsCropping(false);
       setCrop(null);
     } catch (error) {
@@ -239,6 +252,11 @@ function MapEditor() {
           const pixelX = Math.round((originX / resolution) * scale);
           const pixelY = Math.round(((H - originY) / resolution) * scale);
           setOriginPixelPos({ x: pixelX, y: pixelY });
+          setScale(scale);
+          setImageShowPixelSize({
+            width: Math.round(mapWidth * scale),
+            height: Math.round(mapHeight * scale),
+          });
         } catch (error) {
           console.error("Error rotating image:", error);
         }
@@ -300,10 +318,17 @@ function MapEditor() {
           setImageProcessedMetadata={setImageProcessedMetadata}
           setRotationAngle={setRotationAngle}
           setOriginPixelPos={setOriginPixelPos}
+          setImageShowPixelSize={setImageShowPixelSize}
+          setScale={setScale}
         />
 
         <div className="main-content">
           <h1>ROS2 Grid Map Editor</h1>
+          <div>
+            imageShowPixelSize={imageShowPixelSize.width},{" "}
+            {imageShowPixelSize.height}
+          </div>
+          <div>scale: {scale}</div>
           <ControlPanel
             processedImageUrl={processedImageUrl}
             isRotating={isRotating}
@@ -318,8 +343,9 @@ function MapEditor() {
             handleRotationComplete={handleRotationComplete}
             rotationAngle={rotationAngle}
             handleRotationChange={handleRotationChange}
+            scale={scale}
+            imageShowPixelSize={imageShowPixelSize}
           />
-
           <ImageProcessingArea
             saveMessage={saveMessage}
             selectedFilePath={selectedFilePath}
@@ -332,6 +358,7 @@ function MapEditor() {
             setCrop={setCrop}
             originPixelPos={originPixelPos}
             imageMetadata={imageMetadata}
+            scale={scale}
           />
         </div>
       </div>

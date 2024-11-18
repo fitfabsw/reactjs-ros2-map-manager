@@ -14,6 +14,7 @@ const ControlPanel = ({
   toggleRotating,
   handleCropComplete,
   handleRotationComplete,
+  imageShowPixelSize,
 }) => {
   return (
     <div className="control-section">
@@ -72,6 +73,7 @@ const ControlPanel = ({
             imageMetadata={imageMetadata}
             originPixelPos={originPixelPos}
             imageProcessedMetadata={imageProcessedMetadata}
+            imageShowPixelSize={imageShowPixelSize}
           />
         )}
       </div>

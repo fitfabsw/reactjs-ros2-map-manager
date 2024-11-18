@@ -12,6 +12,7 @@ const ImageProcessingArea = ({
   setCrop,
   originPixelPos,
   imageMetadata,
+  scale,
 }) => {
   return (
     <>
@@ -39,6 +40,7 @@ const ImageProcessingArea = ({
           originPixelPos={originPixelPos}
           rotationAngle={rotationAngle}
           imageMetadata={imageMetadata}
+          scale={scale}
         />
       )}
     </>
