@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./StationManager.css";
+import StationManagerLeftNormal from "./StationManagerLeftNormal";
+import StationManagerInfo from "./StationManagerInfo";
 
 function StationManager() {
   const [maps, setMaps] = useState([]);
@@ -13,16 +15,16 @@ function StationManager() {
   const imgRef = useRef(null);
   const [pixelsPerMeter, setPixelsPerMeter] = useState(null);
   const [scale, setScale] = useState(1);
-  const [newStationListName, setNewStationListName] = useState("");
-  const [newStation, setNewStation] = useState({
-    st_name: "",
-    stl_id: "",
-    x: "",
-    y: "",
-    z: "",
-    w: "",
-    type: "station", // 默認類型
-  });
+  // const [newStationListName, setNewStationListName] = useState("");
+  // const [newStation, setNewStation] = useState({
+  //   st_name: "",
+  //   stl_id: "",
+  //   x: "",
+  //   y: "",
+  //   z: "",
+  //   w: "",
+  //   type: "station", // 默認類型
+  // });
   const [stationPoints, setStationPoints] = useState([]);
 
   const [imageDimensions, setImageDimensions] = useState({
@@ -43,38 +45,13 @@ function StationManager() {
   //   }
   // }, [processedImageUrl]);
 
-  const createStationList = async () => {
-    if (!newStationListName || !selectedMap) return;
-
-    try {
-      const response = await fetch("/api/stationlists", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          stl_name: newStationListName,
-          mid: selectedMap,
-        }),
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setStationLists([...stationLists, data]); // 更新站點列表
-        setNewStationListName(""); // 清空輸入框
-      } else {
-        console.error("Error creating station list:", response.statusText);
-      }
-    } catch (error) {
-      console.error("Error creating station list:", error);
-    }
-  };
-
   function onChangeMap(e) {
     setSelectedMap(e.target.value);
     let found = maps.find((m) => m.id === parseInt(e.target.value));
     let mapfile = `${found.mappath}/${found.mapname}.pgm`;
     mapfile = mapfile.replace("/home/pi", "/home/zealzel");
     fetchImage(mapfile);
+    setStationPoints(null);
   }
 
   const fetchImage = async (mapfile) => {
@@ -99,7 +76,6 @@ function StationManager() {
     }
   };
 
-  // const handleGetImageElement = () => {
   const handleGetImageElement = async () => {
     if (imgRef.current) {
       console.log("Image Element:", imgRef.current); // 獲取 img 元素
@@ -114,31 +90,6 @@ function StationManager() {
         height: imgRef.current.height,
       });
       getOrigin();
-    }
-  };
-
-  const fetchStationDetails = async (stl_id) => {
-    try {
-      const response = await fetch(`/api/stationlists/${stl_id}`);
-      const data = await response.json();
-      if (response.ok) {
-        console.log("Station Details:", data);
-        setStationDetails(data);
-        const stationPoints_ = data.Stations.map((station) => {
-          const { mapWidth, mapHeight, origin, resolution } = originImageMeta;
-          return CoordinateToPixel(
-            [mapWidth, mapHeight],
-            [imgRef.current.width, imgRef.current.height],
-            [origin[0] + station.x, origin[1] + station.y],
-            resolution,
-          );
-        });
-        setStationPoints(stationPoints_);
-      } else {
-        console.error("Error fetching station details:", data.error);
-      }
-    } catch (error) {
-      console.error("Error fetching station details:", error);
     }
   };
 
@@ -213,6 +164,30 @@ function StationManager() {
     }
   }, [selectedMap]);
 
+  const fetchStationDetails = async (stl_id) => {
+    try {
+      const response = await fetch(`/api/stationlists/${stl_id}`);
+      const data = await response.json();
+      if (response.ok) {
+        console.log("Station Details:", data);
+        setStationDetails(data);
+        const stationPoints_ = data.Stations.map((station) => {
+          const { mapWidth, mapHeight, origin, resolution } = originImageMeta;
+          return CoordinateToPixel(
+            [mapWidth, mapHeight],
+            [imgRef.current.width, imgRef.current.height],
+            [origin[0] + station.x, origin[1] + station.y],
+            resolution,
+          );
+        });
+        setStationPoints(stationPoints_);
+      } else {
+        console.error("Error fetching station details:", data.error);
+      }
+    } catch (error) {
+      console.error("Error fetching station details:", error);
+    }
+  };
   // 計算需要的格線數量
   const calculateGridLines = () => {
     if (!realDimensions.width || !realDimensions.height) return { h: 0, v: 0 };
@@ -250,80 +225,17 @@ function StationManager() {
 
   return (
     <div className="station-container">
-      <div className="station-left-pandel">
-        {false && (
-          <table className="table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>map</th>
-                <th>robot</th>
-                <th>map path</th>
-                <th>map file (pgm, yaml)</th>
-                <th>type</th>
-              </tr>
-            </thead>
-            <tbody>
-              {maps.map((map) => (
-                <tr key={map.id}>
-                  <td>{map.id}</td>
-                  <td>{map.map}</td>
-                  <td>{map.Robottype?.name}</td>
-                  <td>{map.mappath}</td>
-                  <td>{map.mapname}</td>
-                  <td>{map.real ? "real" : "sim"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-        <div className="map-selection">
-          <h2>Select Map</h2>
-          <select value={selectedMap || ""} onChange={onChangeMap}>
-            <option value="">Select a map...</option>
-            {maps.map((map) => (
-              <option key={map.id} value={map.id}>
-                {map.map} ({map.Robottype?.name})
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="station-lists">
-          <h2>Station Lists</h2>
-          <div className="station-list-creation">
-            <input
-              type="text"
-              placeholder="Station List Name"
-              value={newStationListName}
-              onChange={(e) => setNewStationListName(e.target.value)}
-            />
-            <button onClick={createStationList} className="station-list-card">
-              Create Station List
-            </button>
-          </div>
-
-          <div className="station-lists-grid">
-            {stationLists.map((list) => (
-              <button
-                key={list.id}
-                className="station-list-card"
-                onClick={() => fetchStationDetails(list.id)}
-              >
-                <h3>{list.stl_name}</h3>
-                <div className="station-count">
-                  Stations: {list.Stations?.length || 0}
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-        {stationLists.length > 0 && stationDetails && (
-          <div className="station-details">
-            <h2>Station Details</h2>
-            <pre>{JSON.stringify(stationDetails, null, 2)}</pre>
-          </div>
-        )}
-      </div>
+      <StationManagerLeftNormal
+        maps={maps}
+        selectedMap={selectedMap}
+        stationLists={stationLists}
+        setStationLists={setStationLists}
+        onChangeMap={onChangeMap}
+        setStationDetails={setStationDetails}
+        originImageMeta={originImageMeta}
+        CoordinateToPixel={CoordinateToPixel}
+        fetchStationDetails={fetchStationDetails}
+      />
       <div className="station-content">
         <div className="image-display">
           {imageData && (
@@ -340,13 +252,6 @@ function StationManager() {
               onMouseMove={handleMouseMove}
             />
           )}
-          {/* {originPixelPos && <div>{pixelsPerMeter}</div>} */}
-          {/* {originPixelPos && <div>{scale}</div>} */}
-          {/* {originPixelPos && <div>{pixelsPerMeter * scale}</div>} */}
-          {/* {originPixelPos && <div>{originPixelPos.x}</div>} */}
-          {/* {originPixelPos && <div>{originPixelPos.y}</div>} */}
-          {/* {originPixelPos && <div>{horizontalLines}</div>} */}
-          {/* {originPixelPos && <div>{verticalLines}</div>} */}
           {imageData && (
             <svg
               className="grid-overlay"
@@ -420,40 +325,18 @@ function StationManager() {
                 }}
               />
             ))}
-          {imageData && originPixelPos && (
-            <div className="pixel-info">
-              <p>
-                <b>Original</b> size: {originImageMeta.mapWidth} x{" "}
-                {originImageMeta.mapHeight} pixels
-                {", "}
-                map origin: ({originImageMeta.origin[0].toFixed(2)},{" "}
-                {originImageMeta.origin[1].toFixed(2)}) (m) (image
-                origin@bottom-left)
-              </p>
-              <p>
-                <b>Real</b> size: {realDimensions.width} x{" "}
-                {realDimensions.height} pixels
-                {", "}
-                map origin: ({originPixelPos.x}, {originPixelPos.y}) pixels
-                (image origin@top-left)
-              </p>
-              <p>
-                <b>scale </b>
-                {(realDimensions.height / originImageMeta.mapHeight).toFixed(4)}
-              </p>
-            </div>
-          )}
-          {pixelLocation && (
-            <div className="pixel-info">
-              <p>
-                Pixel Location: ({pixelLocation.x}, {pixelLocation.y})
-              </p>
-              <p>
-                Map Center Coordinate: ({coordLocation.x.toFixed(2)},{" "}
-                {coordLocation.y.toFixed(2)})
-              </p>
-            </div>
-          )}
+          <StationManagerInfo
+            imageData={imageData}
+            originPixelPos={originPixelPos}
+            originImageMeta={originImageMeta}
+            realDimensions={realDimensions}
+            pixelLocation={pixelLocation}
+            coordLocation={coordLocation}
+            pixelsPerMeter={pixelsPerMeter}
+            scale={scale}
+            horizontalLines={horizontalLines}
+            verticalLines={verticalLines}
+          />
         </div>
       </div>
     </div>
