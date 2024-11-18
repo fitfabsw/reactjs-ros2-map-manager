@@ -13,6 +13,17 @@ function StationManager() {
   const imgRef = useRef(null);
   const [pixelsPerMeter, setPixelsPerMeter] = useState(null);
   const [scale, setScale] = useState(1);
+  const [newStationListName, setNewStationListName] = useState("");
+  const [newStation, setNewStation] = useState({
+    st_name: "",
+    stl_id: "",
+    x: "",
+    y: "",
+    z: "",
+    w: "",
+    type: "station", // 默認類型
+  });
+  const [stationPoints, setStationPoints] = useState([]);
 
   const [imageDimensions, setImageDimensions] = useState({
     width: 0,
@@ -31,6 +42,32 @@ function StationManager() {
   //     };
   //   }
   // }, [processedImageUrl]);
+
+  const createStationList = async () => {
+    if (!newStationListName || !selectedMap) return;
+
+    try {
+      const response = await fetch("/api/stationlists", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          stl_name: newStationListName,
+          mid: selectedMap,
+        }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setStationLists([...stationLists, data]); // 更新站點列表
+        setNewStationListName(""); // 清空輸入框
+      } else {
+        console.error("Error creating station list:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error creating station list:", error);
+    }
+  };
 
   function onChangeMap(e) {
     setSelectedMap(e.target.value);
@@ -241,25 +278,35 @@ function StationManager() {
             ))}
           </select>
         </div>
-        {stationLists.length > 0 && (
-          <div className="station-lists">
-            <h2>Station Lists</h2>
-            <div className="station-lists-grid">
-              {stationLists.map((list) => (
-                <button
-                  key={list.id}
-                  className="station-list-card"
-                  onClick={() => fetchStationDetails(list.id)}
-                >
-                  <h3>{list.stl_name}</h3>
-                  <div className="station-count">
-                    Stations: {list.Stations?.length || 0}
-                  </div>
-                </button>
-              ))}
-            </div>
+        <div className="station-lists">
+          <h2>Station Lists</h2>
+          <div className="station-list-creation">
+            <input
+              type="text"
+              placeholder="Station List Name"
+              value={newStationListName}
+              onChange={(e) => setNewStationListName(e.target.value)}
+            />
+            <button onClick={createStationList} className="station-list-card">
+              Create Station List
+            </button>
           </div>
-        )}
+
+          <div className="station-lists-grid">
+            {stationLists.map((list) => (
+              <button
+                key={list.id}
+                className="station-list-card"
+                onClick={() => fetchStationDetails(list.id)}
+              >
+                <h3>{list.stl_name}</h3>
+                <div className="station-count">
+                  Stations: {list.Stations?.length || 0}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
         {stationLists.length > 0 && stationDetails && (
           <div className="station-details">
             <h2>Station Details</h2>

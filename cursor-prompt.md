@@ -1,3 +1,28 @@
+### 2024/11/18
+
+help me create a professional & elegant interface
+
+which can
+
+1. create stationlist
+
+available stationlist field are:
+
+- stl_name
+- mid: the mid of the created station is the current selected map id
+
+2. create a station and add it into existed stationlist
+
+available station field are:
+
+- st_name
+- stl_id: the stl_id of the current stationlist
+- x
+- y
+- z
+- w
+- type (choice: start, end, station)
+
 ### 2024/11/16
 
 @server @client
