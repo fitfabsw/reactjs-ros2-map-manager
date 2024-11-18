@@ -13,3 +13,12 @@
 .station-card p {
   margin: 5px 0;
 }
+
+.station-card input {
+  width: 60px;
+  margin-right: 10px;
+}
+
+.station-card button {
+  margin-left: 10px;
+}

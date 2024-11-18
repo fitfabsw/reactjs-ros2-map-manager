@@ -173,6 +173,46 @@ function StationManager() {
     }
   }, [selectedMap]);
 
+  const modifyStation = (stationId, newDetails) => {
+    setStationDetails((prevDetails) => {
+      const updatedStations = prevDetails.Stations.map((station) =>
+        station.id === stationId ? { ...station, ...newDetails } : station,
+      );
+      return { ...prevDetails, Stations: updatedStations };
+    });
+  };
+
+  const createStation = (newStation) => {
+    setStationDetails((prevDetails) => {
+      const updatedStations = [...prevDetails.Stations, newStation];
+      return { ...prevDetails, Stations: updatedStations };
+    });
+    const newPoint = CoordinateToPixel(
+      [originImageMeta.mapWidth, originImageMeta.mapHeight],
+      [imgRef.current.width, imgRef.current.height],
+      [
+        originImageMeta.origin[0] + newStation.x,
+        originImageMeta.origin[1] + newStation.y,
+      ],
+      originImageMeta.resolution,
+    );
+    setStationPoints((prevPoints) => [...prevPoints, newPoint]);
+  };
+
+  const deleteStation = (stationId) => {
+    setStationDetails((prevDetails) => {
+      const updatedStations = prevDetails.Stations.filter(
+        (station) => station.id !== stationId,
+      );
+      return { ...prevDetails, Stations: updatedStations };
+    });
+    setStationPoints((prevPoints) =>
+      prevPoints.filter(
+        (_, index) => stationDetails.Stations[index].id !== stationId,
+      ),
+    );
+  };
+
   const fetchStationDetails = async (stl_id) => {
     try {
       const response = await fetch(`/api/stationlists/${stl_id}`);
@@ -248,11 +288,27 @@ function StationManager() {
       )}
       {mode == "edit" && (
         <div>
-          EDIT MODE
           <button onClick={() => setMode("normal")}>Back to Normal Mode</button>
           <div className="station-cards">
+            <button
+              onClick={() =>
+                createStation({
+                  id: Date.now(),
+                  x: 0,
+                  y: 0,
+                  st_name: "New Station",
+                })
+              }
+            >
+              Add New Station
+            </button>
             {stationDetails.Stations.map((station) => (
-              <StationCard key={station.id} station={station} />
+              <StationCard
+                key={station.id}
+                station={station}
+                onModify={(newDetails) => modifyStation(station.id, newDetails)}
+                onDelete={() => deleteStation(station.id)}
+              />
             ))}
           </div>
         </div>
