@@ -124,6 +124,16 @@ function StationManager() {
       if (response.ok) {
         console.log("Station Details:", data);
         setStationDetails(data);
+        const stationPoints_ = data.Stations.map((station) => {
+          const { mapWidth, mapHeight, origin, resolution } = originImageMeta;
+          return CoordinateToPixel(
+            [mapWidth, mapHeight],
+            [imgRef.current.width, imgRef.current.height],
+            [origin[0] + station.x, origin[1] + station.y],
+            resolution,
+          );
+        });
+        setStationPoints(stationPoints_);
       } else {
         console.error("Error fetching station details:", data.error);
       }
@@ -399,6 +409,17 @@ function StationManager() {
               }}
             />
           )}
+          {stationPoints &&
+            stationPoints.map((point) => (
+              <div
+                className="origin-marker"
+                style={{
+                  left: `${point.x}px`,
+                  top: `${point.y}px`,
+                  backgroundColor: "red",
+                }}
+              />
+            ))}
           {imageData && originPixelPos && (
             <div className="pixel-info">
               <p>
