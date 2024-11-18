@@ -15,6 +15,22 @@ function StationManager() {
   // const pixelsPerMeter = originImageMeta ? 1 / originImageMeta.resolution : 50;
   // const pixelsPerMeter = 50;
   const [pixelsPerMeter, setPixelsPerMeter] = useState(null);
+  const [scale, setScale] = useState(1);
+
+  const [imageDimensions, setImageDimensions] = useState({
+    width: 0,
+    height: 0,
+  });
+
+  // useEffect(() => {
+  //   if (processedImageUrl) {
+  //     const img = new Image();
+  //     img.src = processedImageUrl;
+  //     img.onload = () => {
+  //       setImageDimensions({ width: img.width, height: img.height });
+  //     };
+  //   }
+  // }, [processedImageUrl]);
 
   function onChangeMap(e) {
     setSelectedMap(e.target.value);
@@ -62,6 +78,10 @@ function StationManager() {
         width: imgRef.current.width,
         height: imgRef.current.height,
       });
+      setImageDimensions({
+        width: imgRef.current.width,
+        height: imgRef.current.height,
+      });
       getOrigin();
     }
   };
@@ -86,6 +106,7 @@ function StationManager() {
     const [W, H] = [imgRef.current.width, imgRef.current.height]; // actual size in pixels
     const [w, h] = [mapWidth, mapHeight]; // original size in pixels
     const scale = H / h;
+    setScale(scale);
     const [originX, originY] = origin;
     console.log(
       `mapWidth: ${mapWidth}, mapHeight: ${mapHeight}, origin: ${origin}`,
@@ -100,13 +121,13 @@ function StationManager() {
     const pixelY = Math.round((h - originY / resolution) * scale);
     setOriginPixelPos({ x: pixelX, y: pixelY });
     console.log(`PixelX: ${pixelX}, PixelY: ${pixelY}`);
-    //
     console.log("realDimensions:", realDimensions);
     console.log("originImageMeta:", originImageMeta);
     console.log("scale:", scale);
     console.log("-->", 1 / originImageMeta.resolution);
     console.log("-->", (1 / originImageMeta.resolution) * scale);
-    setPixelsPerMeter((1 / originImageMeta.resolution) * scale);
+    // setPixelsPerMeter((1 / originImageMeta.resolution) * scale);
+    setPixelsPerMeter(1 / originImageMeta.resolution);
   };
 
   useEffect(() => {
@@ -224,6 +245,11 @@ function StationManager() {
               }}
             />
           )}
+          {originPixelPos && <div>{pixelsPerMeter}</div>}
+          {originPixelPos && <div>{scale}</div>}
+          {originPixelPos && <div>{pixelsPerMeter * scale}</div>}
+          {originPixelPos && <div>{originPixelPos.x}</div>}
+          {originPixelPos && <div>{originPixelPos.y}</div>}
           {imageData && (
             <svg
               className="grid-overlay"
@@ -243,9 +269,15 @@ function StationManager() {
                 <line
                   key={`h-${index}`}
                   x1="0"
-                  y1={index * pixelsPerMeter}
-                  x2={realDimensions.width}
-                  y2={index * pixelsPerMeter}
+                  y1={
+                    (originPixelPos.y % (pixelsPerMeter * scale)) +
+                    index * pixelsPerMeter * scale
+                  }
+                  x2={imageDimensions.width}
+                  y2={
+                    (originPixelPos.y % (pixelsPerMeter * scale)) +
+                    index * pixelsPerMeter * scale
+                  }
                   stroke="rgba(128,128,128,0.3)"
                   strokeWidth="1"
                 />
@@ -254,17 +286,22 @@ function StationManager() {
               {Array.from({ length: verticalLines }).map((_, index) => (
                 <line
                   key={`v-${index}`}
-                  x1={index * pixelsPerMeter}
+                  x1={
+                    (originPixelPos.x % (pixelsPerMeter * scale)) +
+                    index * pixelsPerMeter * scale
+                  }
                   y1="0"
-                  x2={index * pixelsPerMeter}
-                  y2={realDimensions.height}
+                  x2={
+                    (originPixelPos.x % (pixelsPerMeter * scale)) +
+                    index * pixelsPerMeter * scale
+                  }
+                  y2={imageDimensions.height}
                   stroke="rgba(128,128,128,0.3)"
                   strokeWidth="1"
                 />
               ))}
             </svg>
           )}
-
           {originPixelPos && (
             <div
               className="origin-marker"
