@@ -1,60 +1,94 @@
-import React from "react";
-import { useState } from "react";
-import "./StationCard.css";
+import React, { useState } from 'react';
+import './StationCard.css';
 
 function StationCard({ station, onModify, onDelete }) {
-  const [x, setX] = useState(station.x);
-  const [y, setY] = useState(station.y);
-  const [z, setZ] = useState(station.z);
-  const [w, setW] = useState(station.w);
-  const [type, setType] = useState(station.type);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedStation, setEditedStation] = useState({ ...station });
 
-  const [isEditable, setIsEditable] = useState(false);
+  const handleSave = async () => {
+    try {
+      const response = await fetch(`/api/stations/${station.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(editedStation),
+      });
+
+      if (response.ok) {
+        const updatedStation = await response.json();
+        onModify(updatedStation);
+        setIsEditing(false);
+      } else {
+        console.error('更新站點失敗');
+      }
+    } catch (error) {
+      console.error('更新站點時發生錯誤:', error);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (window.confirm('確定要刪除此站點嗎？')) {
+      try {
+        const response = await fetch(`/api/stations/${station.id}`, {
+          method: 'DELETE',
+        });
+
+        if (response.ok) {
+          onDelete(station.id);
+        } else {
+          console.error('刪除站點失敗');
+        }
+      } catch (error) {
+        console.error('刪除站點時發生錯誤:', error);
+      }
+    }
+  };
 
   return (
     <div className="station-card">
-      <h3>{station.st_name}</h3>
-      <button onClick={() => setIsEditable(!isEditable)}>Modify</button>
-      <button onClick={() => onDelete(station)}>Delete</button>
-      <p>
-        <b>Coordinates:</b> (x,y) =
-        <input
-          type="text"
-          value={x}
-          disabled={!isEditable}
-          onChange={(e) => setX(e.target.value)}
-        />
-        <input
-          type="text"
-          value={y}
-          disabled={!isEditable}
-          onChange={(e) => setY(e.target.value)}
-        />
-      </p>
-      <p>
-        <b>Orientation:</b> (z, w) =
-        <input
-          type="text"
-          value={z}
-          disabled={!isEditable}
-          onChange={(e) => setZ(e.target.value)}
-        />
-        <input
-          type="text"
-          value={w}
-          disabled={!isEditable}
-          onChange={(e) => setW(e.target.value)}
-        />
-      </p>
-      <p>
-        <b>Type:</b>
-        <input
-          type="text"
-          value={type}
-          disabled={!isEditable}
-          onChange={(e) => setType(e.target.value)}
-        />
-      </p>
+      {isEditing ? (
+        <div className="station-card-edit">
+          <input
+            type="text"
+            value={editedStation.st_name}
+            onChange={(e) =>
+              setEditedStation({ ...editedStation, st_name: e.target.value })
+            }
+            placeholder="站點名稱"
+          />
+          <input
+            type="number"
+            value={editedStation.x}
+            onChange={(e) =>
+              setEditedStation({ ...editedStation, x: parseFloat(e.target.value) })
+            }
+            placeholder="X 座標"
+          />
+          <input
+            type="number"
+            value={editedStation.y}
+            onChange={(e) =>
+              setEditedStation({ ...editedStation, y: parseFloat(e.target.value) })
+            }
+            placeholder="Y 座標"
+          />
+          <div className="station-card-actions">
+            <button onClick={handleSave}>保存</button>
+            <button onClick={() => setIsEditing(false)}>取消</button>
+          </div>
+        </div>
+      ) : (
+        <div className="station-card-view">
+          <h3>{station.st_name}</h3>
+          <p>X: {station.x}</p>
+          <p>Y: {station.y}</p>
+          <div className="station-card-actions">
+            <button onClick={() => setIsEditing(true)}>修改</button>
+            <button onClick={handleDelete}>刪除</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

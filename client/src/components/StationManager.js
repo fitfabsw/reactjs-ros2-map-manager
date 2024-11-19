@@ -173,13 +173,33 @@ function StationManager() {
     }
   }, [selectedMap]);
 
-  const modifyStation = (stationId, newDetails) => {
-    setStationDetails((prevDetails) => {
-      const updatedStations = prevDetails.Stations.map((station) =>
-        station.id === stationId ? { ...station, ...newDetails } : station,
+  const modifyStation = async (stationId, newDetails) => {
+    try {
+      // 更新本地狀態
+      setStationDetails((prevDetails) => {
+        const updatedStations = prevDetails.Stations.map((station) =>
+          station.id === stationId ? { ...station, ...newDetails } : station
+        );
+        return { ...prevDetails, Stations: updatedStations };
+      });
+
+      // 更新站點位置標記
+      const { mapWidth, mapHeight, origin, resolution } = originImageMeta;
+      const newPoint = CoordinateToPixel(
+        [mapWidth, mapHeight],
+        [imgRef.current.width, imgRef.current.height],
+        [origin[0] + newDetails.x, origin[1] + newDetails.y],
+        resolution
       );
-      return { ...prevDetails, Stations: updatedStations };
-    });
+
+      setStationPoints((prevPoints) =>
+        prevPoints.map((point, index) =>
+          stationDetails.Stations[index].id === stationId ? newPoint : point
+        )
+      );
+    } catch (error) {
+      console.error('修改站點時發生錯誤:', error);
+    }
   };
 
   const createStation = (newStation) => {
@@ -199,18 +219,25 @@ function StationManager() {
     setStationPoints((prevPoints) => [...prevPoints, newPoint]);
   };
 
-  const deleteStation = (stationId) => {
-    setStationDetails((prevDetails) => {
-      const updatedStations = prevDetails.Stations.filter(
-        (station) => station.id !== stationId,
+  const deleteStation = async (stationId) => {
+    try {
+      // 更新本地狀態
+      setStationDetails((prevDetails) => {
+        const updatedStations = prevDetails.Stations.filter(
+          (station) => station.id !== stationId
+        );
+        return { ...prevDetails, Stations: updatedStations };
+      });
+
+      // 移除站點位置標記
+      setStationPoints((prevPoints) =>
+        prevPoints.filter(
+          (_, index) => stationDetails.Stations[index].id !== stationId
+        )
       );
-      return { ...prevDetails, Stations: updatedStations };
-    });
-    setStationPoints((prevPoints) =>
-      prevPoints.filter(
-        (_, index) => stationDetails.Stations[index].id !== stationId,
-      ),
-    );
+    } catch (error) {
+      console.error('刪除站點時發生錯誤:', error);
+    }
   };
 
   const fetchStationDetails = async (stl_id) => {

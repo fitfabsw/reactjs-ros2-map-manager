@@ -4,6 +4,9 @@ node_modules/
 images/
 converted/
 
+bun.lockb
+
+
 .sql
 .sqlite
 

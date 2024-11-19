@@ -1,3 +1,40 @@
+### 2024/11/19
+
+I am now working on the frontend module StationManager
+which have three components
+
+- StationCard
+- StationManager
+- StationManagerLeftNormal
+
+In the left panel, we have StationManagerLeftNormal component, which have following functions
+
+1. select map
+   based on the map, it will
+
+   1. list the related station lists
+   2. show the map in the center area
+
+2. Select station list
+   if there are station lists, it will show cards
+
+3. List all stations
+   When clicking on a card, it will enter "edit mode" and replace original content with all stations info
+   each station info is a StationCard component
+
+Right now, StationCard have modify and delete buttons but not functional.
+
+Please help me to fix it.
+
+The frontend should call backend API to get the jobs done. Related APIs as as follows
+
+- stationlist
+  /api/stationslists
+- stations
+  /api/stations
+- maps
+  /api/maps
+
 ### 2024/11/18
 
 help me create a professional & elegant interface

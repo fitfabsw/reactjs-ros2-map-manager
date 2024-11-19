@@ -81,3 +81,5 @@ insert into map (map, rt_id, mappath, mapname, real) values("fit_newoffice_3f", 
 insert into map (map, rt_id, mappath, mapname, real) values("fit_newoffice_3fp", 1, "/home/pi/fitrobot_db/maps/real", "lino2_newoffice_3f_processed", 1);
 insert into map (map, rt_id, mappath, mapname, real) values("fit_newoffice_3fp", 2, "/home/pi/fitrobot_db/maps/real", "lino2_newoffice_3f_processed", 1);
 
+
+insert into station (st_name, type, stl_id, x, y, z, w) values("Tom Hc", 'home', 1, 0, 0, 0, 0);
