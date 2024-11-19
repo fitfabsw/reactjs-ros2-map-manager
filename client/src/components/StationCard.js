@@ -45,6 +45,28 @@ function StationCard({ station, onModify, onDelete }) {
     }
   };
 
+  const handleCoordinateChange = (e, coordinate) => {
+    const value = e.target.value;
+    // 允許：空值、負號、數字、小數點、以及正在輸入的小數（限制兩位）
+    if (
+      value === "" || // 空值
+      value === "-" || // 負號
+      value === "." || // 單個小數點
+      value === "-." || // 負數的小數點
+      /^-?\d*\.?\d{0,2}$/.test(value) // 允許數字和最多兩位小數
+    ) {
+      setEditedStation({
+        ...editedStation,
+        [coordinate]:
+          value === "" || value === "-" || value === "." || value === "-."
+            ? value
+            : value.endsWith(".")
+              ? value
+              : parseFloat(value),
+      });
+    }
+  };
+
   return (
     <div className="station-card">
       {isEditing ? (
@@ -58,25 +80,15 @@ function StationCard({ station, onModify, onDelete }) {
             placeholder="站點名稱"
           />
           <input
-            type="number"
+            type="text"
             value={editedStation.x}
-            onChange={(e) =>
-              setEditedStation({
-                ...editedStation,
-                x: parseFloat(e.target.value),
-              })
-            }
+            onChange={(e) => handleCoordinateChange(e, "x")}
             placeholder="X 座標"
           />
           <input
-            type="number"
+            type="text"
             value={editedStation.y}
-            onChange={(e) =>
-              setEditedStation({
-                ...editedStation,
-                y: parseFloat(e.target.value),
-              })
-            }
+            onChange={(e) => handleCoordinateChange(e, "y")}
             placeholder="Y 座標"
           />
           <div className="station-card-actions">
