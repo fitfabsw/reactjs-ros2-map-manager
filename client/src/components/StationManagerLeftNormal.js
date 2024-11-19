@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./StationManager.css";
 import StationCard from "./StationCard";
 
@@ -94,6 +94,58 @@ function StationManagerLeftNormal({
         console.error("創建站點失敗:", error);
       });
   };
+
+  // 添加鍵盤事件處理
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!editMode || !stationDetails?.Stations.length) return;
+
+      const stations = stationDetails.Stations;
+      const currentIndex = stations.findIndex(
+        (s) => s.id === selectedStationId,
+      );
+
+      if (currentIndex === -1) {
+        // 如果沒有選中的站點，選擇第一個
+        if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+          setSelectedStationId(stations[0].id);
+        }
+        return;
+      }
+
+      switch (e.key) {
+        case "ArrowUp":
+          e.preventDefault();
+          if (currentIndex > 0) {
+            setSelectedStationId(stations[currentIndex - 1].id);
+            // 確保新選中的卡片可見
+            const card = document.querySelector(
+              `[data-station-id="${stations[currentIndex - 1].id}"]`,
+            );
+            card?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          }
+          break;
+        case "ArrowDown":
+          e.preventDefault();
+          if (currentIndex < stations.length - 1) {
+            setSelectedStationId(stations[currentIndex + 1].id);
+            // 確保新選中的卡片可見
+            const card = document.querySelector(
+              `[data-station-id="${stations[currentIndex + 1].id}"]`,
+            );
+            card?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          }
+          break;
+        default:
+          break;
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [editMode, selectedStationId, stationDetails, setSelectedStationId]);
 
   return (
     <div className="station-left-panel">
