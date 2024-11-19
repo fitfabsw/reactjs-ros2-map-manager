@@ -10,6 +10,9 @@ function StationCard({
   selectedStationId,
   setSelectedStationId,
   stationDetails,
+  editingStationId,
+  setEditingStationId,
+  disabled,
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedStation, setEditedStation] = useState({ ...station });
@@ -40,13 +43,16 @@ function StationCard({
   }, [isEditing, editedStation]);
 
   const handleStartEditing = () => {
+    if (disabled) return;
     setEditedStation({ ...station });
     setIsEditing(true);
+    setEditingStationId(station.id);
   };
 
   const handleCancel = () => {
     setEditedStation({ ...station });
     setIsEditing(false);
+    setEditingStationId(null);
   };
 
   const handleSave = async () => {
@@ -63,6 +69,7 @@ function StationCard({
         const updatedStation = await response.json();
         onModify(updatedStation);
         setIsEditing(false);
+        setEditingStationId(null);
       } else {
         console.error("更新站點失敗");
       }
@@ -139,10 +146,10 @@ function StationCard({
     <div
       className={`station-card ${waitingForLocation === station.id ? "waiting" : ""} ${
         selectedStationId === station.id ? "selected" : ""
-      }`}
+      } ${disabled ? "disabled" : ""}`}
       data-station-id={station.id}
       data-editing={isEditing}
-      onClick={() => setSelectedStationId(station.id)}
+      onClick={() => !disabled && setSelectedStationId(station.id)}
     >
       {isEditing ? (
         <div className="station-card-edit">
@@ -222,8 +229,12 @@ function StationCard({
             <span>{station.y}</span>
           </p>
           <div className="station-card-actions">
-            <button onClick={handleStartEditing}>修改</button>
-            <button onClick={handleDelete}>刪除</button>
+            <button onClick={handleStartEditing} disabled={disabled}>
+              修改
+            </button>
+            <button onClick={handleDelete} disabled={disabled}>
+              刪除
+            </button>
           </div>
         </div>
       )}

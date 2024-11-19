@@ -28,6 +28,7 @@ function StationManagerLeftNormal({
   const [draggedStation, setDraggedStation] = useState(null);
   const [dragOverStation, setDragOverStation] = useState(null);
   const [pendingOrderUpdates, setPendingOrderUpdates] = useState([]);
+  const [editingStationId, setEditingStationId] = useState(null);
 
   const createStationList = async () => {
     if (!newStationListName || !selectedMap) return;
@@ -396,12 +397,23 @@ function StationManagerLeftNormal({
       {editMode && (
         <>
           <div className="station-edit-header">
-            <button onClick={handleBackToNormal}>返回</button>
+            <button
+              onClick={handleBackToNormal}
+              disabled={editingStationId !== null}
+            >
+              返回
+            </button>
             <div className="right-buttons">
-              <button onClick={handleCreateNewStation}>新增站點</button>
+              <button
+                onClick={handleCreateNewStation}
+                disabled={editingStationId !== null}
+              >
+                新增站點
+              </button>
               <button
                 onClick={handleReorderClick}
                 className={isReordering ? "active" : ""}
+                disabled={editingStationId !== null}
               >
                 {isReordering ? "完成排序" : "重新排序"}
               </button>
@@ -432,6 +444,12 @@ function StationManagerLeftNormal({
                     setSelectedStationId={setSelectedStationId}
                     stationDetails={stationDetails}
                     isReordering={isReordering}
+                    editingStationId={editingStationId}
+                    setEditingStationId={setEditingStationId}
+                    disabled={
+                      editingStationId !== null &&
+                      editingStationId !== station.id
+                    }
                   />
                 </div>
               ))}

@@ -17,7 +17,7 @@
 }
 
 .station-card.selected {
-  border: 2px solid #2196F3;
+  border: 2px solid #2196f3;
   background-color: rgba(33, 150, 243, 0.05);
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(33, 150, 243, 0.25);
@@ -192,4 +192,19 @@
   100% {
     opacity: 1;
   }
+}
+
+.station-card.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.station-card.disabled button {
+  cursor: not-allowed;
+}
+
+.station-card.disabled:hover {
+  transform: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }

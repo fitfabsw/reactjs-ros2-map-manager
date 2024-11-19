@@ -435,3 +435,9 @@ button:hover {
 .station-card-wrapper.reordering:hover {
   background-color: rgba(0, 0, 0, 0.02);
 }
+
+.station-edit-header button:disabled {
+  background-color: #ccc; /* 禁用狀態的背景顏色 */
+  cursor: not-allowed; /* 禁用狀態的游標 */
+  opacity: 0.6; /* 禁用狀態的透明度 */
+}
