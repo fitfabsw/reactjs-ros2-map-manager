@@ -21,8 +21,12 @@ function StationManagerLeftNormal({
   setWaitingForLocation,
   selectedStationId,
   setSelectedStationId,
+  setStationDetails,
 }) {
   const [newStationListName, setNewStationListName] = useState("");
+  const [isReordering, setIsReordering] = useState(false);
+  const [draggedStation, setDraggedStation] = useState(null);
+  const [dragOverStation, setDragOverStation] = useState(null);
 
   const createStationList = async () => {
     if (!newStationListName || !selectedMap) return;
@@ -205,6 +209,93 @@ function StationManagerLeftNormal({
     }
   };
 
+  const handleDragStart = (e, station) => {
+    if (!isReordering) return;
+    setDraggedStation(station);
+    e.currentTarget.classList.add("dragging");
+  };
+
+  const handleDragEnd = async (e) => {
+    if (!isReordering) return;
+    e.currentTarget.classList.remove("dragging");
+
+    if (
+      draggedStation &&
+      dragOverStation &&
+      draggedStation.id !== dragOverStation.id
+    ) {
+      const newStations = [...stationDetails.Stations];
+      const draggedIndex = newStations.findIndex(
+        (s) => s.id === draggedStation.id,
+      );
+      const dropIndex = newStations.findIndex(
+        (s) => s.id === dragOverStation.id,
+      );
+
+      // 更新順序
+      const updatedStations = newStations.map((station) => {
+        if (draggedIndex < dropIndex) {
+          if (
+            station.order > draggedStation.order &&
+            station.order <= dragOverStation.order
+          ) {
+            return { ...station, order: station.order - 1 };
+          }
+          if (station.id === draggedStation.id) {
+            return { ...station, order: dragOverStation.order };
+          }
+        } else {
+          if (
+            station.order >= dragOverStation.order &&
+            station.order < draggedStation.order
+          ) {
+            return { ...station, order: station.order + 1 };
+          }
+          if (station.id === draggedStation.id) {
+            return { ...station, order: dragOverStation.order };
+          }
+        }
+        return station;
+      });
+
+      // 更新後端
+      try {
+        const updatePromises = updatedStations
+          .filter(
+            (s) => s.order !== newStations.find((ns) => ns.id === s.id).order,
+          )
+          .map((station) =>
+            fetch(`/api/stations/${station.id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ order: station.order }),
+            }),
+          );
+
+        await Promise.all(updatePromises);
+
+        // 更新本地狀態
+        const sortedStations = [...updatedStations].sort(
+          (a, b) => a.order - b.order,
+        );
+        setStationDetails((prev) => ({ ...prev, Stations: sortedStations }));
+      } catch (error) {
+        console.error("更新站點順序失敗:", error);
+      }
+    }
+
+    setDraggedStation(null);
+    setDragOverStation(null);
+  };
+
+  const handleDragOver = (e, station) => {
+    if (!isReordering) return;
+    e.preventDefault();
+    if (station.id !== draggedStation?.id) {
+      setDragOverStation(station);
+    }
+  };
+
   return (
     <div className="station-left-panel">
       {!editMode && (
@@ -268,21 +359,40 @@ function StationManagerLeftNormal({
       {editMode && (
         <>
           <div className="station-edit-header">
-            <button onClick={handleBackToNormal}>返回一般模式</button>
+            <button onClick={handleBackToNormal}>返回</button>
             <button onClick={handleCreateNewStation}>新增站點</button>
+            <button
+              onClick={() => setIsReordering(!isReordering)}
+              className={isReordering ? "active" : ""}
+            >
+              {isReordering ? "完成排序" : "重新排序"}
+            </button>
           </div>
           <div className="station-cards">
             {stationDetails?.Stations.map((station) => (
-              <StationCard
+              <div
                 key={station.id}
-                station={station}
-                onModify={(newDetails) => modifyStation(station.id, newDetails)}
-                onDelete={() => deleteStation(station.id)}
-                setWaitingForLocation={setWaitingForLocation}
-                selectedStationId={selectedStationId}
-                setSelectedStationId={setSelectedStationId}
-                stationDetails={stationDetails}
-              />
+                draggable={isReordering}
+                onDragStart={(e) => handleDragStart(e, station)}
+                onDragEnd={handleDragEnd}
+                onDragOver={(e) => handleDragOver(e, station)}
+                className={`station-card-wrapper ${
+                  draggedStation?.id === station.id ? "dragging" : ""
+                } ${isReordering ? "reordering" : ""}`}
+              >
+                <StationCard
+                  station={station}
+                  onModify={(newDetails) =>
+                    modifyStation(station.id, newDetails)
+                  }
+                  onDelete={() => deleteStation(station.id)}
+                  setWaitingForLocation={setWaitingForLocation}
+                  selectedStationId={selectedStationId}
+                  setSelectedStationId={setSelectedStationId}
+                  stationDetails={stationDetails}
+                  isReordering={isReordering}
+                />
+              </div>
             ))}
           </div>
         </>

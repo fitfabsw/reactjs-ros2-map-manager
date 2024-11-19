@@ -519,6 +519,7 @@ function StationManager() {
         setWaitingForLocation={setWaitingForLocation}
         selectedStationId={selectedStationId}
         setSelectedStationId={setSelectedStationId}
+        setStationDetails={setStationDetails}
       />
       <div className="station-content">
         <div className="image-display">

@@ -394,3 +394,38 @@ button:hover {
   pointer-events: none;
   z-index: 1003;
 }
+
+.station-card-wrapper {
+  position: relative;
+  transition: transform 0.2s ease;
+}
+
+.station-card-wrapper.reordering {
+  cursor: move;
+}
+
+.station-card-wrapper.dragging {
+  opacity: 0.5;
+  transform: scale(0.98);
+}
+
+.station-edit-header button.active {
+  background-color: #ff9800;
+  color: white;
+}
+
+/* 拖曳時的視覺提示 */
+.station-card-wrapper.reordering::before {
+  content: "⋮⋮";
+  position: absolute;
+  left: -25px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  color: #666;
+  cursor: move;
+}
+
+.station-card-wrapper.reordering:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
