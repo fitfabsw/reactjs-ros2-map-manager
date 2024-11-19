@@ -16,7 +16,8 @@ function StationManager() {
   const imgRef = useRef(null);
   const [pixelsPerMeter, setPixelsPerMeter] = useState(null);
   const [scale, setScale] = useState(1);
-  const [mode, setMode] = useState("normal");
+  // const [mode, setMode] = useState("normal");
+  const [editMode, setEditMode] = useState(false);
 
   // const [newStationListName, setNewStationListName] = useState("");
   // const [newStation, setNewStation] = useState({
@@ -97,10 +98,11 @@ function StationManager() {
   };
 
   useEffect(() => {
-    if (mode === "edit" && imageData) {
+    // if (mode === "edit" && imageData) {
+    if (editMode && imageData) {
       handleGetImageElement();
     }
-  }, [mode, imageData]);
+  }, [editMode, imageData]);
 
   const PixelToCoordinate = (
     pixel,
@@ -264,7 +266,7 @@ function StationManager() {
           );
         });
         setStationPoints(stationPoints_);
-        setMode("edit");
+        setEditMode(true);
       } else {
         console.error("Error fetching station details:", data.error);
       }
@@ -309,64 +311,23 @@ function StationManager() {
 
   return (
     <div className="station-container">
-      {mode == "normal" && (
-        <StationManagerLeftNormal
-          maps={maps}
-          selectedMap={selectedMap}
-          stationLists={stationLists}
-          setStationLists={setStationLists}
-          onChangeMap={onChangeMap}
-          stationDetails={stationDetails}
-          fetchStationDetails={fetchStationDetails}
-        />
-      )}
-      {mode == "edit" && (
-        <div className="station-edit-panel">
-          <div className="station-edit-header">
-            <button onClick={() => setMode("normal")}>返回一般模式</button>
-            <button
-              onClick={() => {
-                const newStation = {
-                  // id: Date.now(), // 臨時 ID，實際應該由後端生成
-                  st_name: "New Station",
-                  x: 0,
-                  y: 0,
-                  stl_id: stationDetails.id, // 關聯到當前站點列表
-                  type: "station", // 默認類型
-                };
-
-                // 發送 API 請求創建新站點
-                fetch("/api/stations", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify(newStation),
-                })
-                  .then((response) => response.json())
-                  .then((createdStation) => {
-                    createStation(createdStation);
-                  })
-                  .catch((error) => {
-                    console.error("創建站點失敗:", error);
-                  });
-              }}
-            >
-              新增站點
-            </button>
-          </div>
-          <div className="station-cards">
-            {stationDetails.Stations.map((station) => (
-              <StationCard
-                key={station.id}
-                station={station}
-                onModify={(newDetails) => modifyStation(station.id, newDetails)}
-                onDelete={() => deleteStation(station.id)}
-              />
-            ))}
-          </div>
-        </div>
-      )}
+      <StationManagerLeftNormal
+        maps={maps}
+        selectedMap={selectedMap}
+        stationLists={stationLists}
+        setStationLists={setStationLists}
+        onChangeMap={onChangeMap}
+        stationDetails={stationDetails}
+        fetchStationDetails={fetchStationDetails}
+        // mode={mode}
+        // setMode={setMode}
+        editMode={editMode}
+        setEditMode={setEditMode}
+        createStation={createStation}
+        modifyStation={modifyStation}
+        deleteStation={deleteStation}
+        setStationPoints={setStationPoints}
+      />
       <div className="station-content">
         <div className="image-display">
           {imageData && (
