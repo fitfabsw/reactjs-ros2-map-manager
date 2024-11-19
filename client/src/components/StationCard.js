@@ -9,6 +9,7 @@ function StationCard({
   setWaitingForLocation,
   selectedStationId,
   setSelectedStationId,
+  stationDetails,
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedStation, setEditedStation] = useState({ ...station });
@@ -77,8 +78,29 @@ function StationCard({
           method: "DELETE",
         });
 
+        const deletedOrder = station.order;
         if (response.ok) {
           onDelete(station.id);
+
+          const updatedStations = stationDetails.Stations.filter(
+            (s) => s.id !== station.id && s.order > deletedOrder,
+          ).map((s) => ({
+            id: s.id,
+            order: s.order - 1,
+          }));
+
+          // 批量更新其他站點的順序
+          console.log("HHHH");
+          console.log(`updatedStations: ${JSON.stringify(updatedStations)}`);
+          for (const updatedStation of updatedStations) {
+            await fetch(`/api/stations/${updatedStation.id}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ order: updatedStation.order }),
+            });
+          }
         } else {
           console.error("刪除站點失敗");
         }

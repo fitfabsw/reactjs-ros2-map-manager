@@ -230,12 +230,28 @@ function StationManager() {
 
   const deleteStation = async (stationId) => {
     try {
+      // 找到要刪除的站點的順序
+      const stationToDelete = stationDetails.Stations.find(
+        (s) => s.id === stationId,
+      );
+      const deletedOrder = stationToDelete.order;
+
       // 更新本地狀態
       setStationDetails((prevDetails) => {
+        // 過濾掉要刪除的站點
         const updatedStations = prevDetails.Stations.filter(
           (station) => station.id !== stationId,
         );
-        return { ...prevDetails, Stations: updatedStations };
+
+        // 更新後續站點的順序
+        const reorderedStations = updatedStations.map((station) => {
+          if (station.order > deletedOrder) {
+            return { ...station, order: station.order - 1 };
+          }
+          return station;
+        });
+
+        return { ...prevDetails, Stations: reorderedStations };
       });
 
       // 移除站點位置標記
@@ -244,6 +260,33 @@ function StationManager() {
           (_, index) => stationDetails.Stations[index].id !== stationId,
         ),
       );
+
+      // 更新後端
+      // 1. 刪除站點
+      // await fetch(`/api/stations/${stationId}`, {
+      //   method: "DELETE",
+      // });
+
+      // 2. 更新其他站點的順序
+      // const updatedStations = stationDetails.Stations.filter(
+      //   (s) => s.id !== stationId && s.order > deletedOrder,
+      // ).map((s) => ({
+      //   id: s.id,
+      //   order: s.order - 1,
+      // }));
+      //
+      // // 批量更新其他站點的順序
+      // console.log("GGGG");
+      // if (updatedStations.length > 0) {
+      //   await fetch("/api/stations/batch-update-order", {
+      //     method: "PUT",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //     },
+      //     body: JSON.stringify(updatedStations),
+      //   });
+      // }
+      console.log("KKKK");
     } catch (error) {
       console.error("刪除站點時發生錯誤:", error);
     }
@@ -297,7 +340,7 @@ function StationManager() {
   const [isDragging, setIsDragging] = useState(false);
 
   const handleStationDragStart = (event, stationId) => {
-    event.preventDefault(); // 防止預設的��曳行為
+    event.preventDefault(); // 防止預設的曳行為
     const stationCard = document.querySelector(
       `[data-station-id="${stationId}"]`,
     );

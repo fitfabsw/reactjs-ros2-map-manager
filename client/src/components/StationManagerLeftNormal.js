@@ -77,6 +77,7 @@ function StationManagerLeftNormal({
       y: 0,
       stl_id: stationDetails.id,
       type: "station",
+      order: stationDetails.Stations.length + 1,
     };
 
     fetch("/api/stations", {
@@ -280,6 +281,7 @@ function StationManagerLeftNormal({
                 setWaitingForLocation={setWaitingForLocation}
                 selectedStationId={selectedStationId}
                 setSelectedStationId={setSelectedStationId}
+                stationDetails={stationDetails}
               />
             ))}
           </div>
