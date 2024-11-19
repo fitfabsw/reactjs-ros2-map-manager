@@ -578,7 +578,11 @@ function StationManager() {
                     style={{
                       left: `${point.x}px`,
                       top: `${point.y}px`,
-                      cursor: isEditing ? (isDragging ? "grabbing" : "grab") : "default",
+                      cursor: isEditing
+                        ? isDragging
+                          ? "grabbing"
+                          : "grab"
+                        : "default",
                       pointerEvents: isEditing ? "auto" : "none",
                     }}
                     onMouseDown={(e) => handleStationDragStart(e, station.id)}
