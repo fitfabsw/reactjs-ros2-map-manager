@@ -360,13 +360,15 @@ function StationManagerLeftNormal({
         <>
           <div className="station-edit-header">
             <button onClick={handleBackToNormal}>返回</button>
-            <button onClick={handleCreateNewStation}>新增站點</button>
-            <button
-              onClick={() => setIsReordering(!isReordering)}
-              className={isReordering ? "active" : ""}
-            >
-              {isReordering ? "完成排序" : "重新排序"}
-            </button>
+            <div className="right-buttons">
+              <button onClick={handleCreateNewStation}>新增站點</button>
+              <button
+                onClick={() => setIsReordering(!isReordering)}
+                className={isReordering ? "active" : ""}
+              >
+                {isReordering ? "完成排序" : "重新排序"}
+              </button>
+            </div>
           </div>
           <div className="station-cards">
             {stationDetails?.Stations.map((station) => (

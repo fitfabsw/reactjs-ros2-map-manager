@@ -252,8 +252,14 @@ button:hover {
 
 .station-edit-header {
   display: flex;
-  gap: 10px;
+  justify-content: space-between;
   margin-bottom: 20px;
+  align-items: center;
+}
+
+.station-edit-header .right-buttons {
+  display: flex;
+  gap: 10px;
 }
 
 .station-edit-header button {
@@ -269,8 +275,8 @@ button:hover {
   color: white;
 }
 
-.station-edit-header button:last-child {
-  background-color: #4caf50;
+.station-edit-header .right-buttons button {
+  background-color: #275066;
   color: white;
 }
 
