@@ -41,7 +41,7 @@
 }
 
 .station-card-actions button:first-child {
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
 }
 
@@ -52,4 +52,21 @@
 
 .station-card-actions button:hover {
   opacity: 0.9;
+}
+
+.station-type-select {
+  display: block;
+  width: 100%;
+  margin: 8px 0;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
+  font-size: 14px;
+}
+
+.station-type-select:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
 }

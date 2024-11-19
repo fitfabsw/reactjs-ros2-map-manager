@@ -5,6 +5,8 @@ function StationCard({ station, onModify, onDelete }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedStation, setEditedStation] = useState({ ...station });
 
+  const stationTypes = ["start", "end", "station"];
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (!isEditing) return;
@@ -106,6 +108,19 @@ function StationCard({ station, onModify, onDelete }) {
             }
             placeholder="站點名稱"
           />
+          <select
+            value={editedStation.type || "station"}
+            onChange={(e) =>
+              setEditedStation({ ...editedStation, type: e.target.value })
+            }
+            className="station-type-select"
+          >
+            {stationTypes.map((type) => (
+              <option key={type} value={type}>
+                {type.charAt(0).toUpperCase() + type.slice(1)}
+              </option>
+            ))}
+          </select>
           <input
             type="text"
             value={editedStation.x}
@@ -126,6 +141,7 @@ function StationCard({ station, onModify, onDelete }) {
       ) : (
         <div className="station-card-view">
           <h3>{station.st_name}</h3>
+          <p>類型: {station.type || "station"}</p>
           <p>X: {station.x}</p>
           <p>Y: {station.y}</p>
           <div className="station-card-actions">
