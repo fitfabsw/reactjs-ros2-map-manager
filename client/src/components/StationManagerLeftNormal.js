@@ -100,20 +100,25 @@ function StationManagerLeftNormal({
       });
   };
 
-  // 添加鍵盤事件處理
+  // 修改鍵盤事件處理部分
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (!editMode || !stationDetails?.Stations.length) return;
 
-      const stations = stationDetails.Stations;
-      const currentIndex = stations.findIndex(
+      // 先按 order 排序站點
+      const sortedStations = [...stationDetails.Stations].sort(
+        (a, b) => a.order - b.order,
+      );
+
+      // 找到當前選中站點的索引
+      const currentIndex = sortedStations.findIndex(
         (s) => s.id === selectedStationId,
       );
 
       if (currentIndex === -1) {
         // 如果沒有選中的站點，選擇第一個
         if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-          setSelectedStationId(stations[0].id);
+          setSelectedStationId(sortedStations[0].id);
         }
         return;
       }
@@ -122,23 +127,25 @@ function StationManagerLeftNormal({
         case "ArrowUp":
           e.preventDefault();
           if (currentIndex > 0) {
-            setSelectedStationId(stations[currentIndex - 1].id);
+            // 選擇上一個站點（order 值較小的）
+            setSelectedStationId(sortedStations[currentIndex - 1].id);
             // 確保新選中的卡片可見
-            const card = document.querySelector(
-              `[data-station-id="${stations[currentIndex - 1].id}"]`,
+            const prevCard = document.querySelector(
+              `[data-station-id="${sortedStations[currentIndex - 1].id}"]`,
             );
-            card?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            prevCard?.scrollIntoView({ behavior: "smooth", block: "nearest" });
           }
           break;
         case "ArrowDown":
           e.preventDefault();
-          if (currentIndex < stations.length - 1) {
-            setSelectedStationId(stations[currentIndex + 1].id);
+          if (currentIndex < sortedStations.length - 1) {
+            // 選擇下一個站點（order 值較大的）
+            setSelectedStationId(sortedStations[currentIndex + 1].id);
             // 確保新選中的卡片可見
-            const card = document.querySelector(
-              `[data-station-id="${stations[currentIndex + 1].id}"]`,
+            const nextCard = document.querySelector(
+              `[data-station-id="${sortedStations[currentIndex + 1].id}"]`,
             );
-            card?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            nextCard?.scrollIntoView({ behavior: "smooth", block: "nearest" });
           }
           break;
         default:
@@ -371,31 +378,33 @@ function StationManagerLeftNormal({
             </div>
           </div>
           <div className="station-cards">
-            {stationDetails?.Stations.map((station) => (
-              <div
-                key={station.id}
-                draggable={isReordering}
-                onDragStart={(e) => handleDragStart(e, station)}
-                onDragEnd={handleDragEnd}
-                onDragOver={(e) => handleDragOver(e, station)}
-                className={`station-card-wrapper ${
-                  draggedStation?.id === station.id ? "dragging" : ""
-                } ${isReordering ? "reordering" : ""}`}
-              >
-                <StationCard
-                  station={station}
-                  onModify={(newDetails) =>
-                    modifyStation(station.id, newDetails)
-                  }
-                  onDelete={() => deleteStation(station.id)}
-                  setWaitingForLocation={setWaitingForLocation}
-                  selectedStationId={selectedStationId}
-                  setSelectedStationId={setSelectedStationId}
-                  stationDetails={stationDetails}
-                  isReordering={isReordering}
-                />
-              </div>
-            ))}
+            {stationDetails?.Stations.slice() // 創建陣列的副本，避免直接修改原陣列
+              .sort((a, b) => a.order - b.order) // 按 order 值排序
+              .map((station) => (
+                <div
+                  key={station.id}
+                  draggable={isReordering}
+                  onDragStart={(e) => handleDragStart(e, station)}
+                  onDragEnd={handleDragEnd}
+                  onDragOver={(e) => handleDragOver(e, station)}
+                  className={`station-card-wrapper ${
+                    draggedStation?.id === station.id ? "dragging" : ""
+                  } ${isReordering ? "reordering" : ""}`}
+                >
+                  <StationCard
+                    station={station}
+                    onModify={(newDetails) =>
+                      modifyStation(station.id, newDetails)
+                    }
+                    onDelete={() => deleteStation(station.id)}
+                    setWaitingForLocation={setWaitingForLocation}
+                    selectedStationId={selectedStationId}
+                    setSelectedStationId={setSelectedStationId}
+                    stationDetails={stationDetails}
+                    isReordering={isReordering}
+                  />
+                </div>
+              ))}
           </div>
         </>
       )}
