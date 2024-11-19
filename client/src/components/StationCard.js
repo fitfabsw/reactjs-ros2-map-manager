@@ -5,6 +5,16 @@ function StationCard({ station, onModify, onDelete }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedStation, setEditedStation] = useState({ ...station });
 
+  const handleStartEditing = () => {
+    setEditedStation({ ...station });
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
+    setEditedStation({ ...station });
+    setIsEditing(false);
+  };
+
   const handleSave = async () => {
     try {
       const response = await fetch(`/api/stations/${station.id}`, {
@@ -47,7 +57,6 @@ function StationCard({ station, onModify, onDelete }) {
 
   const handleCoordinateChange = (e, coordinate) => {
     const value = e.target.value;
-    // 允許：空值、負號、數字、小數點、以及正在輸入的小數（限制兩位）
     if (
       value === "" || // 空值
       value === "-" || // 負號
@@ -93,7 +102,7 @@ function StationCard({ station, onModify, onDelete }) {
           />
           <div className="station-card-actions">
             <button onClick={handleSave}>保存</button>
-            <button onClick={() => setIsEditing(false)}>取消</button>
+            <button onClick={handleCancel}>取消</button>
           </div>
         </div>
       ) : (
@@ -102,7 +111,7 @@ function StationCard({ station, onModify, onDelete }) {
           <p>X: {station.x}</p>
           <p>Y: {station.y}</p>
           <div className="station-card-actions">
-            <button onClick={() => setIsEditing(true)}>修改</button>
+            <button onClick={handleStartEditing}>修改</button>
             <button onClick={handleDelete}>刪除</button>
           </div>
         </div>
