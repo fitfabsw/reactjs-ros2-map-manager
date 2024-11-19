@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import './StationCard.css';
+import React, { useState } from "react";
+import "./StationCard.css";
 
 function StationCard({ station, onModify, onDelete }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -8,9 +8,9 @@ function StationCard({ station, onModify, onDelete }) {
   const handleSave = async () => {
     try {
       const response = await fetch(`/api/stations/${station.id}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(editedStation),
       });
@@ -20,27 +20,27 @@ function StationCard({ station, onModify, onDelete }) {
         onModify(updatedStation);
         setIsEditing(false);
       } else {
-        console.error('更新站點失敗');
+        console.error("更新站點失敗");
       }
     } catch (error) {
-      console.error('更新站點時發生錯誤:', error);
+      console.error("更新站點時發生錯誤:", error);
     }
   };
 
   const handleDelete = async () => {
-    if (window.confirm('確定要刪除此站點嗎？')) {
+    if (window.confirm("確定要刪除此站點嗎？")) {
       try {
         const response = await fetch(`/api/stations/${station.id}`, {
-          method: 'DELETE',
+          method: "DELETE",
         });
 
         if (response.ok) {
           onDelete(station.id);
         } else {
-          console.error('刪除站點失敗');
+          console.error("刪除站點失敗");
         }
       } catch (error) {
-        console.error('刪除站點時發生錯誤:', error);
+        console.error("刪除站點時發生錯誤:", error);
       }
     }
   };
@@ -61,7 +61,10 @@ function StationCard({ station, onModify, onDelete }) {
             type="number"
             value={editedStation.x}
             onChange={(e) =>
-              setEditedStation({ ...editedStation, x: parseFloat(e.target.value) })
+              setEditedStation({
+                ...editedStation,
+                x: parseFloat(e.target.value),
+              })
             }
             placeholder="X 座標"
           />
@@ -69,7 +72,10 @@ function StationCard({ station, onModify, onDelete }) {
             type="number"
             value={editedStation.y}
             onChange={(e) =>
-              setEditedStation({ ...editedStation, y: parseFloat(e.target.value) })
+              setEditedStation({
+                ...editedStation,
+                y: parseFloat(e.target.value),
+              })
             }
             placeholder="Y 座標"
           />

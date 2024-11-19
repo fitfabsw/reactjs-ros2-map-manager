@@ -178,7 +178,7 @@ function StationManager() {
       // 更新本地狀態
       setStationDetails((prevDetails) => {
         const updatedStations = prevDetails.Stations.map((station) =>
-          station.id === stationId ? { ...station, ...newDetails } : station
+          station.id === stationId ? { ...station, ...newDetails } : station,
         );
         return { ...prevDetails, Stations: updatedStations };
       });
@@ -189,34 +189,41 @@ function StationManager() {
         [mapWidth, mapHeight],
         [imgRef.current.width, imgRef.current.height],
         [origin[0] + newDetails.x, origin[1] + newDetails.y],
-        resolution
+        resolution,
       );
 
       setStationPoints((prevPoints) =>
         prevPoints.map((point, index) =>
-          stationDetails.Stations[index].id === stationId ? newPoint : point
-        )
+          stationDetails.Stations[index].id === stationId ? newPoint : point,
+        ),
       );
     } catch (error) {
-      console.error('修改站點時發生錯誤:', error);
+      console.error("修改站點時發生錯誤:", error);
     }
   };
 
-  const createStation = (newStation) => {
-    setStationDetails((prevDetails) => {
-      const updatedStations = [...prevDetails.Stations, newStation];
-      return { ...prevDetails, Stations: updatedStations };
-    });
-    const newPoint = CoordinateToPixel(
-      [originImageMeta.mapWidth, originImageMeta.mapHeight],
-      [imgRef.current.width, imgRef.current.height],
-      [
-        originImageMeta.origin[0] + newStation.x,
-        originImageMeta.origin[1] + newStation.y,
-      ],
-      originImageMeta.resolution,
-    );
-    setStationPoints((prevPoints) => [...prevPoints, newPoint]);
+  const createStation = async (newStation) => {
+    try {
+      setStationDetails((prevDetails) => {
+        const updatedStations = [...prevDetails.Stations, newStation];
+        return { ...prevDetails, Stations: updatedStations };
+      });
+
+      // 計算新站點在地圖上的位置
+      const newPoint = CoordinateToPixel(
+        [originImageMeta.mapWidth, originImageMeta.mapHeight],
+        [imgRef.current.width, imgRef.current.height],
+        [
+          originImageMeta.origin[0] + newStation.x,
+          originImageMeta.origin[1] + newStation.y,
+        ],
+        originImageMeta.resolution,
+      );
+
+      setStationPoints((prevPoints) => [...prevPoints, newPoint]);
+    } catch (error) {
+      console.error("創建站點時發生錯誤:", error);
+    }
   };
 
   const deleteStation = async (stationId) => {
@@ -224,7 +231,7 @@ function StationManager() {
       // 更新本地狀態
       setStationDetails((prevDetails) => {
         const updatedStations = prevDetails.Stations.filter(
-          (station) => station.id !== stationId
+          (station) => station.id !== stationId,
         );
         return { ...prevDetails, Stations: updatedStations };
       });
@@ -232,11 +239,11 @@ function StationManager() {
       // 移除站點位置標記
       setStationPoints((prevPoints) =>
         prevPoints.filter(
-          (_, index) => stationDetails.Stations[index].id !== stationId
-        )
+          (_, index) => stationDetails.Stations[index].id !== stationId,
+        ),
       );
     } catch (error) {
-      console.error('刪除站點時發生錯誤:', error);
+      console.error("刪除站點時發生錯誤:", error);
     }
   };
 
@@ -314,21 +321,41 @@ function StationManager() {
         />
       )}
       {mode == "edit" && (
-        <div>
-          <button onClick={() => setMode("normal")}>Back to Normal Mode</button>
-          <div className="station-cards">
+        <div className="station-edit-panel">
+          <div className="station-edit-header">
+            <button onClick={() => setMode("normal")}>返回一般模式</button>
             <button
-              onClick={() =>
-                createStation({
-                  id: Date.now(),
+              onClick={() => {
+                const newStation = {
+                  // id: Date.now(), // 臨時 ID，實際應該由後端生成
+                  st_name: "New Station",
                   x: 0,
                   y: 0,
-                  st_name: "New Station",
+                  stl_id: stationDetails.id, // 關聯到當前站點列表
+                  type: "station", // 默認類型
+                };
+
+                // 發送 API 請求創建新站點
+                fetch("/api/stations", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(newStation),
                 })
-              }
+                  .then((response) => response.json())
+                  .then((createdStation) => {
+                    createStation(createdStation);
+                  })
+                  .catch((error) => {
+                    console.error("創建站點失敗:", error);
+                  });
+              }}
             >
-              Add New Station
+              新增站點
             </button>
+          </div>
+          <div className="station-cards">
             {stationDetails.Stations.map((station) => (
               <StationCard
                 key={station.id}

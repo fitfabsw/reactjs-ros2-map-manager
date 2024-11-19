@@ -356,10 +356,15 @@ router.get("/stations/:id", async (req, res) => {
 });
 
 router.post("/stations", async (req, res) => {
+  console.log("post stations");
+  console.log(req.body);
   try {
     const station = await db.Station.create(req.body);
+    console.log("AAA");
     res.status(201).json(station);
   } catch (error) {
+    console.log("BBB");
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 });
