@@ -27,6 +27,7 @@ function StationManagerLeftNormal({
   const [isReordering, setIsReordering] = useState(false);
   const [draggedStation, setDraggedStation] = useState(null);
   const [dragOverStation, setDragOverStation] = useState(null);
+  const [pendingOrderUpdates, setPendingOrderUpdates] = useState([]);
 
   const createStationList = async () => {
     if (!newStationListName || !selectedMap) return;
@@ -265,30 +266,24 @@ function StationManagerLeftNormal({
         return station;
       });
 
-      // 更新後端
-      try {
-        const updatePromises = updatedStations
-          .filter(
-            (s) => s.order !== newStations.find((ns) => ns.id === s.id).order,
-          )
-          .map((station) =>
-            fetch(`/api/stations/${station.id}`, {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ order: station.order }),
-            }),
-          );
+      // 收集需要更新的站點
+      const updates = updatedStations
+        .filter(
+          (s) => s.order !== newStations.find((ns) => ns.id === s.id).order,
+        )
+        .map((s) => ({
+          id: s.id,
+          order: s.order,
+        }));
 
-        await Promise.all(updatePromises);
+      // 將更新添加到待更新列表
+      setPendingOrderUpdates((prev) => [...prev, ...updates]);
 
-        // 更新本地狀態
-        const sortedStations = [...updatedStations].sort(
-          (a, b) => a.order - b.order,
-        );
-        setStationDetails((prev) => ({ ...prev, Stations: sortedStations }));
-      } catch (error) {
-        console.error("更新站點順序失敗:", error);
-      }
+      // 更新本地狀態
+      const sortedStations = [...updatedStations].sort(
+        (a, b) => a.order - b.order,
+      );
+      setStationDetails((prev) => ({ ...prev, Stations: sortedStations }));
     }
 
     setDraggedStation(null);
@@ -300,6 +295,41 @@ function StationManagerLeftNormal({
     e.preventDefault();
     if (station.id !== draggedStation?.id) {
       setDragOverStation(station);
+    }
+  };
+
+  const handleFinishReordering = async () => {
+    if (pendingOrderUpdates.length > 0) {
+      try {
+        // 批量更新所有待更新的站點順序
+        const updatePromises = pendingOrderUpdates.map((update) =>
+          fetch(`/api/stations/${update.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ order: update.order }),
+          }),
+        );
+
+        await Promise.all(updatePromises);
+
+        // 清空待更新列表
+        setPendingOrderUpdates([]);
+      } catch (error) {
+        console.error("更新站點順序失敗:", error);
+      }
+    }
+
+    setIsReordering(false);
+  };
+
+  const handleReorderClick = () => {
+    if (isReordering) {
+      // 點擊"完成排序"
+      handleFinishReordering();
+    } else {
+      // 點擊"重新排序"
+      setIsReordering(true);
+      setPendingOrderUpdates([]); // 清空待更新列表
     }
   };
 
@@ -370,7 +400,7 @@ function StationManagerLeftNormal({
             <div className="right-buttons">
               <button onClick={handleCreateNewStation}>新增站點</button>
               <button
-                onClick={() => setIsReordering(!isReordering)}
+                onClick={handleReorderClick}
                 className={isReordering ? "active" : ""}
               >
                 {isReordering ? "完成排序" : "重新排序"}
