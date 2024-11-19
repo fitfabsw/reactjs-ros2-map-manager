@@ -2,42 +2,151 @@
   background: white;
   border: 1px solid #ddd;
   border-radius: 8px;
-  padding: 15px;
+  padding: 16px;
   margin: 10px 0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.station-card-view {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .station-card-view h3 {
-  margin: 0 0 10px 0;
+  margin: 0;
   color: #333;
+  font-size: 1.2em;
 }
 
 .station-card-view p {
-  margin: 5px 0;
+  margin: 0;
   color: #666;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.station-card-edit input {
-  display: block;
+.station-card-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   width: 100%;
-  margin: 8px 0;
+}
+
+.input-group label {
+  font-weight: 500;
+  color: #555;
+  font-size: 0.9em;
+}
+
+.input-group input,
+.input-group select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.95em;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+.coordinates-group {
+  background-color: #f8f9fa;
+  padding: 12px;
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.coordinates-row {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.coordinate-input {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.coordinate-input label {
+  min-width: 20px;
+  font-weight: bold;
+  color: #555;
+  flex-shrink: 0;
+}
+
+.coordinate-input input {
+  flex: 1;
+  min-width: 0;
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 4px;
+  font-size: 0.95em;
+  box-sizing: border-box;
+}
+
+.location-select-btn {
+  width: 100%;
+  padding: 8px;
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.95em;
+  transition: background-color 0.2s;
+}
+
+.location-select-btn:hover {
+  background-color: #1976d2;
+}
+
+.location-select-btn.waiting {
+  background-color: #ffa000;
+  animation: pulse 1.5s infinite;
 }
 
 .station-card-actions {
   display: flex;
   gap: 10px;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .station-card-actions button {
-  padding: 6px 12px;
+  flex: 1;
+  padding: 8px 16px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  font-size: 0.95em;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 .station-card-actions button:first-child {
@@ -52,52 +161,17 @@
 
 .station-card-actions button:hover {
   opacity: 0.9;
+  transform: translateY(-1px);
 }
 
-.station-type-select {
-  display: block;
-  width: 100%;
-  margin: 8px 0;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background-color: white;
-  font-size: 14px;
-}
-
-.station-type-select:focus {
-  outline: none;
-  border-color: #4caf50;
-  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
-}
-
-.station-card.dragging {
-  border: 2px solid #4caf50;
-  box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
-}
-
-.coordinate-input {
-  display: flex;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.coordinate-input label {
-  width: 30px;
-  margin-right: 8px;
-  font-weight: bold;
-}
-
-.coordinate-input input {
-  flex: 1;
-  padding: 6px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  margin: 0;
-}
-
-.coordinate-input input:focus {
-  outline: none;
-  border-color: #4caf50;
-  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+  }
 }

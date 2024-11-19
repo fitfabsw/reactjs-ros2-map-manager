@@ -119,51 +119,61 @@ function StationCard({
     >
       {isEditing ? (
         <div className="station-card-edit">
-          <input
-            type="text"
-            value={editedStation.st_name}
-            onChange={(e) =>
-              setEditedStation({ ...editedStation, st_name: e.target.value })
-            }
-            placeholder="站點名稱"
-          />
-          <select
-            value={editedStation.type || "station"}
-            onChange={(e) =>
-              setEditedStation({ ...editedStation, type: e.target.value })
-            }
-            className="station-type-select"
-          >
-            {stationTypes.map((type) => (
-              <option key={type} value={type}>
-                {type.charAt(0).toUpperCase() + type.slice(1)}
-              </option>
-            ))}
-          </select>
-          <div className="coordinate-display">
-            <div className="coordinate-input">
-              <label>X:</label>
-              <input
-                type="text"
-                value={editedStation.x}
-                onChange={(e) => handleCoordinateChange(e, "x")}
-              />
-            </div>
-            <div className="coordinate-input">
-              <label>Y:</label>
-              <input
-                type="text"
-                value={editedStation.y}
-                onChange={(e) => handleCoordinateChange(e, "y")}
-              />
+          <div className="input-group">
+            <label>站點名稱</label>
+            <input
+              type="text"
+              value={editedStation.st_name}
+              onChange={(e) =>
+                setEditedStation({ ...editedStation, st_name: e.target.value })
+              }
+              placeholder="請輸入站點名稱"
+            />
+          </div>
+
+          <div className="input-group">
+            <label>站點類型</label>
+            <select
+              value={editedStation.type || "station"}
+              onChange={(e) =>
+                setEditedStation({ ...editedStation, type: e.target.value })
+              }
+            >
+              {stationTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="coordinates-group">
+            <div className="coordinates-row">
+              <div className="coordinate-input">
+                <label>X:</label>
+                <input
+                  type="text"
+                  value={editedStation.x}
+                  onChange={(e) => handleCoordinateChange(e, "x")}
+                />
+              </div>
+              <div className="coordinate-input">
+                <label>Y:</label>
+                <input
+                  type="text"
+                  value={editedStation.y}
+                  onChange={(e) => handleCoordinateChange(e, "y")}
+                />
+              </div>
             </div>
             <button
               onClick={handleLocationSelect}
-              className={waitingForLocation === station.id ? "waiting" : ""}
+              className={`location-select-btn ${waitingForLocation === station.id ? "waiting" : ""}`}
             >
               {waitingForLocation === station.id ? "請點選新位置" : "選擇位置"}
             </button>
           </div>
+
           <div className="station-card-actions">
             <button onClick={handleSave}>保存 (Enter)</button>
             <button onClick={handleCancel}>取消 (Esc)</button>
@@ -172,9 +182,18 @@ function StationCard({
       ) : (
         <div className="station-card-view">
           <h3>{station.st_name}</h3>
-          <p>類型: {station.type || "station"}</p>
-          <p>X: {station.x}</p>
-          <p>Y: {station.y}</p>
+          <p>
+            <span>類型:</span>
+            <span>{station.type || "station"}</span>
+          </p>
+          <p>
+            <span>X:</span>
+            <span>{station.x}</span>
+          </p>
+          <p>
+            <span>Y:</span>
+            <span>{station.y}</span>
+          </p>
           <div className="station-card-actions">
             <button onClick={handleStartEditing}>修改</button>
             <button onClick={handleDelete}>刪除</button>
