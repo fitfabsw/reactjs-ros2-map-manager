@@ -339,3 +339,22 @@ button:hover {
     opacity: 1;
   }
 }
+
+.station-marker.selected {
+  width: 16px;
+  height: 16px;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.8), 0 0 0 5px rgba(33, 150, 243, 0.5);
+  z-index: 1002;
+}
+
+.station-label {
+  position: absolute;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1003;
+}

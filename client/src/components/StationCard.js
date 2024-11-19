@@ -7,6 +7,8 @@ function StationCard({
   onDelete,
   waitingForLocation,
   setWaitingForLocation,
+  selectedStationId,
+  setSelectedStationId,
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedStation, setEditedStation] = useState({ ...station });
@@ -113,9 +115,12 @@ function StationCard({
 
   return (
     <div
-      className={`station-card ${waitingForLocation === station.id ? "waiting" : ""}`}
+      className={`station-card ${waitingForLocation === station.id ? "waiting" : ""} ${
+        selectedStationId === station.id ? "selected" : ""
+      }`}
       data-station-id={station.id}
       data-editing={isEditing}
+      onClick={() => setSelectedStationId(station.id)}
     >
       {isEditing ? (
         <div className="station-card-edit">

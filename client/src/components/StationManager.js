@@ -297,7 +297,7 @@ function StationManager() {
   const [isDragging, setIsDragging] = useState(false);
 
   const handleStationDragStart = (event, stationId) => {
-    event.preventDefault(); // 防止預設的拖曳行為
+    event.preventDefault(); // 防止預設的��曳行為
     const stationCard = document.querySelector(
       `[data-station-id="${stationId}"]`,
     );
@@ -450,6 +450,9 @@ function StationManager() {
     }
   };
 
+  // 添加新的狀態
+  const [selectedStationId, setSelectedStationId] = useState(null);
+
   return (
     <div className="station-container">
       <StationManagerLeftNormal
@@ -471,6 +474,8 @@ function StationManager() {
         draggingStationId={draggingStationId}
         waitingForLocation={waitingForLocation}
         setWaitingForLocation={setWaitingForLocation}
+        selectedStationId={selectedStationId}
+        setSelectedStationId={setSelectedStationId}
       />
       <div className="station-content">
         <div className="image-display">
@@ -562,25 +567,35 @@ function StationManager() {
               );
               const isEditing =
                 stationCard?.getAttribute("data-editing") === "true";
+              const isSelected = selectedStationId === station.id;
 
               return (
-                <div
-                  key={station.id}
-                  className={`station-marker ${station.type} ${
-                    draggingStationId === station.id ? "dragging" : ""
-                  }`}
-                  style={{
-                    left: `${point.x}px`,
-                    top: `${point.y}px`,
-                    cursor: isEditing
-                      ? isDragging
-                        ? "grabbing"
-                        : "grab"
-                      : "default",
-                    pointerEvents: isEditing ? "auto" : "none",
-                  }}
-                  onMouseDown={(e) => handleStationDragStart(e, station.id)}
-                />
+                <div key={station.id}>
+                  <div
+                    className={`station-marker ${station.type} ${
+                      draggingStationId === station.id ? "dragging" : ""
+                    } ${isSelected ? "selected" : ""}`}
+                    style={{
+                      left: `${point.x}px`,
+                      top: `${point.y}px`,
+                      cursor: isEditing ? (isDragging ? "grabbing" : "grab") : "default",
+                      pointerEvents: isEditing ? "auto" : "none",
+                    }}
+                    onMouseDown={(e) => handleStationDragStart(e, station.id)}
+                    onClick={() => setSelectedStationId(station.id)}
+                  />
+                  {isSelected && (
+                    <div
+                      className="station-label"
+                      style={{
+                        left: `${point.x + 15}px`,
+                        top: `${point.y - 10}px`,
+                      }}
+                    >
+                      {station.st_name}
+                    </div>
+                  )}
+                </div>
               );
             })}
           <StationManagerInfo

@@ -7,6 +7,24 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   width: 100%;
   box-sizing: border-box;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.station-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.station-card.selected {
+  border: 2px solid #2196F3;
+  background-color: rgba(33, 150, 243, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(33, 150, 243, 0.25);
+}
+
+.station-card.selected:hover {
+  box-shadow: 0 6px 12px rgba(33, 150, 243, 0.3);
 }
 
 .station-card-view {

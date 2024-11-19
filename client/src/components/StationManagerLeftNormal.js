@@ -19,6 +19,8 @@ function StationManagerLeftNormal({
   deleteStation,
   setStationPoints,
   setWaitingForLocation,
+  selectedStationId,
+  setSelectedStationId,
 }) {
   const [newStationListName, setNewStationListName] = useState("");
 
@@ -49,6 +51,7 @@ function StationManagerLeftNormal({
   };
 
   const handleBackToNormal = async () => {
+    setSelectedStationId(null);
     setEditMode(false);
     setStationPoints(null);
     // 重新載入當前地圖的站點列表
@@ -149,6 +152,8 @@ function StationManagerLeftNormal({
                 onModify={(newDetails) => modifyStation(station.id, newDetails)}
                 onDelete={() => deleteStation(station.id)}
                 setWaitingForLocation={setWaitingForLocation}
+                selectedStationId={selectedStationId}
+                setSelectedStationId={setSelectedStationId}
               />
             ))}
           </div>
