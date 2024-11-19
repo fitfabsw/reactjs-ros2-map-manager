@@ -1,9 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./StationCard.css";
 
 function StationCard({ station, onModify, onDelete }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedStation, setEditedStation] = useState({ ...station });
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!isEditing) return;
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleSave();
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        handleCancel();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isEditing, editedStation]);
 
   const handleStartEditing = () => {
     setEditedStation({ ...station });
@@ -101,8 +119,8 @@ function StationCard({ station, onModify, onDelete }) {
             placeholder="Y 座標"
           />
           <div className="station-card-actions">
-            <button onClick={handleSave}>保存</button>
-            <button onClick={handleCancel}>取消</button>
+            <button onClick={handleSave}>保存 (Enter)</button>
+            <button onClick={handleCancel}>取消 (Esc)</button>
           </div>
         </div>
       ) : (
