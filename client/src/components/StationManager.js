@@ -293,20 +293,161 @@ function StationManager() {
 
   const { h: horizontalLines, v: verticalLines } = calculateGridLines();
 
-  const handleMouseMove = (event) => {
-    const rect = event.target.getBoundingClientRect(); // 獲取圖片的邊界矩形
-    const x = Math.round(event.clientX - rect.left); // 計算 x 坐標
-    const y = Math.round(event.clientY - rect.top); // 計算 y 坐標
-    setPixelLocation({ x, y }); // 更新像素位置
+  const [draggingStationId, setDraggingStationId] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
 
-    const { mapWidth, mapHeight, origin, resolution } = originImageMeta;
-    const [W, H] = [imgRef.current.width, imgRef.current.height]; // actual size in pixels
-    const [w, h] = [mapWidth, mapHeight]; // original size in pixels
-    const scale = H / h;
-    setScale(scale);
-    setCoordLocation(
-      PixelToCoordinate([x, y], [W, H], [w, h], resolution, origin),
+  const handleStationDragStart = (event, stationId) => {
+    event.preventDefault(); // 防止預設的拖曳行為
+    const stationCard = document.querySelector(
+      `[data-station-id="${stationId}"]`,
     );
+    const isEditing = stationCard?.getAttribute("data-editing") === "true";
+
+    if (isEditing) {
+      setDraggingStationId(stationId);
+      setIsDragging(true);
+
+      // 添加全局滑鼠事件監聽
+      document.addEventListener("mousemove", handleGlobalMouseMove);
+      document.addEventListener("mouseup", handleGlobalMouseUp);
+    }
+  };
+
+  const handleStationDragEnd = () => {
+    setDraggingStationId(null);
+    setIsDragging(false);
+  };
+
+  const handleMouseMove = (event) => {
+    if (!imgRef.current) return; // 確保 imgRef.current 存在
+
+    const rect = imgRef.current.getBoundingClientRect();
+    const x = Math.round(event.clientX - rect.left);
+    const y = Math.round(event.clientY - rect.top);
+
+    // 檢查滑鼠是否在圖片範圍內
+    if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
+      setPixelLocation({ x, y });
+
+      const { mapWidth, mapHeight, origin, resolution } = originImageMeta;
+      const [W, H] = [imgRef.current.width, imgRef.current.height];
+      const [w, h] = [mapWidth, mapHeight];
+      const scale = H / h;
+      setScale(scale);
+
+      const newCoord = PixelToCoordinate(
+        [x, y],
+        [W, H],
+        [w, h],
+        resolution,
+        origin,
+      );
+
+      // 將座標值限制到兩位小數
+      newCoord.x = parseFloat(newCoord.x.toFixed(2));
+      newCoord.y = parseFloat(newCoord.y.toFixed(2));
+
+      setCoordLocation(newCoord);
+
+      // 如果正在等待選擇位置，更新預覽
+      if (waitingForLocation) {
+        const updatedStation = {
+          ...stationDetails.Stations.find((s) => s.id === waitingForLocation),
+          x: newCoord.x,
+          y: newCoord.y,
+        };
+
+        // 更新 stationDetails 中的座標（即時預覽）
+        setStationDetails((prev) => ({
+          ...prev,
+          Stations: prev.Stations.map((s) =>
+            s.id === waitingForLocation ? updatedStation : s,
+          ),
+        }));
+      }
+    }
+  };
+
+  const handleMouseUp = () => {
+    if (isDragging) {
+      handleStationDragEnd();
+    }
+  };
+
+  // 新增全局滑鼠移動處理函數
+  const handleGlobalMouseMove = (event) => {
+    if (isDragging && imgRef.current) {
+      const rect = imgRef.current.getBoundingClientRect();
+      const x = Math.round(event.clientX - rect.left);
+      const y = Math.round(event.clientY - rect.top);
+
+      // 檢查是否在圖片範圍內
+      if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
+        handleMouseMove({
+          target: imgRef.current,
+          clientX: event.clientX,
+          clientY: event.clientY,
+        });
+      }
+    }
+  };
+
+  // 新增全局滑鼠放開處理函數
+  const handleGlobalMouseUp = () => {
+    if (isDragging) {
+      handleStationDragEnd();
+      // 移除全局事件監聽
+      document.removeEventListener("mousemove", handleGlobalMouseMove);
+      document.removeEventListener("mouseup", handleGlobalMouseUp);
+    }
+  };
+
+  // 添加新的狀態
+  const [waitingForLocation, setWaitingForLocation] = useState(null); // 存儲等待位置選擇的站點 ID
+
+  // 添加點擊地圖處理函數
+  const handleMapClick = (event) => {
+    if (waitingForLocation) {
+      const rect = event.target.getBoundingClientRect();
+      const x = Math.round(event.clientX - rect.left);
+      const y = Math.round(event.clientY - rect.top);
+
+      const { mapWidth, mapHeight, origin, resolution } = originImageMeta;
+      const [W, H] = [imgRef.current.width, imgRef.current.height];
+      const [w, h] = [mapWidth, mapHeight];
+
+      const newCoord = PixelToCoordinate(
+        [x, y],
+        [W, H],
+        [w, h],
+        resolution,
+        origin,
+      );
+
+      // 更新站點位置
+      const updatedStation = {
+        ...stationDetails.Stations.find((s) => s.id === waitingForLocation),
+        x: parseFloat(newCoord.x.toFixed(2)),
+        y: parseFloat(newCoord.y.toFixed(2)),
+      };
+
+      // 更新後端
+      fetch(`/api/stations/${waitingForLocation}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedStation),
+      })
+        .then((response) => response.json())
+        .then(() => {
+          modifyStation(waitingForLocation, updatedStation);
+          setWaitingForLocation(null);
+        })
+        .catch((error) => {
+          console.error("更新站點失敗:", error);
+        });
+    }
   };
 
   return (
@@ -327,21 +468,28 @@ function StationManager() {
         modifyStation={modifyStation}
         deleteStation={deleteStation}
         setStationPoints={setStationPoints}
+        draggingStationId={draggingStationId}
+        waitingForLocation={waitingForLocation}
+        setWaitingForLocation={setWaitingForLocation}
       />
       <div className="station-content">
         <div className="image-display">
+          {waitingForLocation && (
+            <div className="location-prompt">請選擇欲更動之位置</div>
+          )}
           {imageData && (
             <img
               ref={imgRef}
               src={`data:image/png;base64,${imageData}`}
               alt="Map"
-              onLoad={handleGetImageElement} // 在圖片加載後獲取元素
+              onLoad={handleGetImageElement}
               style={{
                 maxWidth: "100%",
                 height: "auto",
                 display: "block",
+                cursor: waitingForLocation ? "crosshair" : "default",
               }}
-              onMouseMove={handleMouseMove}
+              onClick={handleMapClick}
             />
           )}
           {imageData && (
@@ -407,16 +555,34 @@ function StationManager() {
             />
           )}
           {stationPoints &&
-            stationPoints.map((point) => (
-              <div
-                className="origin-marker"
-                style={{
-                  left: `${point.x}px`,
-                  top: `${point.y}px`,
-                  backgroundColor: "red",
-                }}
-              />
-            ))}
+            stationPoints.map((point, index) => {
+              const station = stationDetails.Stations[index];
+              const stationCard = document.querySelector(
+                `[data-station-id="${station.id}"]`,
+              );
+              const isEditing =
+                stationCard?.getAttribute("data-editing") === "true";
+
+              return (
+                <div
+                  key={station.id}
+                  className={`station-marker ${station.type} ${
+                    draggingStationId === station.id ? "dragging" : ""
+                  }`}
+                  style={{
+                    left: `${point.x}px`,
+                    top: `${point.y}px`,
+                    cursor: isEditing
+                      ? isDragging
+                        ? "grabbing"
+                        : "grab"
+                      : "default",
+                    pointerEvents: isEditing ? "auto" : "none",
+                  }}
+                  onMouseDown={(e) => handleStationDragStart(e, station.id)}
+                />
+              );
+            })}
           <StationManagerInfo
             imageData={imageData}
             originPixelPos={originPixelPos}

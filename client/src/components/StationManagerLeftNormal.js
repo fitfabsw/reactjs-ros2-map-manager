@@ -18,6 +18,7 @@ function StationManagerLeftNormal({
   modifyStation,
   deleteStation,
   setStationPoints,
+  setWaitingForLocation,
 }) {
   const [newStationListName, setNewStationListName] = useState("");
 
@@ -147,6 +148,7 @@ function StationManagerLeftNormal({
                 station={station}
                 onModify={(newDetails) => modifyStation(station.id, newDetails)}
                 onDelete={() => deleteStation(station.id)}
+                setWaitingForLocation={setWaitingForLocation}
               />
             ))}
           </div>

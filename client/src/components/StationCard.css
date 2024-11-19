@@ -70,3 +70,34 @@
   border-color: #4caf50;
   box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
 }
+
+.station-card.dragging {
+  border: 2px solid #4caf50;
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+}
+
+.coordinate-input {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.coordinate-input label {
+  width: 30px;
+  margin-right: 8px;
+  font-weight: bold;
+}
+
+.coordinate-input input {
+  flex: 1;
+  padding: 6px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin: 0;
+}
+
+.coordinate-input input:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}

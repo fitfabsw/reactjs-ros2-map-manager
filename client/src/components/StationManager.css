@@ -249,3 +249,93 @@ button:hover {
   border-right: 1px solid #ddd;
   overflow-y: auto;
 }
+
+.station-marker {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  transition:
+    width 0.2s,
+    height 0.2s;
+  pointer-events: none;
+  user-select: none;
+}
+
+.station-marker[data-editable="true"] {
+  pointer-events: auto;
+}
+
+.station-marker.dragging {
+  width: 16px;
+  height: 16px;
+  cursor: grabbing !important;
+  z-index: 1001;
+}
+
+.station-marker.start {
+  background-color: #4caf50;
+}
+
+.station-marker.end {
+  background-color: #f44336;
+}
+
+.station-marker.station {
+  background-color: #2196f3;
+}
+
+.station-marker:hover {
+  width: 16px;
+  height: 16px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+.location-prompt {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 4px;
+  z-index: 1000;
+}
+
+.coordinate-display {
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.coordinate-display button {
+  width: 100%;
+  margin-top: 5px;
+  padding: 8px;
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.coordinate-display button.waiting {
+  background-color: #ffa000;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+  }
+}

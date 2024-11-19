@@ -1,5 +1,21 @@
 ### 2024/11/19
 
+測試結果
+
+1. 只有在點選修改按鈕後，才能拖曳對應的站點
+   ok
+2. 拖曳時會顯示抓取游標
+   not ok.
+   只能拖一下，即使滑鼠還按著，也會停止拖曳
+3. 放開滑鼠按鈕後會停止拖曳
+   not ok
+4. 滑鼠離開圖片區域時也會停止拖曳
+   無法測試
+5. 非編輯狀態的站點不可拖曳
+   ok
+
+另外, x,y 欄位的值沒有更新
+
 I am now working on the frontend module StationManager
 which have three components
 

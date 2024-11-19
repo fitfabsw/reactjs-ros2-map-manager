@@ -1,11 +1,22 @@
 import React, { useState, useEffect } from "react";
 import "./StationCard.css";
 
-function StationCard({ station, onModify, onDelete }) {
+function StationCard({
+  station,
+  onModify,
+  onDelete,
+  waitingForLocation,
+  setWaitingForLocation,
+}) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedStation, setEditedStation] = useState({ ...station });
 
   const stationTypes = ["start", "end", "station"];
+
+  // 當 station prop 更新時，同步更新 editedStation
+  useEffect(() => {
+    setEditedStation({ ...station });
+  }, [station]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -96,8 +107,16 @@ function StationCard({ station, onModify, onDelete }) {
     }
   };
 
+  const handleLocationSelect = () => {
+    setWaitingForLocation(station.id);
+  };
+
   return (
-    <div className="station-card">
+    <div
+      className={`station-card ${waitingForLocation === station.id ? "waiting" : ""}`}
+      data-station-id={station.id}
+      data-editing={isEditing}
+    >
       {isEditing ? (
         <div className="station-card-edit">
           <input
@@ -121,18 +140,30 @@ function StationCard({ station, onModify, onDelete }) {
               </option>
             ))}
           </select>
-          <input
-            type="text"
-            value={editedStation.x}
-            onChange={(e) => handleCoordinateChange(e, "x")}
-            placeholder="X 座標"
-          />
-          <input
-            type="text"
-            value={editedStation.y}
-            onChange={(e) => handleCoordinateChange(e, "y")}
-            placeholder="Y 座標"
-          />
+          <div className="coordinate-display">
+            <div className="coordinate-input">
+              <label>X:</label>
+              <input
+                type="text"
+                value={editedStation.x}
+                onChange={(e) => handleCoordinateChange(e, "x")}
+              />
+            </div>
+            <div className="coordinate-input">
+              <label>Y:</label>
+              <input
+                type="text"
+                value={editedStation.y}
+                onChange={(e) => handleCoordinateChange(e, "y")}
+              />
+            </div>
+            <button
+              onClick={handleLocationSelect}
+              className={waitingForLocation === station.id ? "waiting" : ""}
+            >
+              {waitingForLocation === station.id ? "請點選新位置" : "選擇位置"}
+            </button>
+          </div>
           <div className="station-card-actions">
             <button onClick={handleSave}>保存 (Enter)</button>
             <button onClick={handleCancel}>取消 (Esc)</button>
