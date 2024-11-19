@@ -147,6 +147,63 @@ function StationManagerLeftNormal({
     };
   }, [editMode, selectedStationId, stationDetails, setSelectedStationId]);
 
+  // 修改站點列表名稱
+  const handleEditStationList = async (e, list) => {
+    e.stopPropagation(); // 防止觸發卡片的點擊事件
+    const newName = prompt("請輸入新的站點列表名稱", list.stl_name);
+    if (!newName || newName === list.stl_name) return;
+
+    try {
+      const response = await fetch(`/api/stationlists/${list.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          stl_name: newName,
+          mid: selectedMap,
+        }),
+      });
+
+      if (response.ok) {
+        const updatedList = await response.json();
+        setStationLists((lists) =>
+          lists.map((l) => (l.id === list.id ? updatedList : l)),
+        );
+      } else {
+        console.error("更新站點列表失敗");
+      }
+    } catch (error) {
+      console.error("更新站點列表時發生錯誤:", error);
+    }
+  };
+
+  // 刪除站點列表
+  const handleDeleteStationList = async (e, list) => {
+    e.stopPropagation(); // 防止觸發卡片的點擊事件
+    if (
+      !window.confirm(
+        `確定要刪除站點列表 "${list.stl_name}" 嗎？\n此操作將同時刪除列表中的所有站點。`,
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/stationlists/${list.id}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        setStationLists((lists) => lists.filter((l) => l.id !== list.id));
+      } else {
+        console.error("刪除站點列表失敗");
+      }
+    } catch (error) {
+      console.error("刪除站點列表時發生錯誤:", error);
+    }
+  };
+
   return (
     <div className="station-left-panel">
       {!editMode && (
@@ -175,16 +232,33 @@ function StationManagerLeftNormal({
             </div>
             <div className="station-lists-grid">
               {stationLists.map((list) => (
-                <button
-                  key={list.id}
-                  className="station-list-card"
-                  onClick={() => fetchStationDetails(list.id)}
-                >
-                  <h3>{list.stl_name}</h3>
-                  <div className="station-count">
-                    站點數量: {list.Stations?.length || 0}
+                <div key={list.id} className="station-list-card">
+                  <div className="station-list-actions">
+                    <button
+                      className="icon-button edit"
+                      onClick={(e) => handleEditStationList(e, list)}
+                      title="修改名稱"
+                    >
+                      ✎
+                    </button>
+                    <button
+                      className="icon-button delete"
+                      onClick={(e) => handleDeleteStationList(e, list)}
+                      title="刪除列表"
+                    >
+                      ×
+                    </button>
                   </div>
-                </button>
+                  <div
+                    className="station-list-content"
+                    onClick={() => fetchStationDetails(list.id)}
+                  >
+                    <h3>{list.stl_name}</h3>
+                    <div className="station-count">
+                      站點數量: {list.Stations?.length || 0}
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
           </div>

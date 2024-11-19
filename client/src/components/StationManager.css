@@ -57,10 +57,52 @@
 }
 
 .station-list-card {
+  position: relative;
   background: #f5f5f5;
   border-radius: 10px;
   padding: 15px;
   box-shadow: 3px 2px 4px rgba(10, 10, 10, 0.3);
+  cursor: pointer;
+}
+
+.station-list-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 4px;
+}
+
+.icon-button {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.icon-button:hover {
+  opacity: 1;
+}
+
+.icon-button.edit {
+  color: #2196f3;
+}
+
+.icon-button.delete {
+  color: #f44336;
+}
+
+.station-list-content {
+  padding-right: 50px; /* 為按鈕預留空間 */
 }
 
 .station-list-card h3 {
