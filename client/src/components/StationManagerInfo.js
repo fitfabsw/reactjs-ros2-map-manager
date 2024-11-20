@@ -12,9 +12,25 @@ function StationManagerInfo({
   scale,
   horizontalLines,
   verticalLines,
+  statioinPoints,
 }) {
   return (
     <div className="station-content">
+      {/* below is for debug usage. uncomment if needed */}
+      {/* {statioinPoints && ( */}
+      {/*   <div> */}
+      {/*     <p>Station Points:</p> */}
+      {/*     {statioinPoints.map((p, index) => ( */}
+      {/*       <div key={index}> */}
+      {/*         <span> */}
+      {/*           x: {p.x}, y: {p.y} */}
+      {/*         </span> */}
+      {/*       </div> */}
+      {/*     ))} */}
+      {/*   </div> */}
+      {/* )} */}
+      {/* {originPixelPos && <div>{originPixelPos.x}</div>} */}
+      {/* {originPixelPos && <div>{originPixelPos.y}</div>} */}
       {/* {originPixelPos && <div>{pixelsPerMeter}</div>} */}
       {/* {originPixelPos && <div>{scale}</div>} */}
       {/* {originPixelPos && <div>{pixelsPerMeter * scale}</div>} */}

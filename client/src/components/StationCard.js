@@ -13,9 +13,15 @@ function StationCard({
   editingStationId,
   setEditingStationId,
   disabled,
+  setStationPoints,
+  stationPoints,
+  CoordToPixel,
+  setStationDetails,
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedStation, setEditedStation] = useState({ ...station });
+  const [originalStation, setOriginalStation] = useState(null); // 新增狀態來保存原始站點
+  const [originalDetails, setOriginalDetails] = useState(null);
 
   const stationTypes = ["start", "end", "station"];
 
@@ -47,13 +53,50 @@ function StationCard({
     setEditedStation({ ...station });
     setIsEditing(true);
     setEditingStationId(station.id);
+    setOriginalStation({ ...station });
+    const originalDetails = stationDetails.Stations.filter(
+      (e) => e.id === station.id,
+    )[0];
+    setOriginalDetails(originalDetails);
   };
 
   const handleCancel = () => {
-    setEditedStation({ ...station });
+    console.log("originalStation", originalStation);
+    console.log("editedStation", editedStation);
+    console.log("waitingForLocation", waitingForLocation);
+
+    // 恢復地圖上的位置點圖示
+    console.log("stationDetails", stationDetails);
+    console.log("stationPoints", stationPoints);
+    const originPointPixel = CoordToPixel(originalStation);
+    console.log("originPointPixel", originPointPixel);
+    setStationPoints((prevPoints) =>
+      prevPoints.map((point, index) =>
+        stationDetails.Stations[index].id === waitingForLocation
+          ? { x: originPointPixel.x, y: originPointPixel.y } // 恢復原始位置
+          : point,
+      ),
+    );
+    setStationDetails((prevDetails) => {
+      const updatedStations = prevDetails.Stations.map((station) =>
+        station.id === waitingForLocation
+          ? { ...station, ...originalDetails }
+          : station,
+      );
+      return { ...prevDetails, Stations: updatedStations };
+    });
+    console.log("originalDetails", originalDetails);
+    console.log("stationDetails", stationDetails);
+    console.log("stationPoints", stationPoints);
+
+    setEditedStation(originalStation);
     setIsEditing(false);
     setEditingStationId(null);
     setWaitingForLocation(null);
+    setOriginalStation(null); // 清空原始位置
+
+    // 重置等待位置狀態
+    setSelectedStationId(null); // 清除選中的站點
   };
 
   const handleSave = async () => {
@@ -66,12 +109,15 @@ function StationCard({
         body: JSON.stringify(editedStation),
       });
 
+      console.log("JKJKJK");
       if (response.ok) {
         const updatedStation = await response.json();
+        console.log("updatedStation", updatedStation);
         onModify(updatedStation);
         setIsEditing(false);
         setEditingStationId(null);
         setWaitingForLocation(null);
+        setOriginalStation(null); // 清空原始位置
       } else {
         console.error("更新站點失敗");
       }
@@ -141,7 +187,10 @@ function StationCard({
   };
 
   const handleLocationSelect = () => {
+    console.log("JJJJJ");
     setWaitingForLocation(station.id);
+    console.log("station.id", station.id);
+    console.log("waitingForLocation", waitingForLocation);
   };
 
   return (
@@ -224,10 +273,12 @@ function StationCard({
           </p>
           <p>
             <span>X:</span>
+            {/* <span>{editedStation.x}</span> */}
             <span>{station.x}</span>
           </p>
           <p>
             <span>Y:</span>
+            {/* <span>{editedStation.y}</span> */}
             <span>{station.y}</span>
           </p>
           <div className="station-card-actions">

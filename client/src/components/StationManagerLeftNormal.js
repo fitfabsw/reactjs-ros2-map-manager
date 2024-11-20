@@ -18,10 +18,13 @@ function StationManagerLeftNormal({
   modifyStation,
   deleteStation,
   setStationPoints,
-  setWaitingForLocation,
   selectedStationId,
   setSelectedStationId,
   setStationDetails,
+  waitingForLocation,
+  setWaitingForLocation,
+  stationPoints,
+  CoordToPixel,
 }) {
   const [newStationListName, setNewStationListName] = useState("");
   const [isReordering, setIsReordering] = useState(false);
@@ -439,7 +442,6 @@ function StationManagerLeftNormal({
                       modifyStation(station.id, newDetails)
                     }
                     onDelete={() => deleteStation(station.id)}
-                    setWaitingForLocation={setWaitingForLocation}
                     selectedStationId={selectedStationId}
                     setSelectedStationId={setSelectedStationId}
                     stationDetails={stationDetails}
@@ -450,6 +452,12 @@ function StationManagerLeftNormal({
                       editingStationId !== null &&
                       editingStationId !== station.id
                     }
+                    setStationPoints={setStationPoints}
+                    waitingForLocation={waitingForLocation}
+                    setWaitingForLocation={setWaitingForLocation}
+                    stationPoints={stationPoints}
+                    CoordToPixel={CoordToPixel}
+                    setStationDetails={setStationDetails}
                   />
                 </div>
               ))}

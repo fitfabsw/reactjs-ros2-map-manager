@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import "./StationManager.css";
 import StationManagerLeftNormal from "./StationManagerLeftNormal";
 import StationManagerInfo from "./StationManagerInfo";
-import StationCard from "./StationCard";
 
 function StationManager() {
   const [maps, setMaps] = useState([]);
@@ -16,19 +15,8 @@ function StationManager() {
   const imgRef = useRef(null);
   const [pixelsPerMeter, setPixelsPerMeter] = useState(null);
   const [scale, setScale] = useState(1);
-  // const [mode, setMode] = useState("normal");
   const [editMode, setEditMode] = useState(false);
 
-  // const [newStationListName, setNewStationListName] = useState("");
-  // const [newStation, setNewStation] = useState({
-  //   st_name: "",
-  //   stl_id: "",
-  //   x: "",
-  //   y: "",
-  //   z: "",
-  //   w: "",
-  //   type: "station", // 默認類型
-  // });
   const [stationPoints, setStationPoints] = useState([]);
 
   const [imageDimensions, setImageDimensions] = useState({
@@ -146,6 +134,17 @@ function StationManager() {
       x: Math.round((x / resolution) * scale + (W - w * scale) / 2),
       y: Math.round((h - y / resolution) * scale),
     };
+  };
+
+  const CoordToPixel = (coord) => {
+    const { mapWidth, mapHeight, origin, resolution } = originImageMeta;
+    const pointPixel = CoordinateToPixel(
+      [mapWidth, mapHeight],
+      [imgRef.current.width, imgRef.current.height],
+      [origin[0] + coord.x, origin[1] + coord.y],
+      resolution,
+    );
+    return pointPixel;
   };
 
   const getOrigin = async () => {
@@ -339,27 +338,27 @@ function StationManager() {
   const [draggingStationId, setDraggingStationId] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
 
-  const handleStationDragStart = (event, stationId) => {
-    event.preventDefault(); // 防止預設的曳行為
-    const stationCard = document.querySelector(
-      `[data-station-id="${stationId}"]`,
-    );
-    const isEditing = stationCard?.getAttribute("data-editing") === "true";
+  // const handleStationDragStart = (event, stationId) => {
+  //   event.preventDefault(); // 防止預設的曳行為
+  //   const stationCard = document.querySelector(
+  //     `[data-station-id="${stationId}"]`,
+  //   );
+  //   const isEditing = stationCard?.getAttribute("data-editing") === "true";
+  //
+  //   if (isEditing) {
+  //     setDraggingStationId(stationId);
+  //     setIsDragging(true);
+  //
+  //     // 添加全局滑鼠事件監聽
+  //     document.addEventListener("mousemove", handleGlobalMouseMove);
+  //     document.addEventListener("mouseup", handleGlobalMouseUp);
+  //   }
+  // };
 
-    if (isEditing) {
-      setDraggingStationId(stationId);
-      setIsDragging(true);
-
-      // 添加全局滑鼠事件監聽
-      document.addEventListener("mousemove", handleGlobalMouseMove);
-      document.addEventListener("mouseup", handleGlobalMouseUp);
-    }
-  };
-
-  const handleStationDragEnd = () => {
-    setDraggingStationId(null);
-    setIsDragging(false);
-  };
+  // const handleStationDragEnd = () => {
+  //   setDraggingStationId(null);
+  //   setIsDragging(false);
+  // };
 
   const handleMouseMove = (event) => {
     if (!imgRef.current) return; // 確保 imgRef.current 存在
@@ -411,42 +410,42 @@ function StationManager() {
     }
   };
 
-  const handleMouseUp = () => {
-    if (isDragging) {
-      handleStationDragEnd();
-    }
-  };
+  // const handleMouseUp = () => {
+  //   if (isDragging) {
+  //     handleStationDragEnd();
+  //   }
+  // };
 
   // 新增全局滑鼠移動處理函數
-  const handleGlobalMouseMove = (event) => {
-    if (isDragging && imgRef.current) {
-      const rect = imgRef.current.getBoundingClientRect();
-      const x = Math.round(event.clientX - rect.left);
-      const y = Math.round(event.clientY - rect.top);
-
-      // 檢查是否在圖片範圍內
-      if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
-        handleMouseMove({
-          target: imgRef.current,
-          clientX: event.clientX,
-          clientY: event.clientY,
-        });
-      }
-    }
-  };
+  // const handleGlobalMouseMove = (event) => {
+  //   if (isDragging && imgRef.current) {
+  //     const rect = imgRef.current.getBoundingClientRect();
+  //     const x = Math.round(event.clientX - rect.left);
+  //     const y = Math.round(event.clientY - rect.top);
+  //
+  //     // 檢查是否在圖片範圍內
+  //     if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
+  //       handleMouseMove({
+  //         target: imgRef.current,
+  //         clientX: event.clientX,
+  //         clientY: event.clientY,
+  //       });
+  //     }
+  //   }
+  // };
 
   // 新增全局滑鼠放開處理函數
-  const handleGlobalMouseUp = () => {
-    if (isDragging) {
-      handleStationDragEnd();
-      // 移除全局事件監聽
-      document.removeEventListener("mousemove", handleGlobalMouseMove);
-      document.removeEventListener("mouseup", handleGlobalMouseUp);
-    }
-  };
+  // const handleGlobalMouseUp = () => {
+  //   if (isDragging) {
+  //     handleStationDragEnd();
+  //     // 移除全局事件監聽
+  //     document.removeEventListener("mousemove", handleGlobalMouseMove);
+  //     document.removeEventListener("mouseup", handleGlobalMouseUp);
+  //   }
+  // };
 
   // 添加新的狀態
-  const [waitingForLocation, setWaitingForLocation] = useState(null); // 存儲等���位置選擇的站點 ID
+  const [waitingForLocation, setWaitingForLocation] = useState(null); // 存儲等位置選擇的站點 ID
 
   // 添加點擊地圖處理函數
   const [originalStation, setOriginalStation] = useState(null); // 新增狀態來保存原始站點
@@ -469,6 +468,7 @@ function StationManager() {
         origin,
       );
       console.log("newCoord:", newCoord);
+      console.log("waitingForLocation", waitingForLocation);
 
       // 更新站點位置
       const updatedStation = {
@@ -496,40 +496,51 @@ function StationManager() {
     }
   };
 
-  const handleSave = async () => {
-    // ... existing save logic ...
+  // const handleSave = async () => {
+  //   // ... existing save logic ...
+  //
+  //   // 在保存後重置狀態
+  //   setWaitingForLocation(null); // 提示消失
+  //   setOriginalStation(null); // 清空原始位置
+  //   setIsDragging(false); // 確保拖曳狀態重置
+  //   setSelectedStationId(null); // 清除選中的站點
+  //   // 這裡可以添加其他需要重置的狀態
+  // };
 
-    // 在保存後重置狀態
-    setWaitingForLocation(null); // 提示消失
-    setOriginalStation(null); // 清空原始位置
-    setIsDragging(false); // 確保拖曳狀態重置
-    setSelectedStationId(null); // 清除選中的站點
-    // 這裡可以添加其他需要重置的狀態
-  };
-
-  const handleCancel = () => {
-    // 恢復到原始位置
-    if (originalStation) {
-      const updatedStation = {
-        ...stationDetails.Stations.find((s) => s.id === waitingForLocation),
-        x: originalStation.x,
-        y: originalStation.y,
-      };
-
-      setStationDetails((prev) => ({
-        ...prev,
-        Stations: prev.Stations.map((s) =>
-          s.id === waitingForLocation ? updatedStation : s,
-        ),
-      }));
-      setOriginalStation(null); // 清空原始位置
-    }
-
-    // 重置等待位置狀態
-    setWaitingForLocation(null); // 提示消失
-    setIsDragging(false); // 確保拖曳狀態重置
-    setSelectedStationId(null); // 清除選中的站點
-  };
+  // const handleCancel = () => {
+  //   // 恢復到原始位置
+  //   if (originalStation) {
+  //     const updatedStation = {
+  //       ...stationDetails.Stations.find((s) => s.id === waitingForLocation),
+  //       x: originalStation.x,
+  //       y: originalStation.y,
+  //     };
+  //
+  //     setStationDetails((prev) => ({
+  //       ...prev,
+  //       Stations: prev.Stations.map((s) =>
+  //         s.id === waitingForLocation ? updatedStation : s,
+  //       ),
+  //     }));
+  //     console.log("ori", originalStation);
+  //
+  //     // 恢復地圖上的位置點圖示
+  //     setStationPoints((prevPoints) =>
+  //       prevPoints.map((point, index) =>
+  //         stationDetails.Stations[index].id === waitingForLocation
+  //           ? { x: originalStation.x, y: originalStation.y } // 恢復原始位置
+  //           : point,
+  //       ),
+  //     );
+  //
+  //     setOriginalStation(null); // 清空原始位置
+  //   }
+  //
+  //   // 重置等待位置狀態
+  //   setWaitingForLocation(null); // 提示消失
+  //   setIsDragging(false); // 確保拖曳狀態重置
+  //   setSelectedStationId(null); // 清除選中的站點
+  // };
 
   // 添加新的狀態
   const [selectedStationId, setSelectedStationId] = useState(null);
@@ -558,6 +569,8 @@ function StationManager() {
         selectedStationId={selectedStationId}
         setSelectedStationId={setSelectedStationId}
         setStationDetails={setStationDetails}
+        stationPoints={stationPoints}
+        CoordToPixel={CoordToPixel}
       />
       <div className="station-content">
         <div className="image-display">
@@ -654,20 +667,18 @@ function StationManager() {
               return (
                 <div key={station.id}>
                   <div
-                    className={`station-marker ${station.type} ${
-                      draggingStationId === station.id ? "dragging" : ""
-                    } ${isSelected ? "selected" : ""}`}
+                    className={`station-marker ${station.type} ${isSelected ? "selected" : ""}`}
                     style={{
                       left: `${point.x}px`,
                       top: `${point.y}px`,
-                      cursor: isEditing
-                        ? isDragging
-                          ? "grabbing"
-                          : "grab"
-                        : "default",
+                      // cursor: isEditing
+                      //   ? isDragging
+                      //     ? "grabbing"
+                      //     : "grab"
+                      //   : "default",
                       pointerEvents: isEditing ? "auto" : "none",
                     }}
-                    onMouseDown={(e) => handleStationDragStart(e, station.id)}
+                    // onMouseDown={(e) => handleStationDragStart(e, station.id)}
                     onClick={() => setSelectedStationId(station.id)}
                   />
                   {isSelected && (
@@ -695,6 +706,7 @@ function StationManager() {
             scale={scale}
             horizontalLines={horizontalLines}
             verticalLines={verticalLines}
+            statioinPoints={stationPoints}
           />
         </div>
       </div>
