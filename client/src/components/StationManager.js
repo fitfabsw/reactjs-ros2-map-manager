@@ -446,9 +446,11 @@ function StationManager() {
   };
 
   // 添加新的狀態
-  const [waitingForLocation, setWaitingForLocation] = useState(null); // 存儲等待位置選擇的站點 ID
+  const [waitingForLocation, setWaitingForLocation] = useState(null); // 存儲等���位置選擇的站點 ID
 
   // 添加點擊地圖處理函數
+  const [originalStation, setOriginalStation] = useState(null); // 新增狀態來保存原始站點
+
   const handleMapClick = (event) => {
     if (waitingForLocation) {
       const rect = event.target.getBoundingClientRect();
@@ -466,6 +468,7 @@ function StationManager() {
         resolution,
         origin,
       );
+      console.log("newCoord:", newCoord);
 
       // 更新站點位置
       const updatedStation = {
@@ -474,23 +477,58 @@ function StationManager() {
         y: parseFloat(newCoord.y.toFixed(2)),
       };
 
-      // 更新後端
-      fetch(`/api/stations/${waitingForLocation}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedStation),
-      })
-        .then((response) => response.json())
-        .then(() => {
-          modifyStation(waitingForLocation, updatedStation);
-          setWaitingForLocation(null);
-        })
-        .catch((error) => {
-          console.error("更新站點失敗:", error);
-        });
+      // 更新 stationDetails 中的座標（即時預覽）
+      setStationDetails((prev) => ({
+        ...prev,
+        Stations: prev.Stations.map((s) =>
+          s.id === waitingForLocation ? updatedStation : s,
+        ),
+      }));
+
+      // 更新地圖上的位置點圖示
+      setStationPoints((prevPoints) =>
+        prevPoints.map((point, index) =>
+          stationDetails.Stations[index].id === waitingForLocation
+            ? { x: x, y: y }
+            : point,
+        ),
+      );
     }
+  };
+
+  const handleSave = async () => {
+    // ... existing save logic ...
+
+    // 在保存後重置狀態
+    setWaitingForLocation(null); // 提示消失
+    setOriginalStation(null); // 清空原始位置
+    setIsDragging(false); // 確保拖曳狀態重置
+    setSelectedStationId(null); // 清除選中的站點
+    // 這裡可以添加其他需要重置的狀態
+  };
+
+  const handleCancel = () => {
+    // 恢復到原始位置
+    if (originalStation) {
+      const updatedStation = {
+        ...stationDetails.Stations.find((s) => s.id === waitingForLocation),
+        x: originalStation.x,
+        y: originalStation.y,
+      };
+
+      setStationDetails((prev) => ({
+        ...prev,
+        Stations: prev.Stations.map((s) =>
+          s.id === waitingForLocation ? updatedStation : s,
+        ),
+      }));
+      setOriginalStation(null); // 清空原始位置
+    }
+
+    // 重置等待位置狀態
+    setWaitingForLocation(null); // 提示消失
+    setIsDragging(false); // 確保拖曳狀態重置
+    setSelectedStationId(null); // 清除選中的站點
   };
 
   // 添加新的狀態

@@ -53,6 +53,7 @@ function StationCard({
     setEditedStation({ ...station });
     setIsEditing(false);
     setEditingStationId(null);
+    setWaitingForLocation(null);
   };
 
   const handleSave = async () => {
@@ -70,6 +71,7 @@ function StationCard({
         onModify(updatedStation);
         setIsEditing(false);
         setEditingStationId(null);
+        setWaitingForLocation(null);
       } else {
         console.error("更新站點失敗");
       }
