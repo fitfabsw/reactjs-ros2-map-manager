@@ -2,11 +2,11 @@
   "robottypes": [
     {
       "id": 1,
-      "name": "Lino2"
+      "name": "lino2"
     },
     {
       "id": 2,
-      "name": "Artic"
+      "name": "artic"
     }
   ],
   "robots": [
