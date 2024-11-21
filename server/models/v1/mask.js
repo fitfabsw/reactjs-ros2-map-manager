@@ -1,17 +1,19 @@
 module.exports = (sequelize, DataTypes) => {
   return sequelize.define(
-    "StationList",
+    "Mask",
     {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
+      path: {
+        type: DataTypes.TEXT,
+      },
       name: {
         type: DataTypes.TEXT,
-        allowNull: false,
       },
-      map_id: {
+      mid: {
         type: DataTypes.INTEGER,
         references: {
           model: "Map",
@@ -20,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     {
-      tableName: "StationList",
+      tableName: "Mask",
       timestamps: false,
     },
   );

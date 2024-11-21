@@ -7,13 +7,15 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
-      path: {
-        type: DataTypes.TEXT,
+      pgm: {
+        type: DataTypes.BLOB,
+        // allowNull: false,
       },
-      name: {
-        type: DataTypes.TEXT,
+      yaml: {
+        type: DataTypes.BLOB,
+        // allowNull: false,
       },
-      mid: {
+      map_id: {
         type: DataTypes.INTEGER,
         references: {
           model: "Map",

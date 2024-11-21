@@ -1,0 +1,190 @@
+{
+  "robottypes": [
+    {
+      "id": 1,
+      "name": "lino2"
+    },
+    {
+      "id": 2,
+      "name": "artic"
+    }
+  ],
+  "robots": [
+    {
+      "id": 1,
+      "robottype_id": 1,
+      "sn": "1234"
+    },
+    {
+      "id": 2,
+      "robottype_id": 2,
+      "sn": "1234"
+    },
+    {
+      "id": 3,
+      "robottype_id": 1,
+      "sn": "5678"
+    },
+    {
+      "id": 4,
+      "robottype_id": 2,
+      "sn": "5678"
+    }
+  ],
+  "maps": [
+    {
+      "id": 1,
+      "name": "turtlebot3_world",
+      "robottype_id": 1,
+      "real": 0
+    },
+    {
+      "id": 2,
+      "name": "turtlebot3_world",
+      "robottype_id": 2,
+      "real": 0
+    },
+    {
+      "id": 3,
+      "name": "fit_office_2f",
+      "robottype_id": 1,
+      "real": 1
+    },
+    {
+      "id": 4,
+      "name": "fit_office_2f",
+      "robottype_id": 2,
+      "real": 1
+    },
+    {
+      "id": 5,
+      "name": "fit_newoffice_3f",
+      "robottype_id": 1,
+      "real": 1
+    },
+    {
+      "id": 6,
+      "name": "fit_newoffice_3f",
+      "robottype_id": 2,
+      "real": 1
+    },
+    {
+      "id": 7,
+      "name": "fit_newoffice_3fp",
+      "robottype_id": 1,
+      "real": 1
+    },
+    {
+      "id": 8,
+      "name": "fit_newoffice_3fp",
+      "robottype_id": 2,
+      "real": 1
+    }
+  ],
+  "masks": [
+    {
+      "id": 1,
+      "name": "keepout_mask_lino2_newoffice_3f_processed",
+      "map_id": 7
+    },
+    {
+      "id": 2,
+      "name": "keepout_mask_artic_newoffice_3f_processed",
+      "map_id": 8
+    },
+    {
+      "id": 3,
+      "name": "keepout_mask_lino2_newoffice_3f",
+      "map_id": 5
+    },
+    {
+      "id": 4,
+      "name": "keepout_mask_artic_newoffice_3f",
+      "map_id": 6
+    }
+  ],
+  "stations": [
+    {
+      "type": "start",
+      "name": "Charging station",
+      "stationlist_id": 1,
+      "order": 1,
+      "x": -1.3,
+      "y": 0.5,
+      "z": 1.0,
+      "w": 0.0
+    },
+    {
+      "type": "end",
+      "name": "Printer",
+      "stationlist_id": 1,
+      "order": 2,
+      "x": 2.4,
+      "y": -7.2,
+      "z": 1.0,
+      "w": 0.0
+    },
+    {
+      "type": "station",
+      "name": "Hallway",
+      "stationlist_id": 1,
+      "order": 3,
+      "x": -0.5,
+      "y": -7.5,
+      "z": 1.0,
+      "w": 0.0
+    },
+    {
+      "type": "station",
+      "name": "Hank's seat",
+      "stationlist_id": 1,
+      "order": 4,
+      "x": 1.0,
+      "y": -2.2,
+      "z": 1.0,
+      "w": 0.0
+    },
+    {
+      "type": "station",
+      "name": "Tree's seat",
+      "stationlist_id": 1,
+      "order": 5,
+      "x": -1.1,
+      "y": -5.0,
+      "z": 1.0,
+      "w": 0.0
+    },
+    {
+      "type": "station",
+      "name": "Main entrance door",
+      "stationlist_id": 1,
+      "order": 6,
+      "x": -5.3,
+      "y": -7.7,
+      "z": 1.0,
+      "w": 0.0
+    }
+  ],
+  "stationlists": [
+    {
+      "id": 1,
+      "name": "for_sw",
+      "map_id": 7
+    },
+    {
+      "id": 2,
+      "name": "for_dqe",
+      "map_id": 7
+    },
+    {
+      "id": 3,
+      "name": "for_sw",
+      "map_id": 8
+    },
+    {
+      "id": 4,
+      "name": "for_dqe",
+      "map_id": 8
+    }
+  ]
+}
