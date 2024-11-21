@@ -5,6 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node server.js",
+    "dev2": "node server_v2.js",
     "db:export": "node scripts/db-tools.js export",
     "db:import": "node scripts/db-tools.js import"
   },

@@ -209,9 +209,12 @@ function StationCard({
             <label>站點名稱</label>
             <input
               type="text"
-              value={editedStation.st_name}
-              onChange={(e) =>
-                setEditedStation({ ...editedStation, st_name: e.target.value })
+              // value={editedStation.st_name}
+              value={editedStation.name}
+              onChange={
+                (e) =>
+                  setEditedStation({ ...editedStation, name: e.target.value })
+                // setEditedStation({ ...editedStation, st_name: e.target.value })
               }
               placeholder="請輸入站點名稱"
             />
@@ -267,7 +270,8 @@ function StationCard({
         </div>
       ) : (
         <div className="station-card-view">
-          <h3>{station.st_name}</h3>
+          {/* <h3>{station.st_name}</h3> */}
+          <h3>{station.name}</h3>
           <p>
             <span>類型:</span>
             <span>{station.type || "station"}</span>

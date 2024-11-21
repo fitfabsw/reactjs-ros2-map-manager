@@ -27,33 +27,34 @@ function StationManager() {
   const [pixelLocation, setPixelLocation] = useState({ x: 0, y: 0 });
   const [coordLocation, setCoordLocation] = useState({ x: 0, y: 0 });
 
-  // useEffect(() => {
-  //   if (processedImageUrl) {
-  //     const img = new Image();
-  //     img.src = processedImageUrl;
-  //     img.onload = () => {
-  //       setImageDimensions({ width: img.width, height: img.height });
-  //     };
-  //   }
-  // }, [processedImageUrl]);
-
   function onChangeMap(e) {
     setSelectedMap(e.target.value);
     let found = maps.find((m) => m.id === parseInt(e.target.value));
-    let mapfile = `${found.mappath}/${found.mapname}.pgm`;
-    mapfile = mapfile.replace("/home/pi", "/home/zealzel");
-    fetchImage(mapfile);
+    // let mapfile = `${found.mappath}/${found.mapname}.pgm`;
+    // mapfile = mapfile.replace("/home/pi", "/home/zealzel");
+    fetchImage(found.id);
+    // fetchImage(mapfile);
     setStationPoints(null);
   }
 
-  const fetchImage = async (mapfile) => {
+  // function onChangeMap(e) {
+  //   setSelectedMap(e.target.value);
+  //   let found = maps.find((m) => m.id === parseInt(e.target.value));
+  //   let mapfile = `${found.mappath}/${found.mapname}.pgm`;
+  //   mapfile = mapfile.replace("/home/pi", "/home/zealzel");
+  //   fetchImage(mapfile);
+  //   setStationPoints(null);
+  // }
+
+  // const fetchImage = async (mapfile) => {
+  const fetchImage = async (map_id) => {
     try {
       const response = await fetch("/convert-pgm", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ filePath: mapfile }),
+        body: JSON.stringify({ mapId: map_id }),
       });
       const data = await response.json();
       if (response.ok) {
@@ -86,7 +87,6 @@ function StationManager() {
   };
 
   useEffect(() => {
-    // if (mode === "edit" && imageData) {
     if (editMode && imageData) {
       handleGetImageElement();
     }
@@ -159,6 +159,7 @@ function StationManager() {
   };
 
   useEffect(() => {
+    console.log("ABC!");
     fetch("/api/maps")
       .then((res) => res.json())
       .then((data) => setMaps(data))
@@ -166,6 +167,7 @@ function StationManager() {
   }, []);
 
   useEffect(() => {
+    console.log("stationlist GGGG");
     if (selectedMap) {
       fetch(`/api/maps/${selectedMap}/stationlists`)
         .then((res) => res.json())
@@ -249,43 +251,14 @@ function StationManager() {
           }
           return station;
         });
-
         return { ...prevDetails, Stations: reorderedStations };
       });
-
       // 移除站點位置標記
       setStationPoints((prevPoints) =>
         prevPoints.filter(
           (_, index) => stationDetails.Stations[index].id !== stationId,
         ),
       );
-
-      // 更新後端
-      // 1. 刪除站點
-      // await fetch(`/api/stations/${stationId}`, {
-      //   method: "DELETE",
-      // });
-
-      // 2. 更新其他站點的順序
-      // const updatedStations = stationDetails.Stations.filter(
-      //   (s) => s.id !== stationId && s.order > deletedOrder,
-      // ).map((s) => ({
-      //   id: s.id,
-      //   order: s.order - 1,
-      // }));
-      //
-      // // 批量更新其他站點的順序
-      // console.log("GGGG");
-      // if (updatedStations.length > 0) {
-      //   await fetch("/api/stations/batch-update-order", {
-      //     method: "PUT",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify(updatedStations),
-      //   });
-      // }
-      console.log("KKKK");
     } catch (error) {
       console.error("刪除站點時發生錯誤:", error);
     }
@@ -293,8 +266,11 @@ function StationManager() {
 
   const fetchStationDetails = async (stl_id) => {
     try {
+      console.log("1111111111");
       const response = await fetch(`/api/stationlists/${stl_id}`);
+      console.log("1111111111");
       const data = await response.json();
+      console.log("1111111111");
       if (response.ok) {
         console.log("Station Details:", data);
         setStationDetails(data);
@@ -335,114 +311,7 @@ function StationManager() {
 
   const { h: horizontalLines, v: verticalLines } = calculateGridLines();
 
-  const [draggingStationId, setDraggingStationId] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
-
-  // const handleStationDragStart = (event, stationId) => {
-  //   event.preventDefault(); // 防止預設的曳行為
-  //   const stationCard = document.querySelector(
-  //     `[data-station-id="${stationId}"]`,
-  //   );
-  //   const isEditing = stationCard?.getAttribute("data-editing") === "true";
-  //
-  //   if (isEditing) {
-  //     setDraggingStationId(stationId);
-  //     setIsDragging(true);
-  //
-  //     // 添加全局滑鼠事件監聽
-  //     document.addEventListener("mousemove", handleGlobalMouseMove);
-  //     document.addEventListener("mouseup", handleGlobalMouseUp);
-  //   }
-  // };
-
-  // const handleStationDragEnd = () => {
-  //   setDraggingStationId(null);
-  //   setIsDragging(false);
-  // };
-
-  const handleMouseMove = (event) => {
-    if (!imgRef.current) return; // 確保 imgRef.current 存在
-
-    const rect = imgRef.current.getBoundingClientRect();
-    const x = Math.round(event.clientX - rect.left);
-    const y = Math.round(event.clientY - rect.top);
-
-    // 檢查滑鼠是否在圖片範圍內
-    if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
-      setPixelLocation({ x, y });
-
-      const { mapWidth, mapHeight, origin, resolution } = originImageMeta;
-      const [W, H] = [imgRef.current.width, imgRef.current.height];
-      const [w, h] = [mapWidth, mapHeight];
-      const scale = H / h;
-      setScale(scale);
-
-      const newCoord = PixelToCoordinate(
-        [x, y],
-        [W, H],
-        [w, h],
-        resolution,
-        origin,
-      );
-
-      // 將座標值限制到兩位小數
-      newCoord.x = parseFloat(newCoord.x.toFixed(2));
-      newCoord.y = parseFloat(newCoord.y.toFixed(2));
-
-      setCoordLocation(newCoord);
-
-      // 如果正在等待選擇位置，更新預覽
-      if (waitingForLocation) {
-        const updatedStation = {
-          ...stationDetails.Stations.find((s) => s.id === waitingForLocation),
-          x: newCoord.x,
-          y: newCoord.y,
-        };
-
-        // 更新 stationDetails 中的座標（即時預覽）
-        setStationDetails((prev) => ({
-          ...prev,
-          Stations: prev.Stations.map((s) =>
-            s.id === waitingForLocation ? updatedStation : s,
-          ),
-        }));
-      }
-    }
-  };
-
-  // const handleMouseUp = () => {
-  //   if (isDragging) {
-  //     handleStationDragEnd();
-  //   }
-  // };
-
-  // 新增全局滑鼠移動處理函數
-  // const handleGlobalMouseMove = (event) => {
-  //   if (isDragging && imgRef.current) {
-  //     const rect = imgRef.current.getBoundingClientRect();
-  //     const x = Math.round(event.clientX - rect.left);
-  //     const y = Math.round(event.clientY - rect.top);
-  //
-  //     // 檢查是否在圖片範圍內
-  //     if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
-  //       handleMouseMove({
-  //         target: imgRef.current,
-  //         clientX: event.clientX,
-  //         clientY: event.clientY,
-  //       });
-  //     }
-  //   }
-  // };
-
-  // 新增全局滑鼠放開處理函數
-  // const handleGlobalMouseUp = () => {
-  //   if (isDragging) {
-  //     handleStationDragEnd();
-  //     // 移除全局事件監聽
-  //     document.removeEventListener("mousemove", handleGlobalMouseMove);
-  //     document.removeEventListener("mouseup", handleGlobalMouseUp);
-  //   }
-  // };
 
   // 添加新的狀態
   const [waitingForLocation, setWaitingForLocation] = useState(null); // 存儲等位置選擇的站點 ID
@@ -496,52 +365,6 @@ function StationManager() {
     }
   };
 
-  // const handleSave = async () => {
-  //   // ... existing save logic ...
-  //
-  //   // 在保存後重置狀態
-  //   setWaitingForLocation(null); // 提示消失
-  //   setOriginalStation(null); // 清空原始位置
-  //   setIsDragging(false); // 確保拖曳狀態重置
-  //   setSelectedStationId(null); // 清除選中的站點
-  //   // 這裡可以添加其他需要重置的狀態
-  // };
-
-  // const handleCancel = () => {
-  //   // 恢復到原始位置
-  //   if (originalStation) {
-  //     const updatedStation = {
-  //       ...stationDetails.Stations.find((s) => s.id === waitingForLocation),
-  //       x: originalStation.x,
-  //       y: originalStation.y,
-  //     };
-  //
-  //     setStationDetails((prev) => ({
-  //       ...prev,
-  //       Stations: prev.Stations.map((s) =>
-  //         s.id === waitingForLocation ? updatedStation : s,
-  //       ),
-  //     }));
-  //     console.log("ori", originalStation);
-  //
-  //     // 恢復地圖上的位置點圖示
-  //     setStationPoints((prevPoints) =>
-  //       prevPoints.map((point, index) =>
-  //         stationDetails.Stations[index].id === waitingForLocation
-  //           ? { x: originalStation.x, y: originalStation.y } // 恢復原始位置
-  //           : point,
-  //       ),
-  //     );
-  //
-  //     setOriginalStation(null); // 清空原始位置
-  //   }
-  //
-  //   // 重置等待位置狀態
-  //   setWaitingForLocation(null); // 提示消失
-  //   setIsDragging(false); // 確保拖曳狀態重置
-  //   setSelectedStationId(null); // 清除選中的站點
-  // };
-
   // 添加新的狀態
   const [selectedStationId, setSelectedStationId] = useState(null);
 
@@ -555,15 +378,12 @@ function StationManager() {
         onChangeMap={onChangeMap}
         stationDetails={stationDetails}
         fetchStationDetails={fetchStationDetails}
-        // mode={mode}
-        // setMode={setMode}
         editMode={editMode}
         setEditMode={setEditMode}
         createStation={createStation}
         modifyStation={modifyStation}
         deleteStation={deleteStation}
         setStationPoints={setStationPoints}
-        draggingStationId={draggingStationId}
         waitingForLocation={waitingForLocation}
         setWaitingForLocation={setWaitingForLocation}
         selectedStationId={selectedStationId}
@@ -689,7 +509,8 @@ function StationManager() {
                         top: `${point.y - 10}px`,
                       }}
                     >
-                      {station.st_name}
+                      {station.name}
+                      {/* {station.st_name} */}
                     </div>
                   )}
                 </div>
@@ -707,6 +528,7 @@ function StationManager() {
             horizontalLines={horizontalLines}
             verticalLines={verticalLines}
             statioinPoints={stationPoints}
+            stationLists={stationLists}
           />
         </div>
       </div>

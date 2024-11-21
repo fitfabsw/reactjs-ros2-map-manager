@@ -10,8 +10,6 @@ function StationManagerLeftNormal({
   onChangeMap,
   stationDetails,
   fetchStationDetails,
-  // mode,
-  // setmode,
   editMode,
   setEditMode,
   createStation,
@@ -43,8 +41,10 @@ function StationManagerLeftNormal({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          stl_name: newStationListName,
-          mid: selectedMap,
+          // stl_name: newStationListName,
+          // mid: selectedMap,
+          name: newStationListName,
+          map_id: selectedMap,
         }),
       });
       if (response.ok) {
@@ -81,10 +81,12 @@ function StationManagerLeftNormal({
 
   const handleCreateNewStation = () => {
     const newStation = {
-      st_name: "New Station",
+      // st_name: "New Station",
+      name: "New Station",
       x: 0,
       y: 0,
-      stl_id: stationDetails.id,
+      // stl_id: stationDetails.id,
+      stationlist_id: stationDetails.id,
       type: "station",
       order: stationDetails.Stations.length + 1,
     };
@@ -168,7 +170,8 @@ function StationManagerLeftNormal({
   const handleEditStationList = async (e, list) => {
     e.stopPropagation(); // 防止觸發卡片的點擊事件
     const newName = prompt("請輸入新的站點列表名稱", list.stl_name);
-    if (!newName || newName === list.stl_name) return;
+    // if (!newName || newName === list.stl_name) return;
+    if (!newName || newName === list.name) return;
 
     try {
       const response = await fetch(`/api/stationlists/${list.id}`, {
@@ -177,8 +180,10 @@ function StationManagerLeftNormal({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          stl_name: newName,
-          mid: selectedMap,
+          // stl_name: newName,
+          // mid: selectedMap,
+          name: newName,
+          map_id: selectedMap,
         }),
       });
 
@@ -200,7 +205,7 @@ function StationManagerLeftNormal({
     e.stopPropagation(); // 防止觸發卡片的點擊事件
     if (
       !window.confirm(
-        `確定要刪除站點列表 "${list.stl_name}" 嗎？\n此操作將同時刪除列表中的所有站點。`,
+        `確定要刪除站點列表 "${list.name}" 嗎？\n此操作將同時刪除列表中的所有站點。`,
       )
     ) {
       return;
@@ -347,7 +352,7 @@ function StationManagerLeftNormal({
               <option value="">選擇地圖...</option>
               {maps.map((map) => (
                 <option key={map.id} value={map.id}>
-                  {map.map} ({map.Robottype?.name})
+                  {map.name} ({map.Robottype?.name})
                 </option>
               ))}
             </select>
@@ -386,7 +391,7 @@ function StationManagerLeftNormal({
                     className="station-list-content"
                     onClick={() => fetchStationDetails(list.id)}
                   >
-                    <h3>{list.stl_name}</h3>
+                    <h3>{list.name}</h3>
                     <div className="station-count">
                       站點數量: {list.Stations?.length || 0}
                     </div>
