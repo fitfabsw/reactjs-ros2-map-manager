@@ -106,7 +106,8 @@ function StationCard({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(editedStation),
+        body: JSON.stringify({ ...editedStation, z: 1.0, w: 0.0 }),
+        // body: JSON.stringify(editedStation),
       });
 
       console.log("JKJKJK");
