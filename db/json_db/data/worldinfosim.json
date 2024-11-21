@@ -1,0 +1,96 @@
+{
+  "turtlebot3_world/artic": {
+    "map": "turtlebot3_world.yaml",
+    "mask": "keepout_mask_turtlebot3_world.yaml",
+    "stations": {
+      "two_stations": [
+        {
+          "type": "start",
+          "name": "Charging Station",
+          "x": -0.5,
+          "y": -0.5,
+          "z": 0.70711,
+          "w": 0.70711
+        },
+        {
+          "type": "end",
+          "name": "FA Room",
+          "x": 0.5,
+          "y": -0.5,
+          "z": 0.70711,
+          "w": 0.70711
+        },
+        {
+          "type": "station",
+          "name": "Station-00A",
+          "x": 1.5,
+          "y": 0.5,
+          "z": 0.70711,
+          "w": 0.70711
+        }
+      ]
+    }
+  },
+  "turtlebot3_world/lino2": {
+    "map": "turtlebot3_world.yaml",
+    "mask": "keepout_mask_turtlebot3_world.yaml",
+    "stations": {
+      "two_stations": [
+        {
+          "type": "start",
+          "name": "Charging Station",
+          "x": -1.5,
+          "y": -0.5,
+          "z": 0.70711,
+          "w": 0.70711
+        },
+        {
+          "type": "end",
+          "name": "FA Room",
+          "x": 0.5,
+          "y": -0.5,
+          "z": 0.70711,
+          "w": 0.70711
+        },
+        {
+          "type": "station",
+          "name": "Station-00A",
+          "x": 1.5,
+          "y": 0.5,
+          "z": 0.70711,
+          "w": 0.70711
+        }
+      ]
+    }
+  },
+  "room_with_tags/lino2": {
+    "map": "room_with_tags.yaml",
+    "mask": "",
+    "stations": {}
+  },
+  "room_with_tags/artic": {
+    "map": "room_with_tags.yaml",
+    "mask": "",
+    "stations": {}
+  },
+  "obstacles/lino2": {
+    "map": "obstacles.yaml",
+    "mask": "",
+    "stations": {}
+  },
+  "obstacles/artic": {
+    "map": "obstacles.yaml",
+    "mask": "",
+    "stations": {}
+  },
+  "turtlebot3_house/lino2": {
+    "map": "turtlebot3_house.yaml",
+    "mask": "",
+    "stations": {}
+  },
+  "turtlebot3_house/artic": {
+    "map": "turtlebot3_house.yaml",
+    "mask": "",
+    "stations": {}
+  }
+}

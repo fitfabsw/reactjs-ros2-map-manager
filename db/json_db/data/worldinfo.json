@@ -1,0 +1,573 @@
+{
+  "fit_newoffice_3fp/lino2": {
+    "map": "lino2_newoffice_3f_processed.yaml",
+    "mask": "keepout_mask_lino2_newoffice_3f_processed.yaml",
+    "stations": {
+      "for_sw": [
+        {
+          "type": "start",
+          "name": "Charging station(start)",
+          "x": -1.3,
+          "y": 0.5,
+          "z": 1.0,
+          "w": 0.0
+        },
+        {
+          "type": "end",
+          "name": "Printer(end)",
+          "x": 2.4,
+          "y": -7.2,
+          "z": 1.0,
+          "w": 0.0
+        },
+        {
+          "type": "station",
+          "name": "Hallway",
+          "x": -0.5,
+          "y": -7.5,
+          "z": 1.0,
+          "w": 0.0
+        },
+        {
+          "type": "station",
+          "name": "Hank's seat",
+          "x": 1.0,
+          "y": -2.2,
+          "z": 1.0,
+          "w": 0.0
+        },
+        {
+          "type": "station",
+          "name": "Tree's seat",
+          "x": -1.1,
+          "y": -5.0,
+          "z": 1.0,
+          "w": 0.0
+        },
+        {
+          "type": "station",
+          "name": "Main entrance door",
+          "x": -5.3,
+          "y": -7.7,
+          "z": 1.0,
+          "w": 0.0
+        }
+      ],
+      "for_dqe": [
+        {
+          "type": "start",
+          "name": "Charging station(start)",
+          "x": -1.4,
+          "y": 0.7,
+          "z": 0.70711,
+          "w": -0.70711
+        },
+        {
+          "type": "end",
+          "name": "FA Room(end)",
+          "x": -0.5,
+          "y": -9.0,
+          "z": 0.70711,
+          "w": 0.70711
+        },
+        {
+          "type": "station",
+          "name": "Clark's seat",
+          "x": -1.3,
+          "y": -4.7,
+          "z": 0.70711,
+          "w": 0.70711
+        },
+        {
+          "type": "station",
+          "name": "Main entrance door",
+          "x": -5.3,
+          "y": -7.7,
+          "z": 0.70711,
+          "w": 0.70711
+        },
+        {
+          "type": "station",
+          "name": "Printer",
+          "x": 2.4,
+          "y": -7.2,
+          "z": 0.70711,
+          "w": 0.70711
+        }
+      ]
+    }
+  },
+  "fit_newoffice_3fp/artic": {
+    "map": "artic_newoffice_3f_processed.yaml",
+    "mask": "keepout_mask_artic_newoffice_3f_processed.yaml",
+    "stations": {
+      "for_sw": [
+        {
+          "type": "start",
+          "name": "Charging station(start)",
+          "x": -1.3,
+          "y": -0.5,
+          "z": 1.0,
+          "w": 0.0
+        },
+        {
+          "type": "end",
+          "name": "Printer(end)",
+          "x": 0.5,
+          "y": -7.2,
+          "z": 1.0,
+          "w": 0.0
+        },
+        {
+          "type": "station",
+          "name": "Hallway",
+          "x": -0.5,
+          "y": -7.5,
+          "z": 1.0,
+          "w": 0.0
+        },
+        {
+          "type": "station",
+          "name": "Hank's seat",
+          "x": 1.0,
+          "y": -2.2,
+          "z": 1.0,
+          "w": 0.0
+        },
+        {
+          "type": "station",
+          "name": "Tree's seat",
+          "x": -1.1,
+          "y": -5.0,
+          "z": 1.0,
+          "w": 0.0
+        },
+        {
+          "type": "station",
+          "name": "Main entrance door",
+          "x": -5.3,
+          "y": -7.7,
+          "z": 1.0,
+          "w": 0.0
+        }
+      ],
+      "for_dqe": [
+        {
+          "type": "start",
+          "name": "Charging station(start)",
+          "x": -1.3,
+          "y": -0.5,
+          "z": 0.70711,
+          "w": -0.70711
+        },
+        {
+          "type": "end",
+          "name": "FA Room(end)",
+          "x": -0.5,
+          "y": -7.5,
+          "z": 0.70711,
+          "w": 0.70711
+        },
+        {
+          "type": "station",
+          "name": "Clark's seat",
+          "x": -1.3,
+          "y": -4.7,
+          "z": 0.70711,
+          "w": 0.70711
+        },
+        {
+          "type": "station",
+          "name": "Main entrance door",
+          "x": -5.3,
+          "y": -7.7,
+          "z": 0.70711,
+          "w": 0.70711
+        },
+        {
+          "type": "station",
+          "name": "Printer",
+          "x": 2.4,
+          "y": -7.2,
+          "z": 0.70711,
+          "w": 0.70711
+        }
+      ]
+    }
+  },
+  "fit_newoffice_3f/lino2": {
+    "map": "lino2_newoffice_3f.yaml",
+    "mask": "keepout_mask_lino2_newoffice_3f.yaml",
+    "stations": {
+      "for_sw": [
+        {
+          "type": "start",
+          "name": "Charging station(start)",
+          "x": 0.8,
+          "y": 1.0,
+          "z": 0.70711,
+          "w": 0.70711
+        },
+        {
+          "type": "end",
+          "name": "printer",
+          "x": -7.5,
+          "y": 1.0,
+          "z": 0.0,
+          "w": 1.0
+        },
+        {
+          "type": "station",
+          "name": "entrance door",
+          "x": -7.5,
+          "y": 5.0,
+          "z": 1.0,
+          "w": 0.0
+        },
+        {
+          "type": "station",
+          "name": "Hank's seat",
+          "x": -2.0,
+          "y": -1.0,
+          "z": 0.70711,
+          "w": -0.70711
+        },
+        {
+          "type": "station",
+          "name": "station-C",
+          "x": -5.0,
+          "y": -1.0,
+          "z": 0.70711,
+          "w": -0.70711
+        }
+      ],
+      "for_dqe": [
+        {
+          "type": "start",
+          "name": "Charging station(start)",
+          "x": 0.8,
+          "y": 1.3,
+          "z": 1.0,
+          "w": 0.0
+        },
+        {
+          "type": "end",
+          "name": "FA Room(end)",
+          "x": -9.0,
+          "y": -0.5,
+          "z": 0.0,
+          "w": 1.0
+        },
+        {
+          "type": "station",
+          "name": "Clark's seat",
+          "x": -4.8,
+          "y": 1.2,
+          "z": 0.0,
+          "w": 1.0
+        },
+        {
+          "type": "station",
+          "name": "Main entrance door",
+          "x": -7.5,
+          "y": 5.0,
+          "z": 0.0,
+          "w": 1.0
+        },
+        {
+          "type": "station",
+          "name": "Printer",
+          "x": -7.2,
+          "y": -2.5,
+          "z": 0.0,
+          "w": 1.0
+        }
+      ]
+    }
+  },
+  "fit_newoffice_3f/artic": {
+    "map": "artic_newoffice_3f.yaml",
+    "mask": "keepout_mask_artic_newoffice_3f.yaml",
+    "stations": {
+      "for_sw": [
+        {
+          "type": "start",
+          "name": "Charging station(start)",
+          "x": -2.0,
+          "y": -1.0,
+          "z": 0.70711,
+          "w": 0.70711
+        },
+        {
+          "type": "end",
+          "name": "printer",
+          "x": -7.5,
+          "y": 1.0,
+          "z": 0.0,
+          "w": 1.0
+        },
+        {
+          "type": "station",
+          "name": "entrance door",
+          "x": -7.5,
+          "y": 5.0,
+          "z": 1.0,
+          "w": 0.0
+        },
+        {
+          "type": "station",
+          "name": "Hank's seat",
+          "x": -2.0,
+          "y": -1.0,
+          "z": 0.70711,
+          "w": -0.70711
+        },
+        {
+          "type": "station",
+          "name": "station-C",
+          "x": -5.0,
+          "y": -1.0,
+          "z": 0.70711,
+          "w": -0.70711
+        }
+      ],
+      "for_dqe": [
+        {
+          "type": "start",
+          "name": "Charging station(start)",
+          "x": -0.5,
+          "y": 1.3,
+          "z": 1.0,
+          "w": 0.0
+        },
+        {
+          "type": "end",
+          "name": "FA Room(end)",
+          "x": -7.5,
+          "y": -0.5,
+          "z": 0.0,
+          "w": 1.0
+        },
+        {
+          "type": "station",
+          "name": "Clark's seat",
+          "x": -4.8,
+          "y": 1.2,
+          "z": 0.0,
+          "w": 1.0
+        },
+        {
+          "type": "station",
+          "name": "Main entrance door",
+          "x": -7.5,
+          "y": 5.0,
+          "z": 0.0,
+          "w": 1.0
+        },
+        {
+          "type": "station",
+          "name": "Printer",
+          "x": -7.2,
+          "y": -2.5,
+          "z": 0.0,
+          "w": 1.0
+        }
+      ]
+    }
+  },
+  "fit_office_2f/lino2": {
+    "map": "lino2_office_20240129.yaml",
+    "mask": "keepout_mask_lino2_office_20240129.yaml",
+    "stations": {
+      "for_sw": [
+        {
+          "type": "start",
+          "name": "Charging station(start)",
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.70711,
+          "w": 0.70711
+        },
+        {
+          "type": "end",
+          "name": "LK's seat(end)",
+          "x": -0.5,
+          "y": 0.5,
+          "z": 0.0,
+          "w": 1.0
+        },
+        {
+          "type": "station",
+          "name": "Hank's seat",
+          "x": 1.7,
+          "y": 3.0,
+          "z": 0.0,
+          "w": 1.0
+        },
+        {
+          "type": "station",
+          "name": "Gym",
+          "x": 0.5,
+          "y": 5.0,
+          "z": 0.0,
+          "w": 1.0
+        },
+        {
+          "type": "station",
+          "name": "Wenlan's seat",
+          "x": -7.0,
+          "y": 15.0,
+          "z": 0.0,
+          "w": 1.0
+        },
+        {
+          "type": "station",
+          "name": "Alice's seat",
+          "x": -5.0,
+          "y": 13.0,
+          "z": 0.0,
+          "w": 1.0
+        },
+        {
+          "type": "station",
+          "name": "Meeting table",
+          "x": -8.0,
+          "y": 4.5,
+          "z": 0.0,
+          "w": 1.0
+        }
+      ],
+      "for_dqe": []
+    }
+  },
+  "fit_office_2f/artic": {
+    "map": "office_res002_0523.yaml",
+    "mask": "keepout_mask_office_res002_0523.yaml",
+    "stations": {
+      "for_sw": [
+        {
+          "type": "start",
+          "name": "Charging Station",
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0,
+          "w": 1.0
+        },
+        {
+          "type": "end",
+          "name": "FA Room",
+          "x": 3.0,
+          "y": 3.3,
+          "z": 0.0,
+          "w": 1.0
+        },
+        {
+          "type": "station",
+          "name": "station1",
+          "x": 3.0,
+          "y": 0.0,
+          "z": 0.0,
+          "w": 1.0
+        },
+        {
+          "type": "station",
+          "name": "station2",
+          "x": 4.5,
+          "y": 5.0,
+          "z": 0.70711,
+          "w": 0.70711
+        },
+        {
+          "type": "station",
+          "name": "station3",
+          "x": 0.0,
+          "y": 9.5,
+          "z": 0.0,
+          "w": 1.0
+        },
+        {
+          "type": "station",
+          "name": "station4",
+          "x": 7.0,
+          "y": 11.5,
+          "z": 0.0,
+          "w": 1.0
+        }
+      ],
+      "for_dqe": [
+        {
+          "type": "start",
+          "name": "Charging Station",
+          "x": 5.0,
+          "y": 14.0,
+          "z": 0.0,
+          "w": 1.0
+        },
+        {
+          "type": "end",
+          "name": "FA Room",
+          "x": 5.0,
+          "y": 13.0,
+          "z": 0.0,
+          "w": 1.0
+        },
+        {
+          "type": "station",
+          "name": "FATP",
+          "x": 3.0,
+          "y": 0.0,
+          "z": 0.0,
+          "w": 1.0
+        },
+        {
+          "type": "station",
+          "name": "QT1",
+          "x": 4.5,
+          "y": 5.0,
+          "z": 0.70711,
+          "w": 0.70711
+        },
+        {
+          "type": "station",
+          "name": "FWDL",
+          "x": 0.0,
+          "y": 9.5,
+          "z": 0.0,
+          "w": 1.0
+        },
+        {
+          "type": "station",
+          "name": "FACT",
+          "x": 7.0,
+          "y": 11.5,
+          "z": 0.0,
+          "w": 1.0
+        },
+        {
+          "type": "station",
+          "name": "GMR",
+          "x": 5.0,
+          "y": 11.0,
+          "z": 0.0,
+          "w": 1.0
+        },
+        {
+          "type": "station",
+          "name": "QT2",
+          "x": 5.0,
+          "y": 12.0,
+          "z": 0.0,
+          "w": 1.0
+        },
+        {
+          "type": "station",
+          "name": "BR",
+          "x": -1.0,
+          "y": 14.0,
+          "z": 0.0,
+          "w": 1.0
+        }
+      ]
+    }
+  }
+}

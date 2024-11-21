@@ -1,0 +1,10 @@
+image: artic_newoffice_3f_processed.pgm
+mode: trinary
+resolution: 0.05
+origin:
+  - -13.233975641681269
+  - -9.821458062851242
+  - 0
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.25
