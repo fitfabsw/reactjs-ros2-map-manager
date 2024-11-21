@@ -1,4 +1,43 @@
+# ================
+#      sql  
+# ================
+update map set pgm=readfile('json_db/maps/real/artic_newoffice_3f_processed.pgm') where name='fit_newoffice_3fp' and robottype_id=2;
+update map set yaml=readfile('json_db/maps/real/artic_newoffice_3f_processed.yaml') where name='fit_newoffice_3fp' and robottype_id=2;
+update map set thumbnail=readfile('json_db/maps/real/artic_newoffice_3f_processed.jpeg') where name='fit_newoffice_3fp' and robottype_id=2;
 
+update map set pgm=readfile('json_db/maps/real/lino2_newoffice_3f_processed.pgm') where name='fit_newoffice_3fp' and robottype_id=1;
+update map set yaml=readfile('json_db/maps/real/lino2_newoffice_3f_processed.yaml') where name='fit_newoffice_3fp' and robottype_id=1;
+update map set thumbnail=readfile('json_db/maps/real/lino2_newoffice_3f_processed.jpeg') where name='fit_newoffice_3fp' and robottype_id=1;
+
+update map set pgm=readfile('json_db/maps/real/artic_newoffice_3f.pgm') where name='fit_newoffice_3f' and robottype_id=2;
+update map set yaml=readfile('json_db/maps/real/artic_newoffice_3f.yaml') where name='fit_newoffice_3f' and robottype_id=2;
+update map set thumbnail=readfile('json_db/maps/real/artic_newoffice_3f.jpeg') where name='fit_newoffice_3f' and robottype_id=2;
+
+update map set pgm=readfile('json_db/maps/real/lino2_newoffice_3f.pgm') where name='fit_newoffice_3f' and robottype_id=1;
+update map set yaml=readfile('json_db/maps/real/lino2_newoffice_3f.yaml') where name='fit_newoffice_3f' and robottype_id=1;
+update map set thumbnail=readfile('json_db/maps/real/lino2_newoffice_3f.jpeg') where name='fit_newoffice_3f' and robottype_id=1;
+
+update map set pgm=readfile('json_db/maps/real/lino2_office_20240129.pgm') where name='fit_office_2f' and robottype_id=1;
+update map set yaml=readfile('json_db/maps/real/lino2_office_20240129.yaml') where name='fit_office_2f' and robottype_id=1;
+update map set thumbnail=readfile('json_db/maps/real/lino2_office_20240129.jpeg') where name='fit_office_2f' and robottype_id=1;
+
+update map set pgm=readfile('json_db/maps/real/office_res002_0523.pgm') where name='fit_office_2f' and robottype_id=2;
+update map set yaml=readfile('json_db/maps/real/office_res002_0523.yaml') where name='fit_office_2f' and robottype_id=2;
+update map set thumbnail=readfile('json_db/maps/real/office_res002_0523.jpeg') where name='fit_office_2f' and robottype_id=2;
+
+update map set pgm=readfile('json_db/maps/sim/turtlebot3_world.pgm') where name='turtlebot3_world' and robottype_id=1;
+update map set yaml=readfile('json_db/maps/sim/turtlebot3_world.yaml') where name='turtlebot3_world' and robottype_id=1;
+update map set thumbnail=readfile('json_db/maps/sim/turtlebot3_world.jpeg') where name='turtlebot3_world' and robottype_id=1;
+
+update map set pgm=readfile('json_db/maps/sim/turtlebot3_world.pgm') where name='turtlebot3_world' and robottype_id=2;
+update map set yaml=readfile('json_db/maps/sim/turtlebot3_world.yaml') where name='turtlebot3_world' and robottype_id=2;
+update map set thumbnail=readfile('json_db/maps/sim/turtlebot3_world.jpeg') where name='turtlebot3_world' and robottype_id=2;
+
+
+
+# ================
+#      httpie  
+# ================
 # robottypes
 http http://172.20.10.2:5000/api/robottypes
 http http://172.20.10.2:5000/api/robottypes/3
