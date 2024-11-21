@@ -1,6 +1,6 @@
-const db = require('../models');
-const fs = require('fs').promises;
-const path = require('path');
+const db = require("../models");
+const fs = require("fs").promises;
+const path = require("path");
 
 async function exportData() {
   try {
@@ -10,15 +10,15 @@ async function exportData() {
       maps: await db.Map.findAll({ raw: true }),
       masks: await db.Mask.findAll({ raw: true }),
       stationLists: await db.StationList.findAll({ raw: true }),
-      stations: await db.Station.findAll({ raw: true })
+      stations: await db.Station.findAll({ raw: true }),
     };
 
-    const exportPath = path.join(__dirname, '../../db/seed-data.json');
+    const exportPath = path.join(__dirname, "../../db/seed-data-v2.json");
     await fs.writeFile(exportPath, JSON.stringify(data, null, 2));
-    console.log('Data exported successfully to:', exportPath);
+    console.log("Data exported successfully to:", exportPath);
   } catch (error) {
-    console.error('Export failed:', error);
+    console.error("Export failed:", error);
   }
 }
 
-module.exports = { exportData }; 
+module.exports = { exportData };
