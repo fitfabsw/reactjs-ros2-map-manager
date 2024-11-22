@@ -93,7 +93,8 @@
 }
 
 .file-list th {
-  background-color: #2196f3;
+  /*background-color: #2196f3;*/
+  background-color: #333;
   color: white;
 }
 

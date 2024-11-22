@@ -399,9 +399,9 @@ function MapEditor() {
           <table>
             <thead>
               <tr>
-                <th>Real</th>
+                <th>condition</th>
                 <th>Name</th>
-                <th>Robot Type</th>
+                <th>Robot</th>
               </tr>
             </thead>
             <tbody>
@@ -415,7 +415,7 @@ function MapEditor() {
                       selectedRowIndex === index ? "#e3f2fd" : "transparent", // 高亮顯示
                   }}
                 >
-                  <td>{e.real}</td>
+                  <td>{e.real ? "real" : "sim"}</td>
                   <td>{e.name}</td>
                   <td>{e.Robottype.name}</td>
                 </tr>

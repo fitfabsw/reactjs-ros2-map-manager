@@ -30,21 +30,9 @@ function StationManager() {
   function onChangeMap(e) {
     setSelectedMap(e.target.value);
     let found = maps.find((m) => m.id === parseInt(e.target.value));
-    // let mapfile = `${found.mappath}/${found.mapname}.pgm`;
-    // mapfile = mapfile.replace("/home/pi", "/home/zealzel");
     fetchImage(found.id);
-    // fetchImage(mapfile);
     setStationPoints(null);
   }
-
-  // function onChangeMap(e) {
-  //   setSelectedMap(e.target.value);
-  //   let found = maps.find((m) => m.id === parseInt(e.target.value));
-  //   let mapfile = `${found.mappath}/${found.mapname}.pgm`;
-  //   mapfile = mapfile.replace("/home/pi", "/home/zealzel");
-  //   fetchImage(mapfile);
-  //   setStationPoints(null);
-  // }
 
   // const fetchImage = async (mapfile) => {
   const fetchImage = async (map_id) => {
@@ -266,11 +254,8 @@ function StationManager() {
 
   const fetchStationDetails = async (stl_id) => {
     try {
-      console.log("1111111111");
       const response = await fetch(`/api/stationlists/${stl_id}`);
-      console.log("1111111111");
       const data = await response.json();
-      console.log("1111111111");
       if (response.ok) {
         console.log("Station Details:", data);
         setStationDetails(data);

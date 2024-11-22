@@ -101,6 +101,7 @@ function StationCard({
 
   const handleSave = async () => {
     try {
+      console.log("editStation", editedStation);
       const response = await fetch(`/api/stations/${station.id}`, {
         method: "PUT",
         headers: {
@@ -112,7 +113,9 @@ function StationCard({
 
       console.log("JKJKJK");
       if (response.ok) {
+        console.log("JKJKJK");
         const updatedStation = await response.json();
+        console.log("JKJKJK");
         console.log("updatedStation", updatedStation);
         onModify(updatedStation);
         setIsEditing(false);
