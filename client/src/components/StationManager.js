@@ -147,7 +147,6 @@ function StationManager() {
   };
 
   useEffect(() => {
-    console.log("ABC!");
     fetch("/api/maps")
       .then((res) => res.json())
       .then((data) => setMaps(data))
@@ -155,7 +154,6 @@ function StationManager() {
   }, []);
 
   useEffect(() => {
-    console.log("stationlist GGGG");
     if (selectedMap) {
       fetch(`/api/maps/${selectedMap}/stationlists`)
         .then((res) => res.json())
@@ -350,6 +348,56 @@ function StationManager() {
     }
   };
 
+  const handleMouseMove = (event) => {
+    if (!imgRef.current) return; // 確保 imgRef.current 存在
+
+    const rect = imgRef.current.getBoundingClientRect();
+    const x = Math.round(event.clientX - rect.left);
+    const y = Math.round(event.clientY - rect.top);
+
+    // 檢查滑鼠是否在圖片範圍內
+    if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
+      setPixelLocation({ x, y });
+
+      const { mapWidth, mapHeight, origin, resolution } = originImageMeta;
+      const [W, H] = [imgRef.current.width, imgRef.current.height];
+      const [w, h] = [mapWidth, mapHeight];
+      const scale = H / h;
+      setScale(scale);
+
+      const newCoord = PixelToCoordinate(
+        [x, y],
+        [W, H],
+        [w, h],
+        resolution,
+        origin,
+      );
+
+      // 將座標值限制到兩位小數
+      newCoord.x = parseFloat(newCoord.x.toFixed(2));
+      newCoord.y = parseFloat(newCoord.y.toFixed(2));
+
+      setCoordLocation(newCoord);
+
+      // 如果正在等待選擇位置，更新預覽
+      if (waitingForLocation) {
+        const updatedStation = {
+          ...stationDetails.Stations.find((s) => s.id === waitingForLocation),
+          x: newCoord.x,
+          y: newCoord.y,
+        };
+
+        // 更新 stationDetails 中的座標（即時預覽）
+        setStationDetails((prev) => ({
+          ...prev,
+          Stations: prev.Stations.map((s) =>
+            s.id === waitingForLocation ? updatedStation : s,
+          ),
+        }));
+      }
+    }
+  };
+
   // 添加新的狀態
   const [selectedStationId, setSelectedStationId] = useState(null);
 
@@ -395,6 +443,7 @@ function StationManager() {
                 cursor: waitingForLocation ? "crosshair" : "default",
               }}
               onClick={handleMapClick}
+              onMouseMove={handleMouseMove}
             />
           )}
           {imageData && (

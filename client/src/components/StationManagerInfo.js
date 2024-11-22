@@ -18,14 +18,12 @@ function StationManagerInfo({
   return (
     <div className="station-content">
       {/* below is for debug usage. uncomment if needed */}
-      ABC
-      {stationLists &&
-        stationLists.map((list, index) => (
-          <div key={index}>
-            <p>Station List: {list.name}</p>
-          </div>
-        ))}
-      DFG
+      {/* {stationLists && */}
+      {/*   stationLists.map((list, index) => ( */}
+      {/*     <div key={index}> */}
+      {/*       <p>Station List: {list.name}</p> */}
+      {/*     </div> */}
+      {/*   ))} */}
       {/* {statioinPoints && ( */}
       {/*   <div> */}
       {/*     <p>Station Points:</p> */}
