@@ -335,17 +335,45 @@ function MapEditor() {
         },
         body: JSON.stringify({ mapId: mapId }),
       });
-      const data = await response.json();
-      if (response.ok) {
-        console.log("Image Data:", data.image);
-        const blob = await fetch(`data:image/png;base64,${data.image}`).then(
-          (res) => res.blob(),
-        );
-        setProcessedImageUrl(URL.createObjectURL(blob));
-      } else {
+      if (!response.ok) {
+        const error = await response.json();
         console.error("Error fetching image:", data.error);
+        throw new Error(error.details || "Failed to convert image");
       }
-      //
+      const data = await response.json();
+      console.log("Image Data:", data.image);
+      const blob = await fetch(`data:image/png;base64,${data.image}`).then(
+        (res) => res.blob(),
+      );
+      setProcessedImageUrl(URL.createObjectURL(blob));
+      setImageMetadata(data.metadata);
+      setImageProcessedMetadata(data.metadata);
+      const { resolution, mapWidth, mapHeight, origin, scale } = data.metadata;
+
+      console.log(`imageMetadata: ${JSON.stringify(data.metadata)}`);
+
+      // 計算原點的像素位置
+      const [x, y] = origin; // in meter
+      console.log(`origin: ${origin}`);
+      console.log(`x: ${x}`);
+      console.log(`y: ${y}`);
+      console.log(`resolution: ${resolution}`);
+
+      const H = mapHeight * resolution; // m
+      const pixelX = Math.round((x / resolution) * scale);
+      const pixelY = Math.round(((H - y) / resolution) * scale);
+
+      console.log(`pixelX: ${pixelX}`);
+      console.log(`pixelY: ${pixelY}`);
+
+      setOriginPixelPos({ x: pixelX, y: pixelY });
+      console.log(`scale: ${scale}`);
+      setRotationAngle(0);
+      setScale(scale);
+      setImageShowPixelSize({
+        width: Math.round(mapWidth * scale),
+        height: Math.round(mapHeight * scale),
+      });
     } catch (error) {
       console.error("Error fetching map details:", error);
       alert(`Error fetching map details: ${error.message}`);
