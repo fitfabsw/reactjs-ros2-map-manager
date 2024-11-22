@@ -26,6 +26,11 @@ function MapEditor() {
   const rotationTimeoutRef = useRef(null);
   const previousUrl = useRef(null);
 
+  const [selectedRowIndex, setSelectedRowIndex] = useState(null);
+
+  // 添加對 file-list 的 ref
+  const fileListRef = useRef(null);
+
   // 組件卸載時清理 URL
   React.useEffect(() => {
     return () => {
@@ -266,34 +271,26 @@ function MapEditor() {
     [selectedFilePath, imageMetadata],
   );
 
+  // 更新 handleKeyPress 以檢查 file-list 是否被聚焦
   const handleKeyPress = useCallback(
     (event) => {
-      if (!isCropping && !isRotating) return;
-
-      if (event.key === "Escape") {
-        // ESC 鍵處理取消操作
-        if (isCropping) {
-          toggleCropping();
-        } else if (isRotating) {
-          toggleRotating();
-        }
-      } else if (event.key === "Enter") {
-        // Enter 鍵處理確認操作
-        if (isCropping) {
-          handleCropComplete();
-        } else if (isRotating) {
-          handleRotationComplete();
+      if (
+        fileListRef.current &&
+        document.activeElement === fileListRef.current
+      ) {
+        console.log("key!", event.key);
+        if (event.key === "ArrowDown") {
+          setSelectedRowIndex((prevIndex) =>
+            prevIndex === null ? 0 : Math.min(prevIndex + 1, maps.length - 1),
+          );
+        } else if (event.key === "ArrowUp") {
+          setSelectedRowIndex((prevIndex) =>
+            prevIndex === null ? 0 : Math.max(prevIndex - 1, 0),
+          );
         }
       }
     },
-    [
-      isCropping,
-      isRotating,
-      toggleCropping,
-      toggleRotating,
-      handleCropComplete,
-      handleRotationComplete,
-    ],
+    [maps, selectedRowIndex],
   );
 
   // 添加和移除鍵盤事件監聽器
@@ -304,6 +301,15 @@ function MapEditor() {
     };
   }, [handleKeyPress]);
 
+  useEffect(() => {
+    console.log("selectedRowIndex", selectedRowIndex);
+    console.log("maps[selectedRowIndex]", maps[selectedRowIndex]);
+    if (maps.length > 0) {
+      console.log("maps[selectedRowIndex].id", maps[selectedRowIndex].id);
+      handleFileClick(maps[selectedRowIndex].id);
+    }
+  }, [selectedRowIndex]);
+
   // 新增 useEffect 來從資料庫獲取地圖名稱
   useEffect(() => {
     const fetchMapNames = async () => {
@@ -313,8 +319,6 @@ function MapEditor() {
           throw new Error("Failed to fetch map names");
         }
         const data = await response.json();
-        console.log("SSSSSSSS");
-        console.log(data);
         setMaps(data);
       } catch (error) {
         console.error("Error fetching map names:", error);
@@ -380,22 +384,42 @@ function MapEditor() {
     }
   };
 
+  const handleRowClick = (index) => {
+    setSelectedRowIndex(index); // 設定選中的行索引
+    handleFileClick(index + 1);
+  };
+
   return (
     <div className="map-editor">
       <div className="map-editor-container">
-        <div className="file-list">
+        <div className="file-list" ref={fileListRef} tabIndex={0}>
           <h2>Maps</h2>
-          <div className="files">
-            {maps.map((e) => (
-              <div
-                key={`${e.name}/${e.Robottype.name}`}
-                className="file-item"
-                onClick={() => handleFileClick(e.id)}
-              >
-                <span className="file-name">{`${e.name}/${e.Robottype.name}`}</span>
-              </div>
-            ))}
-          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Real</th>
+                <th>Name</th>
+                <th>Robot Type</th>
+              </tr>
+            </thead>
+            <tbody>
+              {maps.map((e, index) => (
+                <tr
+                  key={`${e.name}/${e.Robottype.name}`}
+                  onClick={() => handleRowClick(index)} // 點擊行時高亮
+                  style={{
+                    cursor: "pointer",
+                    backgroundColor:
+                      selectedRowIndex === index ? "#e3f2fd" : "transparent", // 高亮顯示
+                  }}
+                >
+                  <td>{e.real}</td>
+                  <td>{e.name}</td>
+                  <td>{e.Robottype.name}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
         <div className="main-content">
           <h1>ROS2 Grid Map Editor</h1>
