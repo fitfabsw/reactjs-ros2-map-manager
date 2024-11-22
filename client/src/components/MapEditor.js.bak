@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
+import FileList from "./FileList";
 import ImageProcessingArea from "./ImageProcessingArea";
 import ControlPanel from "./ControlPanel";
 import "./MapEditor.css";
@@ -11,8 +12,6 @@ function MapEditor() {
   const [saveMessage, setSaveMessage] = useState("");
   const [crop, setCrop] = useState(null);
   const [originalImageState, setOriginalImageState] = useState(null);
-  const [mapNames, setMapNames] = useState([]);
-  const [maps, setMaps] = useState([]);
 
   // 圖片處理狀態
   const [isRotating, setIsRotating] = useState(false);
@@ -211,10 +210,10 @@ function MapEditor() {
 
   const handleRotation = useCallback(
     async (angle) => {
-      // if (!selectedFilePath || !imageMetadata) {
-      //   alert("Please select a file first");
-      //   return;
-      // }
+      if (!selectedFilePath || !imageMetadata) {
+        alert("Please select a file first");
+        return;
+      }
       setRotationAngle(angle);
       if (rotationTimeoutRef.current) {
         clearTimeout(rotationTimeoutRef.current);
@@ -304,71 +303,25 @@ function MapEditor() {
     };
   }, [handleKeyPress]);
 
-  // 新增 useEffect 來從資料庫獲取地圖名稱
-  useEffect(() => {
-    const fetchMapNames = async () => {
-      try {
-        const response = await fetch("/api/maps"); // 假設有一個 API 來獲取地圖名稱
-        if (!response.ok) {
-          throw new Error("Failed to fetch map names");
-        }
-        const data = await response.json();
-        console.log("SSSSSSSS");
-        console.log(data);
-        setMaps(data);
-      } catch (error) {
-        console.error("Error fetching map names:", error);
-      }
-    };
-
-    fetchMapNames();
-  }, []);
-
-  const handleFileClick = async (mapId) => {
-    console.log("handleFileClick");
-    console.log(mapId);
-    try {
-      const response = await fetch("/convert-pgm", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ mapId: mapId }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        console.log("Image Data:", data.image);
-        const blob = await fetch(`data:image/png;base64,${data.image}`).then(
-          (res) => res.blob(),
-        );
-        setProcessedImageUrl(URL.createObjectURL(blob));
-      } else {
-        console.error("Error fetching image:", data.error);
-      }
-      //
-    } catch (error) {
-      console.error("Error fetching map details:", error);
-      alert(`Error fetching map details: ${error.message}`);
-    }
-  };
-
   return (
     <div className="map-editor">
       <div className="map-editor-container">
-        <div className="file-list">
-          <h2>Maps</h2>
-          <div className="files">
-            {maps.map((e) => (
-              <div
-                key={`${e.name}/${e.Robottype.name}`}
-                className="file-item"
-                onClick={() => handleFileClick(e.id)}
-              >
-                <span className="file-name">{`${e.name}/${e.Robottype.name}`}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+        <FileList
+          setSelectedFilePath={setSelectedFilePath}
+          currentPath={currentPath}
+          setCurrentPath={setCurrentPath}
+          selectedFilePath={selectedFilePath}
+          isRotating={isRotating}
+          isCropping={isCropping}
+          setProcessedImageUrl={setProcessedImageUrl}
+          setImageMetadata={setImageMetadata}
+          setImageProcessedMetadata={setImageProcessedMetadata}
+          setRotationAngle={setRotationAngle}
+          setOriginPixelPos={setOriginPixelPos}
+          setImageShowPixelSize={setImageShowPixelSize}
+          setScale={setScale}
+        />
+
         <div className="main-content">
           <h1>ROS2 Grid Map Editor</h1>
           <ControlPanel

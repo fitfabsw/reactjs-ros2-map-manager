@@ -149,17 +149,17 @@ router.post("/maps/:id/blob", async (req, res) => {
 });
 
 // 新增路由來下載 BLOB 數據
-router.get("/maps/:id/blob", async (req, res) => {
-  // router.get("/maps/:id/pgm", async (req, res) => {
+// router.get("/maps/:id/blob", async (req, res) => {
+router.get("/maps/:id/pgm", async (req, res) => {
   try {
     const map = await db.Map.findByPk(req.params.id);
     if (map) {
-      // res.status(200).send(map.pgm); // 返回 BLOB 數據
-      res.status(200).json({
-        pgm: map.pgm,
-        yaml: map.yaml,
-        thumbnail: map.thumbnail,
-      }); // 返回多個 BLOB 數據
+      res.status(200).send(map.pgm); // 返回 BLOB 數據
+      // res.status(200).json({
+      //   pgm: map.pgm,
+      //   yaml: map.yaml,
+      //   thumbnail: map.thumbnail,
+      // }); // 返回多個 BLOB 數據
       // res.status(200).send(map.blobField); // 返回 BLOB 數據
     } else {
       res.status(404).json({ error: "Map not found" });

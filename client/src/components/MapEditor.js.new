@@ -211,10 +211,10 @@ function MapEditor() {
 
   const handleRotation = useCallback(
     async (angle) => {
-      // if (!selectedFilePath || !imageMetadata) {
-      //   alert("Please select a file first");
-      //   return;
-      // }
+      if (!selectedFilePath || !imageMetadata) {
+        alert("Please select a file first");
+        return;
+      }
       setRotationAngle(angle);
       if (rotationTimeoutRef.current) {
         clearTimeout(rotationTimeoutRef.current);
@@ -324,28 +324,26 @@ function MapEditor() {
     fetchMapNames();
   }, []);
 
+  // 新增 handleFileClick 函數
   const handleFileClick = async (mapId) => {
     console.log("handleFileClick");
     console.log(mapId);
     try {
-      const response = await fetch("/convert-pgm", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ mapId: mapId }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        console.log("Image Data:", data.image);
-        const blob = await fetch(`data:image/png;base64,${data.image}`).then(
-          (res) => res.blob(),
-        );
-        setProcessedImageUrl(URL.createObjectURL(blob));
-      } else {
-        console.error("Error fetching image:", data.error);
+      const response = await fetch(`/api/maps/${mapId}/pgm`); // 假設有一個 API 來獲取地圖的 PGM 數據
+      if (!response.ok) {
+        throw new Error("Failed to fetch map details");
       }
-      //
+
+      const blob = await response.blob(); // 獲取 Blob 數據
+      const imageUrl = URL.createObjectURL(blob); // 創建一個 URL 來顯示圖片
+      console.log("imageUrl");
+      console.log(imageUrl);
+
+      // 更新狀態以顯示圖片
+      setProcessedImageUrl(imageUrl); // 更新 processedImageUrl 為 Blob 的 URL
+      // 如果有其他的 metadata 需要獲取，您可以在這裡進行處理
+      // const data = await response.json(); // 如果需要其他數據
+      // setImageMetadata(data.metadata); // 假設返回的資料中有 metadata
     } catch (error) {
       console.error("Error fetching map details:", error);
       alert(`Error fetching map details: ${error.message}`);
@@ -369,40 +367,20 @@ function MapEditor() {
             ))}
           </div>
         </div>
-        <div className="main-content">
-          <h1>ROS2 Grid Map Editor</h1>
-          <ControlPanel
-            processedImageUrl={processedImageUrl}
-            isRotating={isRotating}
-            isCropping={isCropping}
-            imageMetadata={imageMetadata}
-            originPixelPos={originPixelPos}
-            imageProcessedMetadata={imageProcessedMetadata}
-            handleSave={handleSave}
-            toggleCropping={toggleCropping}
-            toggleRotating={toggleRotating}
-            handleCropComplete={handleCropComplete}
-            handleRotationComplete={handleRotationComplete}
-            rotationAngle={rotationAngle}
-            handleRotationChange={handleRotationChange}
-            scale={scale}
-            imageShowPixelSize={imageShowPixelSize}
-          />
-          <ImageProcessingArea
-            saveMessage={saveMessage}
-            selectedFilePath={selectedFilePath}
-            isRotating={isRotating}
-            rotationAngle={rotationAngle}
-            handleRotationChange={handleRotationChange}
-            processedImageUrl={processedImageUrl}
-            isCropping={isCropping}
-            crop={crop}
-            setCrop={setCrop}
-            originPixelPos={originPixelPos}
-            imageMetadata={imageMetadata}
-            scale={scale}
-          />
-        </div>
+        <ImageProcessingArea
+          saveMessage={saveMessage}
+          selectedFilePath={selectedFilePath}
+          isRotating={isRotating}
+          rotationAngle={rotationAngle}
+          handleRotationChange={handleRotationChange}
+          processedImageUrl={processedImageUrl}
+          isCropping={isCropping}
+          crop={crop}
+          setCrop={setCrop}
+          originPixelPos={originPixelPos}
+          imageMetadata={imageMetadata}
+          scale={scale}
+        />
       </div>
     </div>
   );

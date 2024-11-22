@@ -7,6 +7,7 @@ module.exports = function (app) {
       target: "http://127.0.0.1:5000",
       // target: "http://172.20.10.2:5000",
       // target: "http://10.0.1.55:5000",
+      // target: "http://192.168.0.187:5000",
       changeOrigin: true,
     }),
   );
@@ -16,6 +17,7 @@ module.exports = function (app) {
       target: "http://127.0.0.1:5000",
       // target: "http://172.20.10.2:5000",
       // target: "http://10.0.1.55:5000",
+      // target: "http://192.168.0.187:5000",
       changeOrigin: true,
     }),
   );

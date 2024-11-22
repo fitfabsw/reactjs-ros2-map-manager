@@ -72,58 +72,58 @@ const ImageDisplay = ({
               display: "block",
             }}
           />
-          {processedImageUrl && (
-            <svg
-              className="grid-overlay"
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                pointerEvents: "none",
-              }}
-              viewBox={`0 0 ${imageDimensions.width} ${imageDimensions.height}`}
-              preserveAspectRatio="none"
-            >
-              {/* 水平線 */}
-              {Array.from({ length: horizontalLines }).map((_, index) => (
-                <line
-                  key={`h-${index}`}
-                  x1="0"
-                  y1={
-                    (originPixelPos.y % (pixelsPerMeter * scale)) +
-                    index * pixelsPerMeter * scale
-                  }
-                  x2={imageDimensions.width}
-                  y2={
-                    (originPixelPos.y % (pixelsPerMeter * scale)) +
-                    index * pixelsPerMeter * scale
-                  }
-                  stroke="rgba(128,128,128,0.3)"
-                  strokeWidth="1"
-                />
-              ))}
-              {/* origin垂直線 */}
-              {Array.from({ length: verticalLines }).map((_, index) => (
-                <line
-                  key={`v-${index}`}
-                  x1={
-                    (originPixelPos.x % (pixelsPerMeter * scale)) +
-                    index * pixelsPerMeter * scale
-                  }
-                  y1="0"
-                  x2={
-                    (originPixelPos.x % (pixelsPerMeter * scale)) +
-                    index * pixelsPerMeter * scale
-                  }
-                  y2={imageDimensions.height}
-                  stroke="rgba(128,128,128,0.3)"
-                  strokeWidth="1"
-                />
-              ))}
-            </svg>
-          )}
+          {/* {processedImageUrl && ( */}
+          {/*   <svg */}
+          {/*     className="grid-overlay" */}
+          {/*     style={{ */}
+          {/*       position: "absolute", */}
+          {/*       top: 0, */}
+          {/*       left: 0, */}
+          {/*       width: "100%", */}
+          {/*       height: "100%", */}
+          {/*       pointerEvents: "none", */}
+          {/*     }} */}
+          {/*     viewBox={`0 0 ${imageDimensions.width} ${imageDimensions.height}`} */}
+          {/*     preserveAspectRatio="none" */}
+          {/*   > */}
+          {/*     {/* 水平線 */} */}
+          {/*     {Array.from({ length: horizontalLines }).map((_, index) => ( */}
+          {/*       <line */}
+          {/*         key={`h-${index}`} */}
+          {/*         x1="0" */}
+          {/*         y1={ */}
+          {/*           (originPixelPos.y % (pixelsPerMeter * scale)) + */}
+          {/*           index * pixelsPerMeter * scale */}
+          {/*         } */}
+          {/*         x2={imageDimensions.width} */}
+          {/*         y2={ */}
+          {/*           (originPixelPos.y % (pixelsPerMeter * scale)) + */}
+          {/*           index * pixelsPerMeter * scale */}
+          {/*         } */}
+          {/*         stroke="rgba(128,128,128,0.3)" */}
+          {/*         strokeWidth="1" */}
+          {/*       /> */}
+          {/*     ))} */}
+          {/*     {/* origin垂直線 */} */}
+          {/*     {Array.from({ length: verticalLines }).map((_, index) => ( */}
+          {/*       <line */}
+          {/*         key={`v-${index}`} */}
+          {/*         x1={ */}
+          {/*           (originPixelPos.x % (pixelsPerMeter * scale)) + */}
+          {/*           index * pixelsPerMeter * scale */}
+          {/*         } */}
+          {/*         y1="0" */}
+          {/*         x2={ */}
+          {/*           (originPixelPos.x % (pixelsPerMeter * scale)) + */}
+          {/*           index * pixelsPerMeter * scale */}
+          {/*         } */}
+          {/*         y2={imageDimensions.height} */}
+          {/*         stroke="rgba(128,128,128,0.3)" */}
+          {/*         strokeWidth="1" */}
+          {/*       /> */}
+          {/*     ))} */}
+          {/*   </svg> */}
+          {/* )} */}
           {originPixelPos && (
             <div
               className="origin-marker"
