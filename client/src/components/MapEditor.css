@@ -73,6 +73,11 @@
   border-right: 1px solid #ddd;
   overflow-y: auto;
   border-radius: 8px;
+  outline: none;
+}
+
+.file-list:focus {
+  outline: none;
 }
 
 .file-list table {

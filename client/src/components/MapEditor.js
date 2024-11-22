@@ -271,7 +271,7 @@ function MapEditor() {
     [selectedFilePath, imageMetadata],
   );
 
-  // 更新 handleKeyPress 以檢查 file-list 是否被聚焦
+  // 更新 handleKeyPress 以防止滾動條的影響
   const handleKeyPress = useCallback(
     (event) => {
       if (
@@ -280,10 +280,12 @@ function MapEditor() {
       ) {
         console.log("key!", event.key);
         if (event.key === "ArrowDown") {
+          event.preventDefault(); // 防止滾動條的影響
           setSelectedRowIndex((prevIndex) =>
             prevIndex === null ? 0 : Math.min(prevIndex + 1, maps.length - 1),
           );
         } else if (event.key === "ArrowUp") {
+          event.preventDefault(); // 防止滾動條的影響
           setSelectedRowIndex((prevIndex) =>
             prevIndex === null ? 0 : Math.max(prevIndex - 1, 0),
           );
