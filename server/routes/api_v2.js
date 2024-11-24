@@ -271,7 +271,9 @@ router.get("/robots/bytype/:robottype_id", async (req, res) => {
 // StationList CRUD
 router.get("/stationlists", async (req, res) => {
   try {
-    const stationLists = await db.StationList.findAll({
+    const { map_id } = req.query; // 從查詢參數中獲取 map_id
+
+    const queryOptions = {
       include: [
         {
           model: db.Map,
@@ -282,7 +284,14 @@ router.get("/stationlists", async (req, res) => {
           model: db.Station,
         },
       ],
-    });
+    };
+
+    // 如果提供了 map_id，則添加過濾條件
+    if (map_id) {
+      queryOptions.where = { map_id }; // 假設 StationList 有 map_id 屬性
+    }
+
+    const stationLists = await db.StationList.findAll(queryOptions);
     res.json(stationLists);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -297,6 +306,38 @@ router.get("/stationlists/:id", async (req, res) => {
           model: db.Map,
           attributes: { exclude: ["pgm", "yaml", "thumbnail"] },
           include: [db.Robottype],
+        },
+        {
+          model: db.Station,
+        },
+      ],
+    });
+    if (stationList) {
+      res.json(stationList);
+    } else {
+      res.status(404).json({ error: "StationList not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get("/stationlists/find/:mapName/:robotTypeName", async (req, res) => {
+  try {
+    const { mapName, robotTypeName } = req.params;
+    // 查詢 StationList，並根據 mapName 和 robotTypeName 進行過濾
+    const stationList = await db.StationList.findOne({
+      include: [
+        {
+          model: db.Map,
+          where: { name: mapName }, // 假設 Map 模型有 name 屬性
+          attributes: { exclude: ["pgm", "yaml", "thumbnail"] },
+          include: [
+            {
+              model: db.Robottype,
+              where: { name: robotTypeName }, // 假設 Robottype 模型有 name 屬性
+            },
+          ],
         },
         {
           model: db.Station,

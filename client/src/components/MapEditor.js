@@ -27,6 +27,7 @@ function MapEditor() {
   const previousUrl = useRef(null);
 
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
+  const [selectedMapId, setSelectedMapId] = useState(null);
 
   // 添加對 file-list 的 ref
   const fileListRef = useRef(null);
@@ -41,29 +42,35 @@ function MapEditor() {
   }, []);
 
   const handleSave = async () => {
+    console.log("selectedMapId", selectedMapId);
+
     try {
-      const response = await fetch("/save-image", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `/api/stationlists?map_id=${selectedMapId}`,
+        {
+          method: "GET",
         },
-        body: JSON.stringify({ angle: rotationAngle }),
-      });
+      );
 
       if (!response.ok) {
-        throw new Error("Failed to save image");
+        throw new Error("Failed to fetch station lists");
       }
 
       const data = await response.json();
-      setSaveMessage(data.message);
+      console.log("Fetched station lists:", data);
+      if (data.length > 0) {
+        alert("地圖已有定義站點, 請先刪除定義站點!");
+        return;
+      }
+      setSaveMessage("Station lists fetched successfully!");
 
       // 3秒後清除消息
       setTimeout(() => {
         setSaveMessage("");
       }, 3000);
     } catch (error) {
-      console.error("Error saving image:", error);
-      setSaveMessage("Error saving image: " + error.message);
+      console.error("Error fetching station lists:", error);
+      setSaveMessage("Error fetching station lists: " + error.message);
     }
   };
 
@@ -309,6 +316,7 @@ function MapEditor() {
     if (maps.length > 0) {
       console.log("maps[selectedRowIndex].id", maps[selectedRowIndex].id);
       handleFileClick(maps[selectedRowIndex].id);
+      setSelectedMapId(maps[selectedRowIndex].id);
     }
   }, [selectedRowIndex]);
 

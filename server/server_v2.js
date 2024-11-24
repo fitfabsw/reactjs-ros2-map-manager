@@ -29,74 +29,9 @@ let mapYamlInfoProcessed = {};
 // const MAX_DIMENSION = 2000;
 const MAX_DIMENSION = 750;
 
-const MYPATH = process.env.MYPATH || path.join(os.homedir(), "fitrobot_db");
-console.log("MYPATH:", MYPATH);
-
 // 創建一個目錄來存儲轉換後的圖片
 const CONVERTED_PATH = path.join(__dirname, "converted");
 fs.mkdir(CONVERTED_PATH).catch(() => {}); // 如果目錄已存在則忽略錯誤
-
-app.get("/files", async (req, res) => {
-  const dirPath = req.query.path || MYPATH;
-  console.log("Getting files from directory:", dirPath);
-
-  try {
-    const files = await fs.readdir(dirPath);
-    const fileStats = await Promise.all(
-      files.map(async (file) => {
-        const fullPath = path.join(dirPath, file);
-        const stats = await fs.stat(fullPath);
-        return {
-          name: file,
-          path: fullPath,
-          size: stats.size,
-          modifiedTime: stats.mtime,
-          isDirectory: stats.isDirectory(),
-        };
-      }),
-    );
-
-    if (dirPath !== MYPATH) {
-      fileStats.unshift({
-        name: "..",
-        path: path.dirname(dirPath),
-        isDirectory: true,
-      });
-    }
-
-    res.json({
-      currentPath: dirPath,
-      files: fileStats,
-    });
-  } catch (error) {
-    console.error("Error reading directory:", error);
-    res.status(500).json({ error: "Failed to read directory" });
-  }
-});
-
-app.get("/file", async (req, res) => {
-  const filePath = req.query.path;
-  if (!filePath) {
-    return res.status(400).json({ error: "File path is required" });
-  }
-
-  try {
-    const buffer = await fs.readFile(filePath);
-    if (filePath.toLowerCase().endsWith(".pgm")) {
-      res.set("Content-Type", "application/octet-stream");
-    } else {
-      const contentType =
-        path.extname(filePath).toLowerCase() === ".png"
-          ? "image/png"
-          : "image/jpeg";
-      res.set("Content-Type", contentType);
-    }
-    res.send(buffer);
-  } catch (error) {
-    console.error("Error reading file:", error);
-    res.status(500).json({ error: "Failed to read file" });
-  }
-});
 
 // 使用 ImageMagick 轉換 PGM 到 PNG or vice versa
 async function convertBtwPngPgm(inputPath, outputPath) {
