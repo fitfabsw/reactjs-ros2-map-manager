@@ -286,6 +286,66 @@ function resizeImage(metadata, max_dimension = MAX_DIMENSION) {
   return { scaledWidth, scaledHeight, scale };
 }
 
+app.post("/update-map-to-db", async (req, res) => {
+  console.log("Updating map in the database...");
+  try {
+    const { mapId } = req.body;
+    console.log(`mapId: ${mapId}`);
+    const map = await db.Map.findByPk(mapId);
+    if (!map) {
+      throw new Error("Map not found");
+    }
+    const mapname = map.name;
+    const robottype = await db.Robottype.findByPk(map.robottype_id);
+    const basename = await getYamlBasename(mapId);
+    console.log("basename", basename);
+
+    tempPath = path.join(CONVERTED_PATH, `${basename}.png`);
+    const temp_png = `${basename}.png`;
+    const temp_pgm = `${basename}.pgm`;
+    const temp_yaml = `${basename}.yaml`;
+
+    await sharp(processedBuffer).toFile(temp_png);
+    console.log("Image saved to:", temp_png);
+
+    // 轉換為 PGM
+    await convertBtwPngPgm(temp_png, temp_pgm);
+    console.log("PGM conversion successful");
+    console.log(`mapYamlInfoProcessed: ${mapYamlInfoProcessed}`);
+
+    // 保存 YAML 文件
+    const yamlContent = {
+      image: path.basename(temp_pgm),
+      mode: "trinary",
+      resolution: mapYamlInfoProcessed.resolution,
+      origin: [...mapYamlInfoProcessed.origin, 0],
+      negate: 0,
+      occupied_thresh: 0.65,
+      free_thresh: 0.25,
+    };
+    await saveYamlFile(temp_yaml, yamlContent);
+    console.log("YAML file saved to:", temp_yaml);
+
+    // 更新 map 表
+    await map.update({
+      pgm: await fs.readFile(temp_pgm), // 將 PGM 文件讀取為 BLOB
+      yaml: await fs.readFile(temp_yaml), // 將 YAML 文件讀取為 BLOB
+    });
+    res.json({
+      message: `Map updated successfully with ID: ${mapId}`,
+    });
+    await fs.unlink(temp_png).catch(() => {}); // 刪除 temp_png
+    await fs.unlink(temp_pgm).catch(() => {}); // 刪除 temp_pgm
+    await fs.unlink(temp_yaml).catch(() => {}); // 刪除 temp_yaml
+  } catch (error) {
+    console.error("Error saving files:", error);
+    res.status(500).json({
+      error: "Failed to save files",
+      details: error.message,
+    });
+  }
+});
+
 app.post("/save-image", async (req, res) => {
   console.log("save-image !!");
   try {
@@ -440,6 +500,26 @@ app.post("/crop-image", async (req, res) => {
     });
   }
 });
+
+async function getYamlBasename(mapId) {
+  try {
+    const map = await db.Map.findByPk(mapId);
+    if (!map || !map.yaml) {
+      throw new Error("Map or YAML data not found");
+    }
+
+    // 解析 YAML 數據
+    const yamlData = yaml.load(map.yaml.toString("utf8"));
+    const imagePath = yamlData.image; // 獲取 image 字段
+
+    // 獲取基礎名稱
+    const basename = path.basename(imagePath, path.extname(imagePath));
+    return basename;
+  } catch (error) {
+    console.error("Error reading YAML:", error);
+    throw error;
+  }
+}
 
 // 添加 API 路由
 app.use("/api", apiRoutes);

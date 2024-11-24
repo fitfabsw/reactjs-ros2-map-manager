@@ -41,6 +41,7 @@ function MapEditor() {
     };
   }, []);
 
+  // const handleSave = async (mapId) => {
   const handleSave = async () => {
     console.log("selectedMapId", selectedMapId);
 
@@ -62,7 +63,23 @@ function MapEditor() {
         alert("地圖已有定義站點, 請先刪除定義站點!");
         return;
       }
-      setSaveMessage("Station lists fetched successfully!");
+
+      const responseU = await fetch("/update-map-to-db", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ mapId: selectedMapId }),
+      });
+
+      if (!responseU.ok) {
+        throw new Error("Failed to save image");
+      }
+
+      const dataU = await responseU.json();
+      setSaveMessage(dataU.message);
+
+      // setSaveMessage("Station lists fetched successfully!");
 
       // 3秒後清除消息
       setTimeout(() => {

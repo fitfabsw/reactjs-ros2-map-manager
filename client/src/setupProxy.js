@@ -12,7 +12,14 @@ module.exports = function (app) {
     }),
   );
   app.use(
-    ["/files", "/convert-pgm", "/save-image", "/crop-image", "/rotate"],
+    [
+      "/files",
+      "/convert-pgm",
+      "/save-image",
+      "/crop-image",
+      "/rotate",
+      "/update-map-to-db",
+    ],
     legacyCreateProxyMiddleware({
       target: "http://127.0.0.1:5000",
       // target: "http://172.20.10.2:5000",
