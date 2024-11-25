@@ -98,6 +98,12 @@
   color: white;
 }
 
+/*.file-list th:nth-child(1),*/
+/*.file-list td:nth-child(1) {*/
+/*  width: 10px; /* ID 欄位 */*/
+/*  white-space: nowrap;*/
+/*}*/
+
 .file-list tr:hover {
   background-color: #f1f1f1;
 }

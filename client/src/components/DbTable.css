@@ -1,0 +1,105 @@
+/* 標題樣式 */
+h2 {
+  text-align: center; /* 使標題居中 */
+  margin: 20px 0; /* 調整標題的上下邊距 */
+}
+
+/* 基本樣式 */
+.db-table {
+  width: 95%; /* 確保表格寬度與標題一致 */
+  margin: 30px 2.5% 10% 2.5%;
+  font-size: 1em;
+  font-family: Arial, sans-serif;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+}
+
+.db-table table {
+  width: 100%;
+  table-layout: fixed; /* 固定表格佈局 */
+}
+
+/* 表頭樣式 */
+.db-table th {
+  background-color: #4caf50;
+  color: white;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+/* 表格單元格樣式 */
+.db-table td {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  min-width: 100px;
+}
+
+/* 設置特定欄位的寬度 */
+.db-table th:nth-child(1),
+.db-table td:nth-child(1) {
+  width: 50px; /* ID 欄位 */
+}
+
+.db-table th:nth-child(2),
+.db-table td:nth-child(2) {
+  width: auto; /* Name 欄位 */
+}
+
+.db-table th:nth-child(3),
+.db-table td:nth-child(3) {
+  width: 150px; /* Type 欄位 */
+}
+
+.db-table th:nth-child(4),
+.db-table td:nth-child(4) {
+  width: 100px; /* Real 欄位 */
+}
+
+/* Actions 欄位的寬度 */
+.db-table th:last-child,
+.db-table td:last-child {
+  width: 320px; /* 設置 Actions 欄位的寬度 */
+  text-align: center; /* 使按鈕居中 */
+  white-space: nowrap; /* 防止文本換行 */
+}
+
+/* 表格行樣式 */
+.db-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+/* 鼠標懸停行樣式 */
+.db-table tr:hover {
+  background-color: #ddd;
+}
+
+/* 創建新條目輸入框樣式 */
+input[type="text"],
+input[type="number"] {
+  padding: 10px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: calc(100% / 4 - 20px); /* 根據列數調整寬度 */
+}
+
+/* 創建按鈕樣式 */
+button {
+  padding: 10px 15px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+.action-button {
+  padding: 5px 10px; /* 調整按鈕的內邊距 */
+  margin: 0 2px; /* 在按鈕之間留出一些空間 */
+  min-width: 40px; /* 設置最小寬度 */
+  max-width: 60px; /* 設置最大寬度 */
+  white-space: nowrap; /* 防止文本換行 */
+}

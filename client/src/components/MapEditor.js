@@ -424,7 +424,7 @@ function MapEditor() {
           <table>
             <thead>
               <tr>
-                <th>condition</th>
+                <th>Type</th>
                 <th>Name</th>
                 <th>Robot</th>
               </tr>
