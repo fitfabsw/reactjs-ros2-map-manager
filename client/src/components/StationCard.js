@@ -211,8 +211,8 @@ function StationCard({
           <div className="input-group">
             <label>站點名稱</label>
             <input
+              className="input-wide"
               type="text"
-              // value={editedStation.st_name}
               value={editedStation.name}
               onChange={
                 (e) =>

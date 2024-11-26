@@ -195,13 +195,22 @@ h1 {
   text-align: center;
 }
 
-.station-list-creation,
-.station-creation {
+.station-list-creation {
   margin: 20px 0;
   padding: 15px;
   border: 1px solid #ddd;
   border-radius: 8px;
   background-color: #f9f9f9;
+}
+
+.station-list-creation input {
+  width: calc(100% - 90px) !important;
+}
+
+.station-list-creation button {
+  /*display: flex;*/
+  background-color: #275066;
+  color: white;
 }
 
 input,

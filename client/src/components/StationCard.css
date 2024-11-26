@@ -208,3 +208,8 @@
   transform: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
+
+.input-wide {
+  width: 100%;
+  min-width: 200px;
+}

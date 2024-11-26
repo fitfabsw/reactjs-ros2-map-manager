@@ -366,7 +366,9 @@ function StationManagerLeftNormal({
                 value={newStationListName}
                 onChange={(e) => setNewStationListName(e.target.value)}
               />
-              <button onClick={createStationList}>建立站點列表</button>
+              <button className="right-buttons" onClick={createStationList}>
+                新增
+              </button>
             </div>
             <div className="station-lists-grid">
               {stationLists.map((list) => (
