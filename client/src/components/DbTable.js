@@ -24,7 +24,7 @@ const DbTable = ({
 
   const handleEditChange = (e, accessor) => {
     const { value } = e.target;
-    setEditEntry((prev) => ({ ...prev, [accessor]: value }));
+    setEditEntry((prev) => ({ ...prev, [accessor]: value === "True" }));
   };
 
   const handleUpdate = (id) => {
