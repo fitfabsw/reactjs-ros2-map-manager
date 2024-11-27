@@ -19,7 +19,6 @@ const DbTable = ({
   const handleUpdate = (id) => {
     onUpdate(selectedTable, id, editEntry);
     setEditEntry(null);
-    window.location.reload();
   };
 
   const handleCancel = () => {

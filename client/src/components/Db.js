@@ -21,6 +21,10 @@ const Db = () => {
   const [columnsStation, setColumnsStation] = useState([]);
   const [activeTab, setActiveTab] = useState("robot");
 
+  useEffect(() => {
+    console.log(`activeTab: ${activeTab}`);
+  }, [activeTab]);
+
   const loadData = async (table) => {
     const fetchedData = await fetchTable(table);
     const schema = await fetchTableSchema(table);
@@ -57,28 +61,35 @@ const Db = () => {
   const handleUpdate = async (table, id, updatedData) => {
     if (table === "robot") {
       await updateRobot(id, updatedData);
+      const fetchedData = await fetchTable("robot");
+      setDataRobot(fetchedData);
     } else if (table === "map") {
       await updateMap(id, updatedData);
+      const fetchedData = await fetchTable("map");
+      setDataMap(fetchedData);
     } else if (table === "station") {
       await updateStation(id, updatedData);
+      const fetchedData = await fetchTable("station");
+      setDataStation(fetchedData);
     }
+    setActiveTab(table);
   };
 
   const handleDelete = async (table, id) => {
-    let fetchedData = null;
     if (table === "robot") {
       await deleteRobot(id);
-      fetchedData = await fetchTable("robot");
+      const fetchedData = await fetchTable("robot");
+      setDataRobot(fetchedData);
     } else if (table === "map") {
       await deleteMap(id);
-      fetchedData = await fetchTable("map");
+      const fetchedData = await fetchTable("map");
+      setDataMap(fetchedData);
     } else if (table === "station") {
       await deleteStation(id);
-      fetchedData = await fetchTable("station");
+      const fetchedData = await fetchTable("station");
+      setDataStation(fetchedData);
     }
-    if (table === "robot") setDataRobot(fetchedData);
-    else if (table === "map") setDataMap(fetchedData);
-    else if (table === "station") setDataStation(fetchedData);
+    setActiveTab(table);
   };
 
   return (
