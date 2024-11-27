@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 import "./DbTable.css";
 
-const DbTable = ({ data, onUpdate, onDelete, columns, selectedTable }) => {
+const DbTable = ({
+  data,
+  onUpdate,
+  onDelete,
+  columns,
+  selectedTable,
+  columnExcludes,
+}) => {
   const [editEntry, setEditEntry] = useState(null);
 
   const handleEditChange = (e, accessor) => {
@@ -24,6 +31,13 @@ const DbTable = ({ data, onUpdate, onDelete, columns, selectedTable }) => {
       onDelete(selectedTable, id);
     }
   };
+
+  // useEffect(() => {
+  //   console.log(`columnExcludes: ${JSON.stringify(columnExcludes)}`);
+  //   if (columnExcludes) {
+  //     console.log(`columnExcludes: ${JSON.stringify(columnExcludes)}`);
+  //   }
+  // }, [columnExcludes]);
 
   useEffect(() => {
     if (data.length > 0) {
@@ -50,11 +64,16 @@ const DbTable = ({ data, onUpdate, onDelete, columns, selectedTable }) => {
                 {columns.map((col) => (
                   <td key={`${row.id}-${col.column}`}>
                     {editEntry && editEntry.id === row.id ? (
-                      <input
-                        type="text"
-                        value={editEntry[col.column] || ""}
-                        onChange={(e) => handleEditChange(e, col.column)}
-                      />
+                      ["TEXT", "INTEGER", "REAL"].includes(col.type) &&
+                      !columnExcludes.includes(col.column) ? (
+                        <input
+                          type={col.type}
+                          value={editEntry[col.column] || ""}
+                          onChange={(e) => handleEditChange(e, col.column)}
+                        />
+                      ) : (
+                        row[col.column]
+                      )
                     ) : (
                       row[col.column]
                     )}

@@ -21,32 +21,38 @@ const Db = () => {
   const [columnsStation, setColumnsStation] = useState([]);
   const [activeTab, setActiveTab] = useState("robot");
 
-  const loadDataStation = async () => {
-    const fetchedData = await fetchTable("station");
-    setDataStation(fetchedData);
-    const schema = await fetchTableSchema("station");
-    setColumnsStation(schema);
-  };
-
-  const loadDataRobot = async () => {
-    const fetchedData = await fetchTable("robot");
-    setDataRobot(fetchedData);
-    const schema = await fetchTableSchema("robot");
-    setColumnsRobot(schema);
-  };
-
-  const loadDataMap = async () => {
-    const fetchedData = await fetchTable("map");
-    setDataMap(fetchedData);
-    const schema = await fetchTableSchema("map");
-    setColumnsMap(schema);
+  const loadData = async (table) => {
+    const fetchedData = await fetchTable(table);
+    const schema = await fetchTableSchema(table);
+    switch (table) {
+      case "robot":
+        setDataRobot(fetchedData);
+        setColumnsRobot(schema);
+        break;
+      case "map":
+        setDataMap(fetchedData);
+        setColumnsMap(schema);
+        break;
+      case "station":
+        setDataStation(fetchedData);
+        setColumnsStation(schema);
+        break;
+      default:
+        break;
+    }
   };
 
   useEffect(() => {
-    loadDataRobot();
-    loadDataMap();
-    loadDataStation();
+    loadData("robot");
+    loadData("map");
+    loadData("station");
   }, []);
+
+  useEffect(() => {
+    if (columnsStation.length > 0) {
+      console.log(`columnsStation: ${JSON.stringify(columnsStation)}`);
+    }
+  }, [columnsStation]);
 
   const handleUpdate = async (table, id, updatedData) => {
     if (table === "robot") {
@@ -106,6 +112,7 @@ const Db = () => {
             columns={columnsRobot}
             onUpdate={handleUpdate}
             onDelete={handleDelete}
+            columnExcludes={["id"]}
             selectedTable={"robot"}
           />
         )}
@@ -115,6 +122,7 @@ const Db = () => {
           columns={columnsMap}
           onUpdate={handleUpdate}
           onDelete={handleDelete}
+          columnExcludes={["id"]}
           selectedTable={"map"}
         />
       )}
@@ -126,6 +134,7 @@ const Db = () => {
             columns={columnsStation}
             onUpdate={handleUpdate}
             onDelete={handleDelete}
+            columnExcludes={["id"]}
             selectedTable={"station"}
           />
         )}
