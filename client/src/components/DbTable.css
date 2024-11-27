@@ -92,9 +92,9 @@ button {
   cursor: pointer;
 }
 
-button:hover {
-  background-color: #45a049;
-}
+/*button:hover {*/
+/*  background-color: #45a049;*/
+/*}*/
 
 .action-button {
   padding: 5px 10px; /* 調整按鈕的內邊距 */
@@ -102,4 +102,24 @@ button:hover {
   min-width: 40px; /* 設置最小寬度 */
   max-width: 60px; /* 設置最大寬度 */
   white-space: nowrap; /* 防止文本換行 */
+}
+
+.tab-container {
+  display: flex;
+  margin-bottom: 20px;
+  margin-left: 20px;
+}
+
+.tab-button {
+  padding: 10px 20px;
+  margin-right: 10px;
+  cursor: pointer;
+  border: none;
+  background-color: #2f4f4f;
+  transition: background-color 0.3s;
+}
+
+.tab-button.active {
+  background-color: #008080;
+  color: white;
 }

@@ -222,9 +222,9 @@ select {
   border-radius: 4px;
 }
 
-button:hover {
-  background-color: #45a049;
-}
+/*button:hover {*/
+/*  background-color: #45a049;*/
+/*}*/
 
 .existing-station-lists {
   margin-top: 20px;
