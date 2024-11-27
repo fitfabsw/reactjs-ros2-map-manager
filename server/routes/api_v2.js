@@ -630,4 +630,24 @@ router.get("/maps/:id/masks", async (req, res) => {
   }
 });
 
+// 新增路由來獲取表的 schema
+router.get("/tables/:tableName/schema", async (req, res) => {
+  const { tableName } = req.params;
+
+  // 確保模型存在
+  const model = db[tableName.charAt(0).toUpperCase() + tableName.slice(1)];
+  if (!model) {
+    return res.status(404).json({ error: "Table not found" });
+  }
+
+  // 獲取模型的屬性
+  const attributes = model.rawAttributes;
+  const schema = Object.keys(attributes).map((key) => ({
+    column: key,
+    type: attributes[key].type.key, // 獲取類型
+  }));
+
+  res.json(schema);
+});
+
 module.exports = router;

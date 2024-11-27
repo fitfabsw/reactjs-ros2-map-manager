@@ -1,5 +1,19 @@
 const API_URL = "/api"; // API 基本路徑
 
+// General CRUD
+export const fetchTable = async (url) => {
+  try {
+    const response = await fetch(`${API_URL}/${url}s`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  } catch (error) {
+    console.error("Error fetching table:", error);
+    return []; // 返回空陣列以避免崩潰
+  }
+};
+
 // Map CRUD
 export const fetchMaps = async () => {
   const response = await fetch(`${API_URL}/maps`);
@@ -232,4 +246,9 @@ export const deleteMask = async (id) => {
   await fetch(`${API_URL}/masks/${id}`, {
     method: "DELETE",
   });
+};
+
+export const fetchTableSchema = async (tableName) => {
+  const response = await fetch(`${API_URL}/tables/${tableName}/schema`);
+  return response.json();
 };

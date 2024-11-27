@@ -388,12 +388,12 @@ function StationManager() {
         };
 
         // 更新 stationDetails 中的座標（即時預覽）
-        // setStationDetails((prev) => ({
-        //   ...prev,
-        //   Stations: prev.Stations.map((s) =>
-        //     s.id === waitingForLocation ? updatedStation : s,
-        //   ),
-        // }));
+        setStationDetails((prev) => ({
+          ...prev,
+          Stations: prev.Stations.map((s) =>
+            s.id === waitingForLocation ? updatedStation : s,
+          ),
+        }));
       }
     }
   };

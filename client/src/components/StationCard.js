@@ -31,6 +31,10 @@ function StationCard({
   }, [station]);
 
   useEffect(() => {
+    console.log(`editedStation changed: ${editedStation}`);
+  }, [editedStation]);
+
+  useEffect(() => {
     const handleKeyDown = (e) => {
       if (!isEditing) return;
       if (e.key === "Enter") {
@@ -211,15 +215,11 @@ function StationCard({
           <div className="input-group">
             <label>站點名稱</label>
             <input
-              className="input-wide"
               type="text"
               value={editedStation.name}
-              onChange={
-                (e) =>
-                  setEditedStation({ ...editedStation, name: e.target.value })
-                // setEditedStation({ ...editedStation, st_name: e.target.value })
-              }
+              onChange={(e) => setEditedStation({ ...editedStation, name: e.target.value })}
               placeholder="請輸入站點名稱"
+              className="input-wide"
             />
           </div>
 
@@ -246,7 +246,7 @@ function StationCard({
                 <input
                   type="text"
                   value={editedStation.x}
-                  onChange={(e) => handleCoordinateChange(e, "x")}
+                  // onChange={(e) => handleCoordinateChange(e, "x")}
                 />
               </div>
               <div className="coordinate-input">

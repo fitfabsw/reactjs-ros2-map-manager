@@ -1,73 +1,117 @@
 import React, { useEffect, useState } from "react";
 import {
-  fetchMaps,
-  createMap,
+  fetchTable,
+  fetchTableSchema,
+  updateRobot,
+  deleteRobot,
   updateMap,
   deleteMap,
-  fetchRobotTypes,
+  updateStation,
+  deleteStation,
 } from "./database";
 import DbTable from "./DbTable";
 
 const Db = () => {
-  const [maps, setMaps] = useState([]);
-  const [robotTypes, setRobotTypes] = useState([]);
-  const [newMap, setNewMap] = useState({ name: "", robottype_id: "", real: 0 });
+  // robot
+  const [dataRobot, setDataRobot] = useState([]);
+  const [columnsRobot, setColumnsRobot] = useState([]);
+  const [dataMap, setDataMap] = useState([]);
+  const [columnsMap, setColumnsMap] = useState([]);
+  const [dataStation, setDataStation] = useState([]);
+  const [columnsStation, setColumnsStation] = useState([]);
+
+  const loadDataStation = async () => {
+    const fetchedData = await fetchTable("station");
+    setDataStation(fetchedData);
+    const schema = await fetchTableSchema("station");
+    setColumnsStation(schema);
+    console.log("Fetched Data Station:", fetchedData);
+    console.log("Schema Station:", schema);
+  };
+
+  const loadDataRobot = async () => {
+    const fetchedData = await fetchTable("robot");
+    setDataRobot(fetchedData);
+    const schema = await fetchTableSchema("robot");
+    setColumnsRobot(schema);
+    console.log("Fetched Data Robot:", fetchedData);
+    console.log("Schema Robot:", schema);
+  };
+
+  const loadDataMap = async () => {
+    const fetchedData = await fetchTable("map");
+    setDataMap(fetchedData);
+    const schema = await fetchTableSchema("map");
+    setColumnsMap(schema);
+    console.log("Fetched Data Map:", fetchedData);
+    console.log("Schema Map:", schema);
+  };
 
   useEffect(() => {
-    const loadData = async () => {
-      setMaps(await fetchMaps());
-      setRobotTypes(await fetchRobotTypes());
-    };
-    loadData();
+    loadDataRobot();
+    loadDataMap();
+    loadDataStation();
   }, []);
 
-  useEffect(() => {
-    if (maps.length > 0) {
-      debug();
+  const handleUpdate = async (table, id, updatedData) => {
+    if (table === "robot") {
+      await updateRobot(id, updatedData);
+    } else if (table === "map") {
+      await updateMap(id, updatedData);
+    } else if (table === "station") {
+      await updateStation(id, updatedData);
     }
-  }, [maps]);
-
-  const handleCreateMap = async (mapData) => {
-    const createdMap = await createMap(mapData);
-    setMaps([...maps, createdMap]);
+    console.log(`updateData: ${JSON.stringify(updatedData)}`);
   };
 
-  const handleUpdateMap = async (id, mapData) => {
-    const updatedMap = await updateMap(id, mapData);
-    setMaps(maps.map((map) => (map.id === id ? updatedMap : map)));
-  };
-
-  const handleDeleteMap = async (id) => {
-    await deleteMap(id);
-    setMaps(maps.filter((map) => map.id !== id));
-  };
-
-  const debug = async () => {
-    console.log("maps", maps);
-  };
-
-  const columns = [
-    { Header: "ID", accessor: "id" },
-    { Header: "Name", accessor: "name" },
-    { Header: "Robot Type", accessor: "robottype_id", isForeignKey: true },
-    { Header: "Real", accessor: "real" },
-  ];
-
-  const foreignKeyOptions = {
-    robottype_id: robotTypes,
+  const handleDelete = async (table, id) => {
+    let fetchedData = null;
+    if (table === "robot") {
+      await deleteRobot(id);
+      fetchedData = await fetchTable("robot");
+    } else if (table === "map") {
+      await deleteMap(id);
+      fetchedData = await fetchTable("map");
+    } else if (table === "station") {
+      await deleteStation(id);
+      fetchedData = await fetchTable("station");
+    }
+    setDataRobot(fetchedData);
   };
 
   return (
     <div>
       <h1>Database Management</h1>
-      <DbTable
-        data={maps}
-        onCreate={handleCreateMap}
-        onUpdate={handleUpdateMap}
-        onDelete={handleDeleteMap}
-        columns={columns}
-        foreignKeyOptions={foreignKeyOptions}
-      />
+      <h2>Robot</h2>
+      {dataRobot.length > 0 && columnsRobot.length > 0 && (
+        <DbTable
+          data={dataRobot}
+          columns={columnsRobot}
+          onUpdate={handleUpdate}
+          onDelete={handleDelete}
+          selectedTable={"robot"}
+        />
+      )}
+      <h2>Map</h2>
+      {dataMap.length > 0 && columnsMap.length > 0 && (
+        <DbTable
+          data={dataMap}
+          columns={columnsMap}
+          onUpdate={handleUpdate}
+          onDelete={handleDelete}
+          selectedTable={"map"}
+        />
+      )}
+      <h2>Station</h2>
+      {dataStation.length > 0 && columnsStation.length > 0 && (
+        <DbTable
+          data={dataStation}
+          columns={columnsStation}
+          onUpdate={handleUpdate}
+          onDelete={handleDelete}
+          selectedTable={"station"}
+        />
+      )}
     </div>
   );
 };

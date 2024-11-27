@@ -1,34 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./DbTable.css";
 
-const DbTable = ({
-  data,
-  onCreate,
-  onUpdate,
-  onDelete,
-  columns,
-  foreignKeyOptions,
-}) => {
-  const [newEntry, setNewEntry] = useState({});
+const DbTable = ({ data, onUpdate, onDelete, columns, selectedTable }) => {
   const [editEntry, setEditEntry] = useState(null);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setNewEntry({ ...newEntry, [name]: value });
-  };
-
-  const handleCreate = () => {
-    onCreate(newEntry);
-    setNewEntry({});
-  };
 
   const handleEditChange = (e, accessor) => {
     const { value } = e.target;
-    setEditEntry((prev) => ({ ...prev, [accessor]: value === "True" }));
+    setEditEntry((prev) => ({ ...prev, [accessor]: value }));
   };
 
   const handleUpdate = (id) => {
-    onUpdate(id, editEntry);
+    onUpdate(selectedTable, id, editEntry);
     setEditEntry(null);
     window.location.reload();
   };
@@ -39,19 +21,25 @@ const DbTable = ({
 
   const handleDelete = (id) => {
     if (window.confirm("Are you sure you want to delete this entry?")) {
-      onDelete(id);
+      onDelete(selectedTable, id);
     }
   };
 
+  useEffect(() => {
+    if (data.length > 0) {
+      console.log({ data });
+    }
+  }, [data]);
+
   return (
     <div>
-      <h2>Map</h2>
+      <h2>{columns.length > 0 ? columns[0].Header : "Table"}</h2>
       <div className="db-table">
         <table>
           <thead>
             <tr>
               {columns.map((col) => (
-                <th key={col.accessor}>{col.Header}</th>
+                <th key={col.column}>{col.column}</th>
               ))}
               <th>Actions</th>
             </tr>
@@ -60,48 +48,15 @@ const DbTable = ({
             {data.map((row) => (
               <tr key={row.id}>
                 {columns.map((col) => (
-                  <td key={col.accessor}>
-                    {col.accessor === "id" ? (
-                      row[col.accessor]
-                    ) : col.accessor === "robottype_id" ? (
-                      editEntry && editEntry.id === row.id ? (
-                        <select
-                          value={editEntry[col.accessor] || ""}
-                          onChange={(e) => handleEditChange(e, col.accessor)}
-                        >
-                          {foreignKeyOptions.robottype_id.map((option) => (
-                            <option key={option.id} value={option.id}>
-                              {option.name}
-                            </option>
-                          ))}
-                        </select>
-                      ) : row.Robottype ? (
-                        row.Robottype.name
-                      ) : (
-                        "N/A"
-                      )
-                    ) : col.accessor === "real" ? (
-                      editEntry && editEntry.id === row.id ? (
-                        <select
-                          value={editEntry[col.accessor] ? "True" : "False"}
-                          onChange={(e) => handleEditChange(e, col.accessor)}
-                        >
-                          <option value="True">True</option>
-                          <option value="False">False</option>
-                        </select>
-                      ) : row[col.accessor] ? (
-                        "True"
-                      ) : (
-                        "False"
-                      )
-                    ) : editEntry && editEntry.id === row.id ? (
+                  <td key={`${row.id}-${col.column}`}>
+                    {editEntry && editEntry.id === row.id ? (
                       <input
                         type="text"
-                        value={editEntry[col.accessor] || ""}
-                        onChange={(e) => handleEditChange(e, col.accessor)}
+                        value={editEntry[col.column] || ""}
+                        onChange={(e) => handleEditChange(e, col.column)}
                       />
                     ) : (
-                      row[col.accessor]
+                      row[col.column]
                     )}
                   </td>
                 ))}
