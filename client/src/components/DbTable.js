@@ -66,7 +66,8 @@ const DbTable = ({
                       ["TEXT", "INTEGER", "REAL"].includes(col.type) &&
                       !columnExcludes.includes(col.column) ? (
                         <input
-                          type={col.type}
+                          type="text"
+                          style={{ width: "78%" }}
                           value={editEntry[col.column] || ""}
                           onChange={(e) => handleEditChange(e, col.column)}
                         />
