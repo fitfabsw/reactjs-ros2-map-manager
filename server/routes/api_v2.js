@@ -271,7 +271,7 @@ router.get("/robots/bytype/:robottype_id", async (req, res) => {
 // StationList CRUD
 router.get("/stationlists", async (req, res) => {
   try {
-    const { map_id } = req.query; // 從查詢參數中獲取 map_id
+    const { map_id, stl_name } = req.query; // 從查詢參數中獲取 map_id
 
     const queryOptions = {
       include: [
@@ -286,9 +286,15 @@ router.get("/stationlists", async (req, res) => {
       ],
     };
 
+    // Initialize where clause
+    queryOptions.where = {};
+
     // 如果提供了 map_id，則添加過濾條件
     if (map_id) {
-      queryOptions.where = { map_id }; // 假設 StationList 有 map_id 屬性
+      queryOptions.where.map_id = map_id; // 假設 StationList 有 map_id 屬性
+    }
+    if (stl_name) {
+      queryOptions.where.name = stl_name; // 假設 StationList 有 name 屬性
     }
 
     const stationLists = await db.StationList.findAll(queryOptions);

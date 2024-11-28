@@ -8,6 +8,8 @@ import {
   deleteMap,
   updateStation,
   deleteStation,
+  updateStationList,
+  deleteStationList,
 } from "./database";
 import DbTable from "./DbTable";
 import "./DbTable.css";
@@ -18,6 +20,8 @@ const Db = () => {
   const [dataMap, setDataMap] = useState([]);
   const [columnsMap, setColumnsMap] = useState([]);
   const [dataStation, setDataStation] = useState([]);
+  const [dataStationlist, setDataStationlist] = useState([]);
+  const [columnsStationlist, setColumnsStationlist] = useState([]);
   const [columnsStation, setColumnsStation] = useState([]);
   const [activeTab, setActiveTab] = useState("robot");
 
@@ -41,6 +45,10 @@ const Db = () => {
         setDataStation(fetchedData);
         setColumnsStation(schema);
         break;
+      case "stationList":
+        setDataStationlist(fetchedData);
+        setColumnsStationlist(schema);
+        break;
       default:
         break;
     }
@@ -50,13 +58,14 @@ const Db = () => {
     loadData("robot");
     loadData("map");
     loadData("station");
+    loadData("stationList");
   }, []);
 
   useEffect(() => {
-    if (columnsStation.length > 0) {
-      console.log(`columnsStation: ${JSON.stringify(columnsStation)}`);
+    if (columnsStationlist.length > 0) {
+      console.log(`columnsStationlist: ${JSON.stringify(columnsStationlist)}`);
     }
-  }, [columnsStation]);
+  }, [columnsStationlist]);
 
   const handleUpdate = async (table, id, updatedData) => {
     if (table === "robot") {
@@ -71,6 +80,10 @@ const Db = () => {
       await updateStation(id, updatedData);
       const fetchedData = await fetchTable("station");
       setDataStation(fetchedData);
+    } else if (table === "stationList") {
+      await updateStationList(id, updatedData);
+      const fetchedData = await fetchTable("stationList");
+      setDataStationlist(fetchedData);
     }
     setActiveTab(table);
   };
@@ -88,6 +101,10 @@ const Db = () => {
       await deleteStation(id);
       const fetchedData = await fetchTable("station");
       setDataStation(fetchedData);
+    } else if (table === "stationList") {
+      await deleteStationList(id);
+      const fetchedData = await fetchTable("stationList");
+      setDataStationlist(fetchedData);
     }
     setActiveTab(table);
   };
@@ -113,6 +130,12 @@ const Db = () => {
           onClick={() => setActiveTab("station")}
         >
           Station
+        </button>
+        <button
+          className={`tab-button ${activeTab === "stationList" ? "active" : ""}`}
+          onClick={() => setActiveTab("stationList")}
+        >
+          StationList
         </button>
       </div>
       {activeTab === "robot" &&
@@ -147,6 +170,18 @@ const Db = () => {
             onDelete={handleDelete}
             columnExcludes={["id"]}
             selectedTable={"station"}
+          />
+        )}
+      {activeTab === "stationList" &&
+        dataStationlist.length > 0 &&
+        columnsStationlist.length > 0 && (
+          <DbTable
+            data={dataStationlist}
+            columns={columnsStationlist}
+            onUpdate={handleUpdate}
+            onDelete={handleDelete}
+            columnExcludes={["id"]}
+            selectedTable={"stationList"}
           />
         )}
     </div>
