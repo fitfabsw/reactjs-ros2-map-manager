@@ -328,37 +328,43 @@ router.get("/stationlists/:id", async (req, res) => {
   }
 });
 
-router.get("/stationlists/find/:mapName/:robotTypeName", async (req, res) => {
-  try {
-    const { mapName, robotTypeName } = req.params;
-    // 查詢 StationList，並根據 mapName 和 robotTypeName 進行過濾
-    const stationList = await db.StationList.findOne({
-      include: [
-        {
-          model: db.Map,
-          where: { name: mapName }, // 假設 Map 模型有 name 屬性
-          attributes: { exclude: ["pgm", "yaml", "thumbnail"] },
-          include: [
-            {
-              model: db.Robottype,
-              where: { name: robotTypeName }, // 假設 Robottype 模型有 name 屬性
-            },
-          ],
-        },
-        {
-          model: db.Station,
-        },
-      ],
-    });
-    if (stationList) {
-      res.json(stationList);
-    } else {
-      res.status(404).json({ error: "StationList not found" });
+// ex: /api/stationlists/find/fit_newoffice_3fp/lino2/for_dqe
+router.get(
+  "/stationlists/find/:mapName/:robotTypeName/:stl_name",
+  async (req, res) => {
+    try {
+      const { mapName, robotTypeName, stl_name } = req.params;
+      // 查詢 StationList，並根據 mapName 和 robotTypeName 進行過濾
+      // const stationList = await db.StationList.findOne({
+      const stationList = await db.StationList.findAll({
+        where: { name: stl_name },
+        include: [
+          {
+            model: db.Map,
+            where: { name: mapName }, // 假設 Map 模型有 name 屬性
+            attributes: { exclude: ["pgm", "yaml", "thumbnail"] },
+            include: [
+              {
+                model: db.Robottype,
+                where: { name: robotTypeName }, // 假設 Robottype 模型有 name 屬性
+              },
+            ],
+          },
+          {
+            model: db.Station,
+          },
+        ],
+      });
+      if (stationList) {
+        res.json(stationList);
+      } else {
+        res.status(404).json({ error: "StationList not found" });
+      }
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
+  },
+);
 
 router.post("/stationlists", async (req, res) => {
   try {
