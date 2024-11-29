@@ -19,6 +19,7 @@ module.exports = function (app) {
       "/crop-image",
       "/rotate",
       "/update-map-to-db",
+      "/restart-service",
     ],
     legacyCreateProxyMiddleware({
       target: "http://127.0.0.1:5000",

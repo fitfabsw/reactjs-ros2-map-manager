@@ -521,6 +521,20 @@ async function getYamlBasename(mapId) {
   }
 }
 
+// 新增路由來重啟 systemd 服務
+app.post("/restart-service", async (req, res) => {
+  try {
+    // 使用 exec 來執行重啟命令
+    await execPromise("sudo systemctl restart fitrobot.central.service");
+    res.status(200).json({ message: "Service restarted successfully" });
+  } catch (error) {
+    console.error("Error restarting service:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to restart service", details: error.message });
+  }
+});
+
 // 添加 API 路由
 app.use("/api", apiRoutes);
 
