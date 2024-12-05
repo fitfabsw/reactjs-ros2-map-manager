@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Card, CardContent, Typography } from "@mui/material";
+import { Card, CardContent, Typography, Button } from "@mui/material";
 import ROSLIB from "roslib";
 
 const ImuData = ({ ros, robot_namespace }) => {
   const [imuData, setImuData] = useState(null);
+  const [isActive, setIsActive] = useState(false);
 
   useEffect(() => {
+    // if (!ros || !isActive) {
     if (!ros) {
       return;
     }
@@ -47,40 +49,50 @@ const ImuData = ({ ros, robot_namespace }) => {
 
     imuTopic.subscribe((message) => {
       const eulerAngles = getEulerAngles(message.orientation);
-      // console.log('Received message on ' + listener_imu.name + ': ', eulerAngles);
-
       const roll = (eulerAngles.roll * 180.0) / Math.PI;
       const pitch = (eulerAngles.pitch * 180.0) / Math.PI;
       const yaw = (eulerAngles.yaw * 180.0) / Math.PI;
       const sec = message.header.stamp.sec;
+      // console.log(message);
 
-      setImuData((prevState) => {
-        const newData = {
-          roll: roll.toFixed(2),
-          pitch: pitch.toFixed(2),
-          yaw: yaw.toFixed(2),
-          sec: sec,
-        };
-        return { ...prevState, ...newData };
+      setImuData({
+        roll: roll.toFixed(2),
+        pitch: pitch.toFixed(2),
+        yaw: yaw.toFixed(2),
+        sec: sec,
       });
     });
 
     return () => {
       imuTopic.unsubscribe();
     };
-  }, [ros, robot_namespace]);
+  }, [ros, robot_namespace, isActive]);
 
   return (
-    <Card variant="outlined">
+    <Card
+      sx={{
+        backgroundColor: !imuData ? "lightcoral" : "white",
+        variant: "outlined",
+      }}
+    >
       <CardContent>
         <Typography variant="h6">IMU Data</Typography>
+        {imuData && (
+          <Button onClick={() => setIsActive(!isActive)}>
+            {isActive ? "Stop Updating" : "Start Updating"}
+          </Button>
+        )}
         {imuData ? (
-          <div>
-            <Typography>Roll: {imuData.roll}</Typography>
-            <Typography>Pitch: {imuData.pitch}</Typography>
-            <Typography>Yaw: {imuData.yaw}</Typography>
-            <Typography>Sec: {imuData.sec}</Typography>
-          </div>
+          isActive ? (
+            <div>
+              <Typography>Roll: {imuData.roll}</Typography>
+              <Typography>Pitch: {imuData.pitch}</Typography>
+              <Typography>Yaw: {imuData.yaw}</Typography>
+              <Typography>Sec: {imuData.sec}</Typography>
+            </div>
+          ) : (
+            <></>
+          )
         ) : (
           <Typography>Loading IMU data...</Typography>
         )}

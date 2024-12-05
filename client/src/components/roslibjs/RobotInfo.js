@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Card, Typography, CardContent, Box } from "@mui/material";
 import ROSLIB from "roslib";
 import ImuData from "./ImuData";
+import ScanData from "./ScanData";
 
 const RobotInfo = ({ ros, robot_namespace }) => {
   const [robotStatus, setRobotStatus] = useState(null);
@@ -66,6 +67,8 @@ const RobotInfo = ({ ros, robot_namespace }) => {
 
   return (
     <Box display="flex" flexDirection="column" spacing={2}>
+      <ImuData ros={ros} robot_namespace={robot_namespace} />
+      <ScanData ros={ros} robot_namespace={robot_namespace} />
       <Card
         sx={{
           backgroundColor:
@@ -90,7 +93,6 @@ const RobotInfo = ({ ros, robot_namespace }) => {
           </Typography>
         </CardContent>
       </Card>
-      <ImuData ros={ros} robot_namespace={robot_namespace} />
       <Card
         sx={{
           backgroundColor:
