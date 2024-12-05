@@ -1,6 +1,8 @@
-import Card from "react-bootstrap/Card";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
 import React, { useEffect, useState } from "react";
 import "./MapData.css";
+import { Typography } from "@mui/material";
 
 function MapData({ topics }) {
   const [mapMeta, setMapMeta] = useState([]);
@@ -24,21 +26,21 @@ function MapData({ topics }) {
 
   return (
     <Card className="map-data-card">
-      <Card.Body>
-        <Card.Title>Map Data</Card.Title>
+      <CardContent>
+        <Typography variant="h6">Map Data</Typography>
         {mapMeta.length > 0 ? (
           mapMeta.map((map, index) => (
-            <Card.Text
+            <Typography
               key={index}
               className={map.enabled ? "active" : "inactive"}
             >
               {map.mapkey} | {map.enabled ? "Active" : "Inactive"}
-            </Card.Text>
+            </Typography>
           ))
         ) : (
-          <Card.Text>No map data available</Card.Text>
+          <Typography>No map data available</Typography>
         )}
-      </Card.Body>
+      </CardContent>
     </Card>
   );
 }

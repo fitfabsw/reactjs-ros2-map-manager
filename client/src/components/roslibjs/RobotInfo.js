@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { Card, Typography } from "@mui/material";
+import CardContent from "@mui/material/CardContent";
 import ROSLIB from "roslib";
 import ImuData from "./ImuData";
-import Card from "react-bootstrap/Card";
 
 const RobotInfo = ({ ros, robot_namespace }) => {
   const [robotStatus, setRobotStatus] = useState(null);
@@ -64,50 +65,40 @@ const RobotInfo = ({ ros, robot_namespace }) => {
     );
   }, [ros]);
 
-  const robotStatusCardStyle =
-    robotStatus && robotStatus.status < 10
-      ? { backgroundColor: "#f8d7da", borderColor: "#f5c6cb" }
-      : {};
-
-  const currentStationCardStyle =
-    currentStation.station_key === ""
-      ? { backgroundColor: "#f8d7da", borderColor: "#f5c6cb" }
-      : {};
-
   return (
     <>
-      <Card className="mb-4 fixed-card" style={robotStatusCardStyle}>
-        <Card.Body>
-          <Card.Title>RobotStatus</Card.Title>
-          <Card.Text>
-            {robotStatus && (
-              <>
-                {`RobotStatus: ${robotStatus.status}`}
-                <br />
-              </>
-            )}
-          </Card.Text>
-        </Card.Body>
+      <Card
+        variant={
+          robotStatus && robotStatus.status < 10 ? "outlined" : "elevated"
+        }
+      >
+        <CardContent>
+          <Typography variant="h6">Robot Status</Typography>
+          <Typography>
+            {robotStatus ? `RobotStatus: ${robotStatus.status}` : "Loading..."}
+          </Typography>
+        </CardContent>
       </Card>
-      <Card className="mb-4 fixed-card">
-        <Card.Body>
-          <Card.Title>Target Station</Card.Title>
-          {targetStation
-            ? `TargetStation: ${targetStation.name} | (${targetStation.x}, ${targetStation.y}, ${targetStation.z}, ${targetStation.w})`
-            : `TargetStation: `}
-        </Card.Body>
+      <Card>
+        <CardContent>
+          <Typography variant="h6">Target Station</Typography>
+          <Typography>
+            {targetStation
+              ? `TargetStation: ${targetStation.name}`
+              : "No target station"}
+          </Typography>
+        </CardContent>
       </Card>
       <ImuData ros={ros} robot_namespace={robot_namespace} />
-      <Card className="mb-4 fixed-card" style={currentStationCardStyle}>
-        <Card.Body>
-          <Card.Title>Current Stations</Card.Title>
-          <Card.Text>
+      <Card>
+        <CardContent>
+          <Typography variant="h6">Current Stations</Typography>
+          <Typography>
             {`station_key: ${currentStation.station_key}`}
             <br />
             {`map_key: ${currentStation.map_key}`}
-            <br />
-          </Card.Text>
-        </Card.Body>
+          </Typography>
+        </CardContent>
       </Card>
     </>
   );
