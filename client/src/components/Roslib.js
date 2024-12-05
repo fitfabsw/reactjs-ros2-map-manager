@@ -14,6 +14,7 @@ import Rosconnection from "./roslibjs/RosConnection";
 import CmdData from "./roslibjs/CmdData";
 import RobotInfo from "./roslibjs/RobotInfo";
 import { Row, Col } from "react-bootstrap";
+import MapData from "./roslibjs/MapData";
 
 // import CameraData from "./components/CameraData";
 // import MapandOdom from "./components/MapandOdom";
@@ -81,6 +82,7 @@ function Roslibjs() {
       <h4>
         Connection: <span id="status">N/A</span>
       </h4>
+      <MapData topics={topicInfo} />
       {robotNamespaces && (
         <Row className="d-flex flex-wrap">
           {robotNamespaces.map((robotNamespace, index) => (
