@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Typography, CardContent } from "@mui/material";
+import { Card, Typography, CardContent, Box } from "@mui/material";
 import ROSLIB from "roslib";
 import ImuData from "./ImuData";
 
@@ -65,8 +65,8 @@ const RobotInfo = ({ ros, robot_namespace }) => {
   }, [ros]);
 
   return (
-    <>
-      {`currentStation.station_key: ${currentStation.station_key}`}
+    <Box display="flex" flexDirection="column" spacing={2}>
+      <Typography>{`currentStation.station_key: ${currentStation.station_key}`}</Typography>
       <Card
         sx={{
           backgroundColor:
@@ -95,8 +95,8 @@ const RobotInfo = ({ ros, robot_namespace }) => {
       <Card
         sx={{
           backgroundColor:
-            (currentStation.station_key === "") |
-            (currentStation.station_key === "NA")
+            currentStation.station_key === "" ||
+            currentStation.station_key === "NA"
               ? "lightcoral"
               : "white",
         }}
@@ -110,7 +110,7 @@ const RobotInfo = ({ ros, robot_namespace }) => {
           </Typography>
         </CardContent>
       </Card>
-    </>
+    </Box>
   );
 };
 

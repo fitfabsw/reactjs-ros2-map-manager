@@ -16,13 +16,13 @@ import MapData from "./roslibjs/MapData";
 // import MapandOdom from "./components/MapandOdom";
 
 import {
-  Grid,
   Card,
   CardContent,
   Accordion,
   AccordionSummary,
   AccordionDetails,
   Typography,
+  Box,
 } from "@mui/material";
 
 function Roslibjs() {
@@ -80,7 +80,6 @@ function Roslibjs() {
   return (
     <>
       <Rosconnection
-        // rosUrl="ws://172.20.10.2:9090"
         rosUrl="ws://192.168.0.184:9090"
         rosDomainId="89"
         setRos={setRos}
@@ -90,43 +89,38 @@ function Roslibjs() {
       </h4>
       <MapData topics={topicInfo} />
       {robotNamespaces && (
-        <Grid container spacing={2}>
+        <Box display="flex" flexWrap="wrap" justifyContent="flex-start">
           {robotNamespaces.map((robotNamespace, index) => (
-            <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
-              <Card className="mb-4 fixed-card-group">
+            <Box key={index} mb={2}>
+              <Card className="fixed-card-group">
                 <CardContent>
-                  <h4 style={{ fontSize: "1.5em", color: "blue" }}>
-                    <b>{robotNamespace}</b>
-                  </h4>
-                  <br />
+                  <Typography variant="h5" style={{ color: "blue" }}>
+                    {robotNamespace}
+                  </Typography>
                   <RobotInfo ros={ros} robot_namespace={robotNamespace} />
                 </CardContent>
               </Card>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       )}
       {ros && (
-        <>
-          <Grid container>
-            <Grid item xs={12}>
-              <div className="d-flex justify-content-center align-items-center">
-                {topicInfo && (
-                  <Accordion className="mb-4 fixed-card-group">
-                    <AccordionSummary>
-                      <h4>All Topics</h4>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      {topicInfo.map((topic, index) => (
-                        <Typography key={index}>{topic}</Typography>
-                      ))}
-                    </AccordionDetails>
-                  </Accordion>
-                )}
-              </div>
-            </Grid>
-          </Grid>
-        </>
+        <Box>
+          <Box display="flex" justifyContent="center" alignItems="center">
+            {topicInfo && (
+              <Accordion className="mb-4 fixed-card-group">
+                <AccordionSummary>
+                  <Typography variant="h6">All Topics</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  {topicInfo.map((topic, index) => (
+                    <Typography key={index}>{topic}</Typography>
+                  ))}
+                </AccordionDetails>
+              </Accordion>
+            )}
+          </Box>
+        </Box>
       )}
     </>
   );
