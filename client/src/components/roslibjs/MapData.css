@@ -1,0 +1,17 @@
+.map-data-card {
+  margin: 20px;
+  padding: 15px;
+  background-color: #f8f9fa; /* 淺色背景 */
+  border: 1px solid #dee2e6; /* 邊框顏色 */
+  border-radius: 5px; /* 圓角 */
+}
+
+.map-data-card .card-title {
+  font-size: 1.5em;
+  color: #007bff; /* Bootstrap primary color */
+  margin-bottom: 15px;
+}
+
+.map-data-card .card-text {
+  margin: 5px 0;
+}

@@ -1,29 +1,21 @@
 import Card from "react-bootstrap/Card";
 import React, { useEffect, useState } from "react";
-import ROSLIB from "roslib";
+import "./MapData.css";
 
 function MapData({ topics }) {
-  const [ros, setRos] = useState(null);
-  const [filterTopics, setFilterTopics] = useState([]);
   const [mapMeta, setMapMeta] = useState([]);
 
   useEffect(() => {
-    const filteredall = topics.filter((topic) => topic.includes("map_server"));
-    console.log(`filteredall: ${filteredall}`);
-
-    const mapkeyData = filteredall.map((filtered) => {
+    const filteredTopics = topics.filter((topic) =>
+      topic.includes("map_server"),
+    );
+    const mapData = filteredTopics.map((filtered) => {
       const parts = filtered.split("/");
       const mapkey = `/${parts[1]}/${parts[2]}`;
       const mapEnabled = hasTopic(`${mapkey}/map`);
-      const newData = {
-        mapkey: mapkey,
-        enabled: mapEnabled,
-      };
-      return newData;
+      return { mapkey, enabled: mapEnabled };
     });
-    console.log(`mapkeyData: ${mapkeyData}`);
-    console.log(JSON.stringify(mapkeyData));
-    setMapMeta(mapkeyData);
+    setMapMeta(mapData);
   }, [topics]);
 
   const hasTopic = (topic) => {
@@ -31,14 +23,20 @@ function MapData({ topics }) {
   };
 
   return (
-    <>
-      {mapMeta &&
-        mapMeta.map((map, index) => (
-          <Card.Text key={index}>
-            {map.mapkey} | {map.enabled ? "enabled" : "disabled"}
-          </Card.Text>
-        ))}
-    </>
+    <Card className="map-data-card">
+      <Card.Body>
+        <Card.Title>Map Data</Card.Title>
+        {mapMeta.length > 0 ? (
+          mapMeta.map((map, index) => (
+            <Card.Text key={index}>
+              {map.mapkey} | {map.enabled ? "Active" : "Inactive"}
+            </Card.Text>
+          ))
+        ) : (
+          <Card.Text>No map data available</Card.Text>
+        )}
+      </Card.Body>
+    </Card>
   );
 }
 
