@@ -49,13 +49,15 @@ const GeneralData = ({ ros }) => {
         <Card.Body>
           <Card.Title>RobotStatus Data</Card.Title>
           <Card.Text>
-            {robotStatus && <p>RobotStatus: {robotStatus.status}</p>}
-            {targetStation && (
-              <p>
-                TargetStation: {targetStation.name} | ({targetStation.x},{" "}
-                {targetStation.y}, {targetStation.z}, {targetStation.w})
-              </p>
+            {robotStatus && (
+              <>
+                {`RobotStatus: ${robotStatus.status}`}
+                <br />
+              </>
             )}
+            {targetStation &&
+              `TargetStation: ${targetStation.name} | (${targetStation.x},{" "}
+                ${targetStation.y}, ${targetStation.z}, ${targetStation.w})`}
           </Card.Text>
         </Card.Body>
       </Card>
