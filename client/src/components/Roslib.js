@@ -8,7 +8,7 @@ import ROSLIB from "roslib";
 import React, { useState, useEffect } from "react";
 
 import Rosconnection from "./roslibjs/RosConnection";
-import CmdData from "./roslibjs/CmdData";
+// import CmdData from "./roslibjs/CmdData";
 import RobotInfo from "./roslibjs/RobotInfo";
 import MapData from "./roslibjs/MapData";
 

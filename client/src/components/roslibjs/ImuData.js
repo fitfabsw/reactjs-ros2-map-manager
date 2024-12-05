@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
+import { Card, CardContent, Typography } from "@mui/material";
 import ROSLIB from "roslib";
-import Card from "react-bootstrap/Card";
 
 const ImuData = ({ ros, robot_namespace }) => {
-  const [imuData, setImuData] = useState({});
+  const [imuData, setImuData] = useState(null);
 
   useEffect(() => {
     if (!ros) {
       return;
     }
-    // When we receive a message on /my_topic, add its data as a list item to the "messages" ul
-    var imuTopic = new ROSLIB.Topic({
+
+    const imuTopic = new ROSLIB.Topic({
       ros: ros,
       name: `${robot_namespace}/imu/data`,
       messageType: "sensor_msgs/Imu",
@@ -64,29 +64,28 @@ const ImuData = ({ ros, robot_namespace }) => {
         return { ...prevState, ...newData };
       });
     });
-  }, [ros]);
+
+    return () => {
+      imuTopic.unsubscribe();
+    };
+  }, [ros, robot_namespace]);
 
   return (
-    <>
-      <Card className="mb-4 fixed-card">
-        <Card.Body>
-          <Card.Title>Imu Data</Card.Title>
-          <Card.Subtitle className="mb-2 text-muted">
-            subscribe imu/data
-          </Card.Subtitle>
-          <Card.Text>
-            <strong>Roll: </strong> <span>{imuData.roll}</span>
-            <br />
-            <strong>Pitch: </strong> <span>{imuData.pitch}</span>
-            <br />
-            <strong>Yaw: </strong> <span>{imuData.yaw}</span>
-            <br />
-            <strong>Sec: </strong> <span>{imuData.sec}</span>
-            <br />
-          </Card.Text>
-        </Card.Body>
-      </Card>
-    </>
+    <Card variant="outlined">
+      <CardContent>
+        <Typography variant="h6">IMU Data</Typography>
+        {imuData ? (
+          <div>
+            <Typography>Roll: {imuData.roll}</Typography>
+            <Typography>Pitch: {imuData.pitch}</Typography>
+            <Typography>Yaw: {imuData.yaw}</Typography>
+            <Typography>Sec: {imuData.sec}</Typography>
+          </div>
+        ) : (
+          <Typography>Loading IMU data...</Typography>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

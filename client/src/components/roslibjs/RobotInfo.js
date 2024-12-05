@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Typography } from "@mui/material";
-import CardContent from "@mui/material/CardContent";
+import { Card, Typography, CardContent } from "@mui/material";
 import ROSLIB from "roslib";
 import ImuData from "./ImuData";
 
@@ -67,10 +66,13 @@ const RobotInfo = ({ ros, robot_namespace }) => {
 
   return (
     <>
+      {`currentStation.station_key: ${currentStation.station_key}`}
       <Card
-        variant={
-          robotStatus && robotStatus.status < 10 ? "outlined" : "elevated"
-        }
+        sx={{
+          backgroundColor:
+            robotStatus && robotStatus.status < 10 ? "lightcoral" : "white",
+          variant: "outlined",
+        }}
       >
         <CardContent>
           <Typography variant="h6">Robot Status</Typography>
@@ -79,7 +81,7 @@ const RobotInfo = ({ ros, robot_namespace }) => {
           </Typography>
         </CardContent>
       </Card>
-      <Card>
+      <Card variant="outlined">
         <CardContent>
           <Typography variant="h6">Target Station</Typography>
           <Typography>
@@ -90,7 +92,15 @@ const RobotInfo = ({ ros, robot_namespace }) => {
         </CardContent>
       </Card>
       <ImuData ros={ros} robot_namespace={robot_namespace} />
-      <Card>
+      <Card
+        sx={{
+          backgroundColor:
+            (currentStation.station_key === "") |
+            (currentStation.station_key === "NA")
+              ? "lightcoral"
+              : "white",
+        }}
+      >
         <CardContent>
           <Typography variant="h6">Current Stations</Typography>
           <Typography>
