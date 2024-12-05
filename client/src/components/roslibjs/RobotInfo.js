@@ -66,7 +66,6 @@ const RobotInfo = ({ ros, robot_namespace }) => {
 
   return (
     <Box display="flex" flexDirection="column" spacing={2}>
-      <Typography>{`currentStation.station_key: ${currentStation.station_key}`}</Typography>
       <Card
         sx={{
           backgroundColor:
