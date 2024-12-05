@@ -4,6 +4,7 @@ import Navigation from "./components/Navigation";
 import MapEditor from "./components/MapEditor";
 import StationManager from "./components/StationManager";
 import Db from "./components/Db";
+import Roslibjs from "./components/Roslib";
 import "./App.css";
 
 function Home() {
@@ -48,6 +49,7 @@ function App() {
           <Route path="/map-editor" element={<MapEditor />} />
           <Route path="/stations" element={<StationManager />} />
           <Route path="/db" element={<Db />} />
+          <Route path="/roslib" element={<Roslibjs />} />
         </Routes>
       </div>
     </Router>
