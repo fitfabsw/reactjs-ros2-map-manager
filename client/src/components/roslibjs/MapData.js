@@ -28,7 +28,10 @@ function MapData({ topics }) {
         <Card.Title>Map Data</Card.Title>
         {mapMeta.length > 0 ? (
           mapMeta.map((map, index) => (
-            <Card.Text key={index}>
+            <Card.Text
+              key={index}
+              className={map.enabled ? "active" : "inactive"}
+            >
               {map.mapkey} | {map.enabled ? "Active" : "Inactive"}
             </Card.Text>
           ))
