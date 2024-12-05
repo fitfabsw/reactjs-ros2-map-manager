@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import ROSLIB from "roslib";
+import ImuData from "./ImuData";
 import Card from "react-bootstrap/Card";
 
-const GeneralData = ({ ros }) => {
+const RobotInfo = ({ ros, robot_namespace }) => {
   // const [myData, setMyData] = useState(null);
   const [robotStatus, setRobotStatus] = useState(null);
   const [targetStation, setTargetStation] = useState(null);
@@ -14,7 +15,7 @@ const GeneralData = ({ ros }) => {
 
     let robotstatusTopic = new ROSLIB.Topic({
       ros: ros,
-      name: "/lino2_1234/robot_status",
+      name: `${robot_namespace}/robot_status`,
       messageType: "fitrobot_interfaces/msg/RobotStatus",
     });
     robotstatusTopic.subscribe((message) => {
@@ -26,15 +27,9 @@ const GeneralData = ({ ros }) => {
 
     let targetStationTopic = new ROSLIB.Topic({
       ros: ros,
-      name: "/lino2_1234/target_station",
+      name: `${robot_namespace}/target_station`,
       messageType: "fitrobot_interfaces/msg/Station",
     });
-    // string type
-    // string name
-    // float64 x
-    // float64 y
-    // float64 z
-    // float64 w
     targetStationTopic.subscribe((message) => {
       const { type, name, x, y, z, w } = message;
       setTargetStation(() => {
@@ -45,9 +40,9 @@ const GeneralData = ({ ros }) => {
 
   return (
     <>
-      <Card className="mb-4" style={{ width: "48rem" }}>
+      <Card className="mb-4 fixed-card">
         <Card.Body>
-          <Card.Title>RobotStatus Data</Card.Title>
+          <Card.Title>RobotStatus</Card.Title>
           <Card.Text>
             {robotStatus && (
               <>
@@ -55,14 +50,21 @@ const GeneralData = ({ ros }) => {
                 <br />
               </>
             )}
-            {targetStation &&
-              `TargetStation: ${targetStation.name} | (${targetStation.x},{" "}
-                ${targetStation.y}, ${targetStation.z}, ${targetStation.w})`}
           </Card.Text>
         </Card.Body>
       </Card>
+      <Card className="mb-4 fixed-card">
+        <Card.Body>
+          <Card.Title>Target Station</Card.Title>
+          {targetStation
+            ? `TargetStation: ${targetStation.name} | (${targetStation.x},{" "}
+                ${targetStation.y}, ${targetStation.z}, ${targetStation.w})`
+            : `TargetStation: `}
+        </Card.Body>
+      </Card>
+      <ImuData ros={ros} robot_namespace={robot_namespace} />
     </>
   );
 };
 
-export default GeneralData;
+export default RobotInfo;

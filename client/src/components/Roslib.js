@@ -12,10 +12,7 @@ import Accordion from "react-bootstrap/Accordion";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Rosconnection from "./roslibjs/RosConnection";
 import CmdData from "./roslibjs/CmdData";
-import GeneralData from "./roslibjs/GeneralData";
-import ImuData from "./roslibjs/ImuData";
-import Header from "./roslibjs/Header";
-import Footer from "./roslibjs/Footer";
+import RobotInfo from "./roslibjs/RobotInfo";
 import { Row, Col } from "react-bootstrap";
 
 // import CameraData from "./components/CameraData";
@@ -25,11 +22,11 @@ function Roslibjs() {
   const [ros, setRos] = useState(null);
   const [topicInfo, setTopicInfo] = useState([]);
   const [robotInfo, setRobotInfo] = useState([]);
+  const [robotNamespaces, setRobotNamespaces] = useState([]);
   useEffect(() => {
     if (!ros) {
       return;
     }
-
     console.log("111111111111");
     const listRobotsClient = new ROSLIB.Service({
       ros: ros,
@@ -44,6 +41,9 @@ function Roslibjs() {
           console.log("JJ1");
           console.log(result.robot_info_list);
           setRobotInfo(result.robot_info_list);
+          setRobotNamespaces(
+            result.robot_info_list.map((robot) => robot.robot_namespace),
+          );
         } else {
           console.log("JJ2");
           setRobotInfo([]);
@@ -78,13 +78,33 @@ function Roslibjs() {
         rosDomainId="89"
         setRos={setRos}
       />
+      <h4>
+        Connection: <span id="status">N/A</span>
+      </h4>
+      {robotNamespaces && (
+        <Row className="d-flex flex-wrap">
+          {robotNamespaces.map((robotNamespace, index) => (
+            <Col key={index} xs={12} sm={6} md={4} lg={3}>
+              <Card className="mb-4 fixed-card-group">
+                <Card.Body>
+                  <Card.Title style={{ fontSize: "1.5em", color: "blue" }}>
+                    <b>{robotNamespace}</b>
+                  </Card.Title>
+                  <br />
+                  <RobotInfo ros={ros} robot_namespace={robotNamespace} />
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      )}
       {ros && (
         <>
           <Row>
             <Col>
               <div className="d-flex justify-content-center align-items-center">
                 {topicInfo && (
-                  <Accordion className="mb-4" style={{ width: "48rem" }}>
+                  <Accordion className="mb-4 fixed-card-group">
                     <Accordion.Item eventKey="0">
                       <Accordion.Header>All Topics</Accordion.Header>
                       <Accordion.Body>
@@ -95,39 +115,11 @@ function Roslibjs() {
                     </Accordion.Item>
                   </Accordion>
                 )}
-                {robotInfo && (
-                  <Card className="mb-4" style={{ width: "48rem" }}>
-                    <Card.Body>
-                      <Card.Title>Robots</Card.Title>
-                      {robotInfo.map((robot, index) => (
-                        <Card.Text key={index}>
-                          {robot.robot_namespace}
-                        </Card.Text>
-                      ))}
-                    </Card.Body>
-                  </Card>
-                )}
-              </div>
-            </Col>
-          </Row>
-          <Row>
-            <Col>
-              <div className="d-flex justify-content-center align-items-center">
-                <GeneralData ros={ros} />
-              </div>
-            </Col>
-            <Col>
-              <div className="d-flex justify-content-center align-items-center">
-                <ImuData ros={ros} />
               </div>
             </Col>
           </Row>
         </>
       )}
-      <hr />
-      <h3>
-        Connection: <span id="status">N/A</span>
-      </h3>
     </>
   );
 }
