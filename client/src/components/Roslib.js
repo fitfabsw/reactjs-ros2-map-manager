@@ -79,14 +79,7 @@ function Roslibjs() {
   }, [ros]);
   return (
     <>
-      <Rosconnection
-        rosUrl="ws://192.168.0.184:9090"
-        rosDomainId="89"
-        setRos={setRos}
-      />
-      <h4>
-        Connection: <span id="status">N/A</span>
-      </h4>
+      <Rosconnection setRos={setRos} />
       <MapData topics={topicInfo} />
       {robotNamespaces && (
         <Box display="flex" flexWrap="wrap" justifyContent="flex-start">

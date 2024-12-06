@@ -20,48 +20,73 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
--------------------------------*/ 
+-------------------------------*/
 
-import React, { useEffect } from 'react';
-import ROSLIB from 'roslib';
+import React, { useState, useEffect } from "react";
+import { Button, TextField, Box } from "@mui/material";
+import ROSLIB from "roslib";
 
-const Rosconnection = ({ rosUrl, rosDomainId, setRos}) => {
+const RosConnection = ({ setRos }) => {
+  const [rosUrl, setRosUrl] = useState("ws://192.168.0.184:9090"); // 預設值
+  const [rosDomainId, setRosDomainId] = useState("89");
 
+  // 在組件加載時檢索 URL
   useEffect(() => {
-    // Create ros object to communicate over your Rosbridge connection
+    const savedUrl = localStorage.getItem("rosUrl");
+    if (savedUrl) {
+      setRosUrl(savedUrl);
+    }
+  }, []);
+
+  const connectToRos = () => {
     const ros = new ROSLIB.Ros({
       url: rosUrl,
-      options: {
-        ros_domain_id: rosDomainId // ROS_DOMAIN_IDを設定する
-      }
     });
 
-    // When the Rosbridge server connects, fill the span with id "status" with "successful"
     ros.on("connection", () => {
       setRos(ros);
       document.getElementById("status").innerHTML = "successful";
-      console.log('Connected to ROSBridge WebSocket server.');
-    });
-  
-    // When the Rosbridge server experiences an error, fill the "status" span with the returned error
-    ros.on('error', function(error) {
-      console.log('Error connecting to ROSBridge WebSocket server: ', error);
-    });
-  
-    // When the Rosbridge server shuts down, fill the "status" span with "closed"
-    ros.on('close', function() {
-      console.log('Connection to ROSBridge WebSocket server closed.');
+      console.log("Connected to ROSBridge WebSocket server.");
     });
 
-    return () => {
-      ros.close();
-    };
-  }, [rosUrl, rosDomainId, setRos]);
+    ros.on("error", function (error) {
+      console.log("Error connecting to ROSBridge WebSocket server: ", error);
+    });
+
+    ros.on("close", function () {
+      console.log("Connection to ROSBridge WebSocket server closed.");
+    });
+
+    // 保存 URL 到 localStorage
+    localStorage.setItem("rosUrl", rosUrl);
+  };
 
   return (
-    <>
-
-    </>
+    <Box display="flex" alignItems="center">
+      <TextField
+        label="ROS WebSocket URL"
+        variant="outlined"
+        value={rosUrl}
+        onChange={(e) => setRosUrl(e.target.value)}
+        fullWidth
+        margin="normal"
+        style={{ width: "80%", marginLeft: "10px", marginRight: "10px" }}
+      />
+      <Box display="flex" alignItems="center" style={{ marginTop: "10px" }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={connectToRos}
+          style={{ marginRight: "10px" }}
+        >
+          Connect
+        </Button>
+        <h4>
+          Connection: <span id="status">N/A</span>
+        </h4>
+      </Box>
+    </Box>
   );
-}
-export default Rosconnection;
+};
+
+export default RosConnection;
