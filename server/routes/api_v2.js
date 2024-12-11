@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../models");
+const { exec } = require("child_process"); // Import exec from child_process
 
 // Robottype CRUD
 router.get("/robottypes", async (req, res) => {
@@ -660,6 +661,23 @@ router.get("/tables/:tableName/schema", async (req, res) => {
   }));
 
   res.json(schema);
+});
+
+router.get("/logs", (req, res) => {
+  var service = "fitrobot.central.service";
+  var since = "2024-11-01 10:00:00";
+  var until = "2024-12-11 11:00:00";
+  var cmd = "journalctl -u " + service + " --since \"" + since + "\" --until \"" + until + "\"";
+  exec(cmd, (error, stdout, stderr) => {
+    if (error) {
+      return res.status(500).json({ error: error.message });
+    }
+    if (stderr) {
+      return res.status(500).json({ error: stderr });
+    }
+    // Send the output of the ls command as the response
+    res.json({ files: stdout.split("\n").filter(Boolean)}); // Split output into an array and filter out empty lines
+  });
 });
 
 module.exports = router;
