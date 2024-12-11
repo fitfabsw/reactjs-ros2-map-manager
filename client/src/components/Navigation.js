@@ -28,6 +28,12 @@ function Navigation() {
       >
         Masks
       </Link>
+      <Link
+        to="/logs"
+        className={location.pathname.startsWith("/logs") ? "active" : ""}
+      >
+        Logs
+      </Link>
     </nav>
   );
 }

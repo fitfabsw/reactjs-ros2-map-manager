@@ -1,0 +1,10 @@
+image: lino2_fit_newoffice_3f_241114.pgm
+mode: trinary
+resolution: 0.02
+origin:
+  - -11.704249752639377
+  - -15.455890066464143
+  - 0
+negate: 0
+occupied_thresh: 0.65
+free_thresh: 0.25
