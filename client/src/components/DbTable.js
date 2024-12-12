@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./DbTable.css";
+import { uploadFile } from "./database";
 
 const DbTable = ({
   data,
@@ -25,36 +26,15 @@ const DbTable = ({
   };
 
   const handleUpdate = async (id) => {
-    console.log("handleUpdate!");
     if (editEntry) {
-      console.log("AA");
       for (const [key, file] of Object.entries(fileInputs)) {
         if (file) {
-          console.log("BB");
-          console.log(file);
-          const formData = new FormData();
-          formData.append("file", file);
-          formData.append("column", key);
-          formData.append("id", id);
-          console.log("key", key);
-          console.log("file", file);
-          console.log("selectedTable", selectedTable);
-          console.log("id", id);
-
-          await fetch(`/api/${selectedTable}s/${id}/upload`, {
-            method: "POST",
-            body: formData,
-          });
-          console.log("EE");
+          await uploadFile(selectedTable, id, key, file);
         }
       }
-      console.log("111");
       onUpdate(selectedTable, id, editEntry);
-      console.log("222");
       setEditEntry(null);
-      console.log("333");
       setFileInputs({});
-      console.log("444");
     }
   };
 

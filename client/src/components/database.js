@@ -252,3 +252,20 @@ export const fetchTableSchema = async (tableName) => {
   const response = await fetch(`${API_URL}/tables/${tableName}/schema`);
   return response.json();
 };
+
+export const uploadFile = async (table, id, column, file) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("column", column);
+
+  const response = await fetch(`${API_URL}/${table}s/${id}/upload`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  return response.json();
+};
