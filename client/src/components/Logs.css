@@ -35,3 +35,12 @@
   color: #666;
   font-size: 1.1em;
 }
+
+input[type="text"],
+input[type="number"] {
+  padding: 10px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+}

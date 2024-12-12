@@ -667,7 +667,9 @@ router.get("/logs", (req, res) => {
   var service = "fitrobot.central.service";
   var since = "2024-11-01 10:00:00";
   var until = "2024-12-11 11:00:00";
-  var cmd = "journalctl -u " + service + " --since \"" + since + "\" --until \"" + until + "\"";
+  var ip = "192.168.8.102";
+//   var cmd = "sudo journalctl --file=/var/log/journal/remote/remote-" + ip + ".journal -u " + service + " --since \"" + since + "\" --until \"" + until + "\" --output json";
+  var cmd = "journalctl -u fitrobot.central.service --since '2024-11-01 10:00:00' --until '2024-12-11 11:00:00' -n 1000 -p info";
   exec(cmd, (error, stdout, stderr) => {
     if (error) {
       return res.status(500).json({ error: error.message });
@@ -675,8 +677,10 @@ router.get("/logs", (req, res) => {
     if (stderr) {
       return res.status(500).json({ error: stderr });
     }
-    // Send the output of the ls command as the response
-    res.json({ files: stdout.split("\n").filter(Boolean)}); // Split output into an array and filter out empty lines
+    // Send the output of the ls command as the response, with each line escaped
+    const escapedResults = stdout.split("\n")
+      .filter(Boolean);
+    res.json({ results: escapedResults });
   });
 });
 
