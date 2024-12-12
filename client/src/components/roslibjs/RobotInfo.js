@@ -12,6 +12,19 @@ const RobotInfo = ({ ros, robot_namespace }) => {
     map_key: "NA",
     stations: [],
   });
+  const [lifecycleNodeStates, setLifecycleNodeStates] = useState({
+    amcl: null,
+    behavior_server: null,
+    bt_navigator: null,
+    controller_server: null,
+    costmap_filter_info_server: null,
+    "global_costmap/global_costmap": null,
+    "local_costmap/local_costmap": null,
+    planner_server: null,
+    smoother_server: null,
+    velocity_smoother: null,
+    waypoint_follower: null,
+  });
 
   useEffect(() => {
     if (!ros) {
@@ -63,6 +76,43 @@ const RobotInfo = ({ ros, robot_namespace }) => {
         }
       },
     );
+
+    const getLifecycleNodeState = (nodeName) => {
+      const lifecycleClient = new ROSLIB.Service({
+        ros: ros,
+        name: `${robot_namespace}/${nodeName}/get_state`,
+        serviceType: "lifecycle_msgs/srv/GetState",
+      });
+
+      lifecycleClient.callService(
+        new ROSLIB.ServiceRequest(),
+        function (result) {
+          setLifecycleNodeStates((prevStates) => ({
+            ...prevStates,
+            [nodeName]: {
+              id: result.current_state.id,
+              label: result.current_state.label,
+            },
+          }));
+        },
+      );
+    };
+
+    const lifecycleNodes = [
+      "amcl",
+      "behavior_server",
+      "bt_navigator",
+      "controller_server",
+      "costmap_filter_info_server",
+      "global_costmap/global_costmap",
+      "local_costmap/local_costmap",
+      "planner_server",
+      "smoother_server",
+      "velocity_smoother",
+      "waypoint_follower",
+    ];
+
+    lifecycleNodes.forEach(getLifecycleNodeState);
   }, [ros]);
 
   return (
@@ -81,6 +131,16 @@ const RobotInfo = ({ ros, robot_namespace }) => {
           <Typography>
             {robotStatus ? `RobotStatus: ${robotStatus.status}` : "Loading..."}
           </Typography>
+        </CardContent>
+      </Card>
+      <Card variant="outlined">
+        <CardContent>
+          <Typography variant="h6">Lifecycle Nodes</Typography>
+          {Object.entries(lifecycleNodeStates).map(([nodeName, state]) => (
+            <Typography key={nodeName}>
+              {`${nodeName}: ${state ? state.label : "Loading..."}`}
+            </Typography>
+          ))}
         </CardContent>
       </Card>
       <Card variant="outlined">
