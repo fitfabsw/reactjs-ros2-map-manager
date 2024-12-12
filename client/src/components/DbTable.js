@@ -36,9 +36,12 @@ const DbTable = ({
           formData.append("file", file);
           formData.append("column", key);
           formData.append("id", id);
-          console.log("DD");
+          console.log("key", key);
+          console.log("file", file);
+          console.log("selectedTable", selectedTable);
+          console.log("id", id);
 
-          await fetch(`/api/${selectedTable}/${id}/upload`, {
+          await fetch(`/api/${selectedTable}s/${id}/upload`, {
             method: "POST",
             body: formData,
           });
