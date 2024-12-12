@@ -26,6 +26,36 @@ const RobotInfo = ({ ros, robot_namespace }) => {
     waypoint_follower: null,
   });
 
+  const checkLifecycleNodesForStatus3 = () => {
+    const expectedStates = {
+      amcl: 3, // active
+      behavior_server: 2, // inactive
+      bt_navigator: 2, // inactive
+      controller_server: 3, // active
+      costmap_filter_info_server: 3, // active
+      "global_costmap/global_costmap": 13, // activating, is this normal? TBD
+      "local_costmap/local_costmap": 3, // active
+      // not sure about the valid states of below four ndoes
+      // planner_server: 3, // active
+      // smoother_server: 3, // active
+      // velocity_smoother: 3, // active
+      // waypoint_follower: 3, // active
+    };
+
+    return Object.entries(expectedStates).every(
+      ([nodeName, expectedStateId]) => {
+        const currentNodeState = lifecycleNodeStates[nodeName];
+        return currentNodeState && currentNodeState.id === expectedStateId;
+      },
+    );
+  };
+
+  const areAllLifecycleNodesActive = () => {
+    return Object.values(lifecycleNodeStates).every(
+      (state) => state && state.id === 3,
+    );
+  };
+
   useEffect(() => {
     if (!ros) {
       return;
@@ -111,6 +141,17 @@ const RobotInfo = ({ ros, robot_namespace }) => {
       "velocity_smoother",
       "waypoint_follower",
     ];
+    // PRIMARY_STATE_UNKNOWN = 0
+    // PRIMARY_STATE_UNCONFIGURED = 1
+    // PRIMARY_STATE_INACTIVE = 2
+    // PRIMARY_STATE_ACTIVE = 3
+    // PRIMARY_STATE_FINALIZED = 4
+    // TRANSITION_STATE_CONFIGURING = 10
+    // TRANSITION_STATE_CLEANINGUP = 11
+    // TRANSITION_STATE_SHUTTINGDOWN = 12
+    // TRANSITION_STATE_ACTIVATING = 13
+    // TRANSITION_STATE_DEACTIVATING = 14
+    // TRANSITION_STATE_ERRORPROCESSING = 15
 
     lifecycleNodes.forEach(getLifecycleNodeState);
   }, [ros]);
@@ -133,12 +174,25 @@ const RobotInfo = ({ ros, robot_namespace }) => {
           </Typography>
         </CardContent>
       </Card>
-      <Card variant="outlined">
+      <Card
+        variant="outlined"
+        sx={{
+          backgroundColor:
+            (robotStatus &&
+              robotStatus.status === 3 &&
+              !checkLifecycleNodesForStatus3()) ||
+            (robotStatus &&
+              robotStatus.status >= 10 &&
+              !areAllLifecycleNodesActive())
+              ? "lightcoral"
+              : "white",
+        }}
+      >
         <CardContent>
           <Typography variant="h6">Lifecycle Nodes</Typography>
           {Object.entries(lifecycleNodeStates).map(([nodeName, state]) => (
             <Typography key={nodeName}>
-              {`${nodeName}: ${state ? state.label : "Loading..."}`}
+              {`${nodeName}: ${state ? state.label : "Loading..."} (ID: ${state ? state.id : "N/A"})`}
             </Typography>
           ))}
         </CardContent>
