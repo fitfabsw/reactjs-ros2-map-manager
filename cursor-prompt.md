@@ -1,9 +1,28 @@
+### 2024/12/12
+
+Database management 模組包含 Db.js & DbTable 兩個組件
+在DbTable.js component 中, 當選點修改時,
+目前僅有 ["TEXT", "INTEGER", "REAL"] 這三個格式, 才允許修改
+
+我的 database table 中, 有的欄位格式為blob
+我希望針對 blob 格式的欄位, 在點選 Edit 按鈕後, 對應的欄位中增加一個可供選擇檔案的 input
+當選擇檔案時, 輸入以下sql指令插入database
+ex1:
+update map set pgm=readfile(filepath) where id=<current map id>; <-- 當欄位為pgm
+ex2:
+update map set yaml=readfile(filepath) where id=<current map id>; <-- 當欄位為yaml
+ex3:
+update map set thumbnail=readfile(filepath) where id=<current map id>; <-- 當欄位為thumbnail
+
+目前有 blob 的 table 有 map & mask
+
 ### 2024/11/20
 
 ===預期行為===
 
 在 edit 模式下, 點選"修改button", 點選 "選擇位置button"
 地圖會出現
+
 1. "請選擇欲更動之位置" 提示
 2. 且滑鼠游標圖示由箭頭變成十字
 
@@ -11,25 +30,23 @@
 
 3. 若沒進入等待點選狀態, 不會有提示和十字
 4. 進入等待點選狀態後
-     在地圖上點選新的位置點
-     A. 左側StationCard中的(x,y)位置會更新
-     B. 地圖的位置點圖示也會更新
-     C. 此時按下保存
-        C1.提示消失
-        C2.十字變回箭頭
-        C3.(x,y)位置會維持更新
-        C4.地圖位置點會維持更新
-     D. 此時按下取消 -> 提示消失, 十字變回箭頭, 且 (x,y)位置和地圖位置點均會變為原本的值和位置
-        D1.提示消失
-        D2.十字變回箭頭
-        D3.(x,y)位置變回原本的值
-        D4.地圖位置點變回原本的位置
+   在地圖上點選新的位置點
+   A. 左側StationCard中的(x,y)位置會更新
+   B. 地圖的位置點圖示也會更新
+   C. 此時按下保存
+   C1.提示消失
+   C2.十字變回箭頭
+   C3.(x,y)位置會維持更新
+   C4.地圖位置點會維持更新
+   D. 此時按下取消 -> 提示消失, 十字變回箭頭, 且 (x,y)位置和地圖位置點均會變為原本的值和位置
+   D1.提示消失
+   D2.十字變回箭頭
+   D3.(x,y)位置變回原本的值
+   D4.地圖位置點變回原本的位置
 
 ===現在問題===
 4D3. (x,y)位置沒有變回原本的值
 4D4. 地圖位置點沒變回原本的位置
-
-
 
 ### 2024/11/19
 

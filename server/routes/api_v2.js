@@ -1,6 +1,11 @@
 const express = require("express");
+// const { sequelize } = require("sequelize");
+const { sequelize } = require("../models");
 const router = express.Router();
 const db = require("../models");
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" }); // 設定上傳目錄
+const fs = require("fs").promises; // 確保引入 fs 模組
 
 // Robottype CRUD
 router.get("/robottypes", async (req, res) => {
@@ -660,6 +665,28 @@ router.get("/tables/:tableName/schema", async (req, res) => {
   }));
 
   res.json(schema);
+});
+
+router.post("/maps/:id/upload", upload.single("file"), async (req, res) => {
+  const { column } = req.body; // 從請求的 body 中獲取 column
+  const id = req.params.id; // 從 URL 中獲取 id
+  const filePath = req.file.path; // 獲取上傳的文件路徑
+
+  try {
+    // 讀取文件並轉換為 Buffer
+    const fileBuffer = await fs.readFile(filePath);
+
+    // 根據欄位更新資料庫
+    await db.Map.update(
+      { [column]: fileBuffer }, // 將 Buffer 存儲到資料庫
+      { where: { id } },
+    );
+
+    res.status(200).json({ message: "File uploaded and database updated." });
+  } catch (error) {
+    console.error("Error updating database:", error); // 輸出錯誤信息
+    res.status(500).json({ error: error.message });
+  }
 });
 
 module.exports = router;

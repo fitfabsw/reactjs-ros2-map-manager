@@ -10,19 +10,54 @@ const DbTable = ({
   columnExcludes,
 }) => {
   const [editEntry, setEditEntry] = useState(null);
+  const [fileInputs, setFileInputs] = useState({});
 
   const handleEditChange = (e, accessor) => {
     const { value } = e.target;
     setEditEntry((prev) => ({ ...prev, [accessor]: value }));
   };
 
-  const handleUpdate = (id) => {
-    onUpdate(selectedTable, id, editEntry);
-    setEditEntry(null);
+  const handleFileChange = (e, accessor) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFileInputs((prev) => ({ ...prev, [accessor]: file }));
+    }
+  };
+
+  const handleUpdate = async (id) => {
+    console.log("handleUpdate!");
+    if (editEntry) {
+      console.log("AA");
+      for (const [key, file] of Object.entries(fileInputs)) {
+        if (file) {
+          console.log("BB");
+          console.log(file);
+          const formData = new FormData();
+          formData.append("file", file);
+          formData.append("column", key);
+          formData.append("id", id);
+          console.log("DD");
+
+          await fetch(`/api/${selectedTable}/${id}/upload`, {
+            method: "POST",
+            body: formData,
+          });
+          console.log("EE");
+        }
+      }
+      console.log("111");
+      onUpdate(selectedTable, id, editEntry);
+      console.log("222");
+      setEditEntry(null);
+      console.log("333");
+      setFileInputs({});
+      console.log("444");
+    }
   };
 
   const handleCancel = () => {
     setEditEntry(null);
+    setFileInputs({});
   };
 
   const handleDelete = (id) => {
@@ -30,13 +65,6 @@ const DbTable = ({
       onDelete(selectedTable, id);
     }
   };
-
-  // useEffect(() => {
-  //   console.log(`columnExcludes: ${JSON.stringify(columnExcludes)}`);
-  //   if (columnExcludes) {
-  //     console.log(`columnExcludes: ${JSON.stringify(columnExcludes)}`);
-  //   }
-  // }, [columnExcludes]);
 
   useEffect(() => {
     if (data.length > 0) {
@@ -70,6 +98,11 @@ const DbTable = ({
                           style={{ width: "78%" }}
                           value={editEntry[col.column] || ""}
                           onChange={(e) => handleEditChange(e, col.column)}
+                        />
+                      ) : col.type === "BLOB" ? (
+                        <input
+                          type="file"
+                          onChange={(e) => handleFileChange(e, col.column)}
                         />
                       ) : (
                         row[col.column]
