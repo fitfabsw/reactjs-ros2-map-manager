@@ -664,12 +664,15 @@ router.get("/tables/:tableName/schema", async (req, res) => {
 });
 
 router.get("/logs", (req, res) => {
-  var service = "fitrobot.central.service";
-  var since = "2024-11-01 10:00:00";
-  var until = "2024-12-11 11:00:00";
-  var ip = "192.168.8.102";
-//   var cmd = "sudo journalctl --file=/var/log/journal/remote/remote-" + ip + ".journal -u " + service + " --since \"" + since + "\" --until \"" + until + "\" --output json";
-  var cmd = "journalctl -u fitrobot.central.service --since '2024-11-01 10:00:00' --until '2024-12-11 11:00:00' -n 1000 -p info";
+  const service = "fitrobot.central.service";
+  const { start, end } = req.query; // Get start and end from query parameters
+
+  // Set default values if start or end are not provided
+  const since = start.replace('T', ' '); // Default start date
+  const until = end.replace('T', ' '); // Default end date
+  console.log(since, until);
+  const cmd = `journalctl -u ${service} --since '${since}' --until '${until}' -n 1000`;
+  
   exec(cmd, (error, stdout, stderr) => {
     if (error) {
       return res.status(500).json({ error: error.message });
@@ -677,9 +680,7 @@ router.get("/logs", (req, res) => {
     if (stderr) {
       return res.status(500).json({ error: stderr });
     }
-    // Send the output of the ls command as the response, with each line escaped
-    const escapedResults = stdout.split("\n")
-      .filter(Boolean);
+    const escapedResults = stdout.split("\n").filter(Boolean);
     res.json({ results: escapedResults });
   });
 });

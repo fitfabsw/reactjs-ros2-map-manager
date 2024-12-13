@@ -10,30 +10,34 @@ const Logs = () => {
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
 
-    useEffect(() => {
-        const fetchLogs = async (start, end) => {
-            try {
-                console.log("fetching logs");
-                const response = await fetch(`/api/logs?start=${start}&end=${end}`);
-                const data = await response.json();
-                setLogs(data.results);
-            } catch (error) {
-                console.error('Error fetching logs:', error);
-            }
-        };
+    const fetchLogs = async () => {
+        try {
+            console.log("fetching logs");
+            const formattedStart = startDate ? startDate.format('YYYY-MM-DDTHH:mm:ss') : ""; // Default start date
+            const formattedEnd = endDate ? endDate.format('YYYY-MM-DDTHH:mm:ss') : ""; // Default end date
+            const response = await fetch(`/api/logs?start=${formattedStart}&end=${formattedEnd}`);
+            const data = await response.json();
+            setLogs(data.results);
+        } catch (error) {
+            console.error('Error fetching logs:', error);
+        }
+    };
 
+    useEffect(() => {
         // Fetch logs when startDate or endDate changes
-        if (startDate && endDate) {
-            fetchLogs(startDate.format('YYYY-MM-DDTHH:mm:ss'), endDate.format('YYYY-MM-DDTHH:mm:ss'));
+        if (startDate || endDate) {
+            fetchLogs();
         }
     }, [startDate, endDate]);
 
     const handleStartDateChange = (newValue) => {
         setStartDate(newValue);
+        fetchLogs();
     };
 
     const handleEndDateChange = (newValue) => {
         setEndDate(newValue);
+        fetchLogs();
     };
 
     return (
@@ -56,7 +60,7 @@ const Logs = () => {
                 </LocalizationProvider>
             </div>
             <div className="logs-column">
-                {logs.length > 0 ? (
+                {logs &&logs.length > 0 ? (
                     logs.map((log, index) => (
                         <div key={index} className="log-entry">
                             {log} {/* Adjust according to your log structure */}
