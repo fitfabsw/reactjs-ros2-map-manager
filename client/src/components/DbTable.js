@@ -13,7 +13,9 @@ const DbTable = ({
   setDataLoading,
 }) => {
   const [editEntry, setEditEntry] = useState(null);
-  const [fileInput, setFileInput] = useState(null);
+  const [pgmFileInput, setPgmFileInput] = useState(null);
+  const [thumbnailFileInput, setThumbnailFileInput] = useState(null);
+  const [yamlFileInput, setYamlFileInput] = useState(null);
   // const [dataLoaded, setDataLoaded] = useState(false);
 
   const handleEditChange = (e, accessor) => {
@@ -21,13 +23,146 @@ const DbTable = ({
     setEditEntry((prev) => ({ ...prev, [accessor]: value }));
   };
 
-  const handleFileChange = (e, accessor) => {
+  const handleFileChange = (file, accessor) => {
     console.log("handleFileChange!");
-    const file = e.target.files[0];
     if (file) {
       console.log("file", file);
-      setFileInput(file);
+      if (accessor === "pgm") {
+        console.log("pgmFileInput", pgmFileInput);
+        setPgmFileInput(file);
+      } else if (accessor === "thumbnail") {
+        console.log("thumbnailFileInput", thumbnailFileInput);
+        setThumbnailFileInput(file);
+      } else if (accessor === "yaml") {
+        console.log("yamlFileInput", yamlFileInput);
+        setYamlFileInput(file);
+      }
     }
+  };
+
+  const FileInput = ({ accessor }) => {
+    const handleFileChangeLocal = (file) => {
+      if (file) {
+        console.log("file", file);
+        handleFileChange(file, accessor);
+      }
+    };
+
+    return (
+      <>
+        {/* <input */}
+        {/*   type="file" */}
+        {/*   accept={accessor === "pgm" ? ".pgm" : "image/*"} */}
+        {/*   onChange={(e) => handleFileChangeLocal(e.target.files[0])} */}
+        {/*   style={{ display: "none" }} */}
+        {/*   id={`file-input-${accessor}`} */}
+        {/* /> */}
+
+        {accessor === "pgm" && (
+          <input
+            type="file"
+            accept={".pgm"}
+            style={{ display: "none" }}
+            id={`file-input-${accessor}`}
+            onChange={(e) => handleFileChangeLocal(e.target.files[0])}
+          />
+        )}
+        {accessor === "thumbnail" && (
+          <input
+            type="file"
+            accept={"image/*"}
+            style={{ display: "none" }}
+            id={`file-input-${accessor}`}
+            onChange={(e) => handleFileChangeLocal(e.target.files[0])}
+          />
+        )}
+        {accessor === "yaml" && (
+          <input
+            type="file"
+            accept={"*.yaml"}
+            style={{ display: "none" }}
+            id={`file-input-${accessor}`}
+            onChange={(e) => handleFileChangeLocal(e.target.files[0])}
+          />
+        )}
+
+        <label
+          htmlFor={`file-input-${accessor}`}
+          style={{
+            cursor: "pointer",
+            display: "inline-block",
+            padding: "10px 15px",
+            backgroundColor: "#007bff",
+            color: "#fff",
+            borderRadius: "5px",
+            textAlign: "center",
+            textDecoration: "none",
+            transition: "background-color 0.3s",
+          }}
+          onMouseDown={(e) => {
+            e.currentTarget.style.backgroundColor = "#0056b3"; // 按下時的顏色
+          }}
+          onMouseUp={(e) => {
+            e.currentTarget.style.backgroundColor = "#007bff"; // 恢復顏色
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "#007bff"; // 滑出時恢復顏色
+          }}
+        >
+          選擇檔案
+        </label>
+        <br />
+        {accessor === "pgm" && pgmFileInput && (
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              maxWidth: "150px",
+            }}
+          >
+            {pgmFileInput.name}
+          </span>
+        )}
+        {accessor === "thumbnail" && thumbnailFileInput && (
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              maxWidth: "150px",
+            }}
+          >
+            {thumbnailFileInput.name}
+          </span>
+        )}
+        {accessor === "thumbnail" && thumbnailFileInput && (
+          <img
+            src={URL.createObjectURL(thumbnailFileInput)}
+            alt={accessor}
+            style={{ width: "100px", height: "auto" }}
+          />
+        )}
+        {accessor === "yaml" && yamlFileInput && (
+          <span
+            style={{
+              display: "flex",
+              alignItems: "center",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              maxWidth: "150px",
+            }}
+          >
+            {yamlFileInput.name}
+          </span>
+        )}
+      </>
+    );
   };
 
   const handleUpdate = async (id) => {
@@ -35,30 +170,36 @@ const DbTable = ({
     if (editEntry) {
       console.log("AA");
       console.log("editEntry", editEntry);
-      if (fileInput) {
-        console.log("BB");
-        console.log("key", "pgm");
-        console.log("file", fileInput);
-        await uploadFile(selectedTable, id, "pgm", fileInput);
+      if (pgmFileInput) {
+        await uploadFile(selectedTable, id, "pgm", pgmFileInput);
         ["pgm", "yaml", "thumbnail"].forEach((item) => delete editEntry[item]);
         onUpdate(selectedTable, id, editEntry);
-      } else {
-        console.log("11111");
+      }
+      if (thumbnailFileInput) {
+        await uploadFile(selectedTable, id, "thumbnail", thumbnailFileInput);
         ["pgm", "yaml", "thumbnail"].forEach((item) => delete editEntry[item]);
         onUpdate(selectedTable, id, editEntry);
-        console.log("22222");
+      }
+      if (yamlFileInput) {
+        await uploadFile(selectedTable, id, "yaml", yamlFileInput);
+        ["pgm", "yaml", "thumbnail"].forEach((item) => delete editEntry[item]);
+        onUpdate(selectedTable, id, editEntry);
       }
       console.log("DBT---1");
       setEditEntry(null);
       console.log("DBT---2");
-      setFileInput(null);
+      setPgmFileInput(null);
+      setThumbnailFileInput(null);
+      setYamlFileInput(null);
       console.log("DBT---3");
     }
   };
 
   const handleCancel = () => {
     setEditEntry(null);
-    setFileInput(null);
+    setPgmFileInput(null);
+    setThumbnailFileInput(null);
+    setYamlFileInput(null);
   };
 
   const handleDelete = (id) => {
@@ -70,6 +211,7 @@ const DbTable = ({
   useEffect(() => {
     if (data.length > 0) {
       console.log({ data });
+      console.log("columns", columns);
       // setDataLoaded(false);
     }
   }, [data]);
@@ -103,20 +245,7 @@ const DbTable = ({
                             onChange={(e) => handleEditChange(e, col.column)}
                           />
                         ) : col.type === "BLOB" ? (
-                          <>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => handleFileChange(e, col.column)}
-                            />
-                            {fileInput && (
-                              <img
-                                src={URL.createObjectURL(fileInput)}
-                                alt={col.column}
-                                style={{ width: "100px", height: "auto" }}
-                              />
-                            )}
-                          </>
+                          <FileInput accessor={col.column} />
                         ) : (
                           row[col.column]
                         )
