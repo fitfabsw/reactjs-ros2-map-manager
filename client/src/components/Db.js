@@ -24,22 +24,39 @@ const Db = () => {
   const [columnsStationlist, setColumnsStationlist] = useState([]);
   const [columnsStation, setColumnsStation] = useState([]);
   const [activeTab, setActiveTab] = useState("robot");
+  const [dataLoaded, setDataLoaded] = useState(false);
+  const [dataLoading, setDataLoading] = useState(false);
 
   useEffect(() => {
     console.log(`activeTab: ${activeTab}`);
+    // if (activeTab === "map") {
+    // loadData("map");
+    loadData(activeTab);
+    // }
   }, [activeTab]);
 
   const loadData = async (table) => {
+    setDataLoading(true);
+    console.log("loadData!!");
     const fetchedData = await fetchTable(table);
     const schema = await fetchTableSchema(table);
+
     switch (table) {
+      case "map":
+        // 將 BLOB 轉換為狀態��述
+        const dataWithBlobStatus = fetchedData.map((item) => ({
+          ...item,
+          pgm: item.pgm ? "BLOB" : "",
+          yaml: item.yaml ? "BLOB" : "",
+          thumbnail: item.thumbnail ? "BLOB" : "",
+        }));
+        console.log("dataWithBlobStatus", dataWithBlobStatus);
+        setDataMap(dataWithBlobStatus);
+        setColumnsMap(schema);
+        break;
       case "robot":
         setDataRobot(fetchedData);
         setColumnsRobot(schema);
-        break;
-      case "map":
-        setDataMap(fetchedData);
-        setColumnsMap(schema);
         break;
       case "station":
         setDataStation(fetchedData);
@@ -52,22 +69,18 @@ const Db = () => {
       default:
         break;
     }
+    setDataLoading(false);
   };
 
-  useEffect(() => {
-    loadData("robot");
-    loadData("map");
-    loadData("station");
-    loadData("stationList");
-  }, []);
-
-  useEffect(() => {
-    if (columnsStationlist.length > 0) {
-      console.log(`columnsStationlist: ${JSON.stringify(columnsStationlist)}`);
-    }
-  }, [columnsStationlist]);
+  // useEffect(() => {
+  //   loadData("robot");
+  //   loadData("map");
+  //   loadData("station");
+  //   loadData("stationList");
+  // }, []);
 
   const handleUpdate = async (table, id, updatedData) => {
+    console.log("updatedData", updatedData);
     if (table === "robot") {
       await updateRobot(id, updatedData);
       const fetchedData = await fetchTable("robot");
@@ -86,6 +99,11 @@ const Db = () => {
       setDataStationlist(fetchedData);
     }
     setActiveTab(table);
+
+    if (table === "map") {
+      console.log("GHJ");
+      await loadData("map");
+    }
   };
 
   const handleDelete = async (table, id) => {
@@ -148,6 +166,8 @@ const Db = () => {
             onDelete={handleDelete}
             columnExcludes={["id"]}
             selectedTable={"robot"}
+            dataLoading={dataLoading}
+            setDataLoading={setDataLoading}
           />
         )}
       {activeTab === "map" && dataMap.length > 0 && columnsMap.length > 0 && (
@@ -158,6 +178,8 @@ const Db = () => {
           onDelete={handleDelete}
           columnExcludes={["id"]}
           selectedTable={"map"}
+          dataLoading={dataLoading}
+          setDataLoading={setDataLoading}
         />
       )}
       {activeTab === "station" &&
@@ -170,6 +192,8 @@ const Db = () => {
             onDelete={handleDelete}
             columnExcludes={["id"]}
             selectedTable={"station"}
+            dataLoading={dataLoading}
+            setDataLoading={setDataLoading}
           />
         )}
       {activeTab === "stationList" &&
@@ -182,6 +206,8 @@ const Db = () => {
             onDelete={handleDelete}
             columnExcludes={["id"]}
             selectedTable={"stationList"}
+            dataLoading={dataLoading}
+            setDataLoading={setDataLoading}
           />
         )}
     </div>

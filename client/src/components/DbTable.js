@@ -9,9 +9,12 @@ const DbTable = ({
   columns,
   selectedTable,
   columnExcludes,
+  dataLoading,
+  setDataLoading,
 }) => {
   const [editEntry, setEditEntry] = useState(null);
-  const [fileInputs, setFileInputs] = useState({});
+  const [fileInput, setFileInput] = useState(null);
+  // const [dataLoaded, setDataLoaded] = useState(false);
 
   const handleEditChange = (e, accessor) => {
     const { value } = e.target;
@@ -19,28 +22,43 @@ const DbTable = ({
   };
 
   const handleFileChange = (e, accessor) => {
+    console.log("handleFileChange!");
     const file = e.target.files[0];
     if (file) {
-      setFileInputs((prev) => ({ ...prev, [accessor]: file }));
+      console.log("file", file);
+      setFileInput(file);
     }
   };
 
   const handleUpdate = async (id) => {
+    console.log("handleUpdate!");
     if (editEntry) {
-      for (const [key, file] of Object.entries(fileInputs)) {
-        if (file) {
-          await uploadFile(selectedTable, id, key, file);
-        }
+      console.log("AA");
+      console.log("editEntry", editEntry);
+      if (fileInput) {
+        console.log("BB");
+        console.log("key", "pgm");
+        console.log("file", fileInput);
+        await uploadFile(selectedTable, id, "pgm", fileInput);
+        ["pgm", "yaml", "thumbnail"].forEach((item) => delete editEntry[item]);
+        onUpdate(selectedTable, id, editEntry);
+      } else {
+        console.log("11111");
+        ["pgm", "yaml", "thumbnail"].forEach((item) => delete editEntry[item]);
+        onUpdate(selectedTable, id, editEntry);
+        console.log("22222");
       }
-      onUpdate(selectedTable, id, editEntry);
+      console.log("DBT---1");
       setEditEntry(null);
-      setFileInputs({});
+      console.log("DBT---2");
+      setFileInput(null);
+      console.log("DBT---3");
     }
   };
 
   const handleCancel = () => {
     setEditEntry(null);
-    setFileInputs({});
+    setFileInput(null);
   };
 
   const handleDelete = (id) => {
@@ -52,6 +70,7 @@ const DbTable = ({
   useEffect(() => {
     if (data.length > 0) {
       console.log({ data });
+      // setDataLoaded(false);
     }
   }, [data]);
 
@@ -69,47 +88,62 @@ const DbTable = ({
             </tr>
           </thead>
           <tbody>
-            {data.map((row) => (
-              <tr key={row.id}>
-                {columns.map((col) => (
-                  <td key={`${row.id}-${col.column}`}>
-                    {editEntry && editEntry.id === row.id ? (
-                      ["TEXT", "INTEGER", "REAL"].includes(col.type) &&
-                      !columnExcludes.includes(col.column) ? (
-                        <input
-                          type="text"
-                          style={{ width: "78%" }}
-                          value={editEntry[col.column] || ""}
-                          onChange={(e) => handleEditChange(e, col.column)}
-                        />
+            {!dataLoading &&
+              data.map((row) => (
+                <tr key={row.id}>
+                  {columns.map((col) => (
+                    <td key={`${row.id}-${col.column}`}>
+                      {editEntry && editEntry.id === row.id ? (
+                        ["TEXT", "INTEGER", "REAL"].includes(col.type) &&
+                        !columnExcludes.includes(col.column) ? (
+                          <input
+                            type="text"
+                            style={{ width: "78%" }}
+                            value={editEntry[col.column] || ""}
+                            onChange={(e) => handleEditChange(e, col.column)}
+                          />
+                        ) : col.type === "BLOB" ? (
+                          <>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => handleFileChange(e, col.column)}
+                            />
+                            {fileInput && (
+                              <img
+                                src={URL.createObjectURL(fileInput)}
+                                alt={col.column}
+                                style={{ width: "100px", height: "auto" }}
+                              />
+                            )}
+                          </>
+                        ) : (
+                          row[col.column]
+                        )
                       ) : col.type === "BLOB" ? (
-                        <input
-                          type="file"
-                          onChange={(e) => handleFileChange(e, col.column)}
-                        />
+                        row[col.column]
                       ) : (
                         row[col.column]
-                      )
+                      )}
+                    </td>
+                  ))}
+                  <td>
+                    {editEntry && editEntry.id === row.id ? (
+                      <>
+                        <button onClick={() => handleUpdate(row.id)}>
+                          Save
+                        </button>
+                        <button onClick={handleCancel}>Cancel</button>
+                      </>
                     ) : (
-                      row[col.column]
+                      <button onClick={() => setEditEntry({ ...row })}>
+                        Edit
+                      </button>
                     )}
+                    <button onClick={() => handleDelete(row.id)}>Delete</button>
                   </td>
-                ))}
-                <td>
-                  {editEntry && editEntry.id === row.id ? (
-                    <>
-                      <button onClick={() => handleUpdate(row.id)}>Save</button>
-                      <button onClick={handleCancel}>Cancel</button>
-                    </>
-                  ) : (
-                    <button onClick={() => setEditEntry({ ...row })}>
-                      Edit
-                    </button>
-                  )}
-                  <button onClick={() => handleDelete(row.id)}>Delete</button>
-                </td>
-              </tr>
-            ))}
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>

@@ -17,6 +17,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// 設定 multer，並增加文件大小限制
+const upload = multer({
+  dest: "uploads/",
+  limits: { fileSize: 10 * 1024 * 1024 }, // 設定最大文件大小為 10MB
+});
+
 let imageBuffer = null;
 let compressedImageBuffer = null;
 let processedBuffer = null;
@@ -334,7 +340,7 @@ app.post("/update-map-to-db", async (req, res) => {
     res.json({
       message: `Map updated successfully with ID: ${mapId}`,
     });
-    await fs.unlink(temp_png).catch(() => {}); // 刪除 temp_png
+    await fs.unlink(temp_png).catch(() => {}); // 刪�� temp_png
     await fs.unlink(temp_pgm).catch(() => {}); // 刪除 temp_pgm
     await fs.unlink(temp_yaml).catch(() => {}); // 刪除 temp_yaml
   } catch (error) {

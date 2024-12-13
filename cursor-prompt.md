@@ -1,3 +1,34 @@
+### 2024/12/13
+
+in Db.js, when first load, I will load all tables using loadData()
+
+the exact line is
+const fetchedData = await fetchTable(table);
+
+when dealing with table map, it will call backend API /maps
+
+Currently it will ignore three blob fields, ie: pgm, yaml, thumbnail
+this exact line is in
+=== api_v2.js ===
+
+router.get("/maps", async (req, res) => {
+console.log("get maps");
+try {
+const maps = await db.Map.findAll({
+attributes: { exclude: ["pgm", "yaml", "thumbnail"] },
+include: [db.Robottype],
+});
+...
+
+however, at the frontend, I want to know which blob field has data
+
+for example, If the row 2 of map is
+pgm: has data, yaml: no data, thumbnail: no data
+I want to UI to render as
+pgm: BLOB, yaml-->empty, thumbnail-->empty
+
+How can I achieve this?
+
 ### 2024/12/12
 
 Database management 模組包含 Db.js & DbTable 兩個組件

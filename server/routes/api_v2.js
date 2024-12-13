@@ -72,9 +72,10 @@ router.delete("/robottypes/:id", async (req, res) => {
 
 // Map CRUD
 router.get("/maps", async (req, res) => {
+  console.log("get maps");
   try {
     const maps = await db.Map.findAll({
-      attributes: { exclude: ["pgm", "yaml", "thumbnail"] },
+      // attributes: { exclude: ["pgm", "yaml", "thumbnail"] },
       include: [db.Robottype],
     });
     res.json(maps);
@@ -153,19 +154,16 @@ router.post("/maps/:id/blob", async (req, res) => {
   }
 });
 
-// 新增路由來下載 BLOB 數據
-// router.get("/maps/:id/blob", async (req, res) => {
-router.get("/maps/:id/pgm", async (req, res) => {
+// 新增路由來獲取特定地圖的 BLOB 資料
+router.get("/maps/:id/blob", async (req, res) => {
   try {
     const map = await db.Map.findByPk(req.params.id);
     if (map) {
-      res.status(200).send(map.pgm); // 返回 BLOB 數據
-      // res.status(200).json({
-      //   pgm: map.pgm,
-      //   yaml: map.yaml,
-      //   thumbnail: map.thumbnail,
-      // }); // 返回多個 BLOB 數據
-      // res.status(200).send(map.blobField); // 返回 BLOB 數據
+      res.json({
+        pgm: map.pgm,
+        yaml: map.yaml,
+        thumbnail: map.thumbnail,
+      });
     } else {
       res.status(404).json({ error: "Map not found" });
     }
@@ -668,9 +666,13 @@ router.get("/tables/:tableName/schema", async (req, res) => {
 });
 
 router.post("/maps/:id/upload", upload.single("file"), async (req, res) => {
+  console.log("post maps/:id/upload");
   const { column } = req.body; // 從請求的 body 中獲取 column
   const id = req.params.id; // 從 URL 中獲取 id
   const filePath = req.file.path; // 獲取上傳的文件路徑
+  console.log(id, id);
+  console.log(column, column);
+  console.log(filePath, filePath);
 
   try {
     // 讀取文件並轉換為 Buffer
