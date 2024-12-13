@@ -170,15 +170,21 @@ const DbTable = ({
       console.log("AA");
       console.log("editEntry", editEntry);
       if (pgmFileInput) {
+        console.log("AA-1");
         await uploadFile(selectedTable, id, "pgm", pgmFileInput);
+        console.log("AA-2");
         ["pgm", "yaml", "thumbnail"].forEach((item) => delete editEntry[item]);
+        console.log("AA-3");
         onUpdate(selectedTable, id, editEntry);
+        console.log("AA-4");
       }
+      console.log("BB");
       if (thumbnailFileInput) {
         await uploadFile(selectedTable, id, "thumbnail", thumbnailFileInput);
         ["pgm", "yaml", "thumbnail"].forEach((item) => delete editEntry[item]);
         onUpdate(selectedTable, id, editEntry);
       }
+      console.log("CC");
       if (yamlFileInput) {
         await uploadFile(selectedTable, id, "yaml", yamlFileInput);
         ["pgm", "yaml", "thumbnail"].forEach((item) => delete editEntry[item]);

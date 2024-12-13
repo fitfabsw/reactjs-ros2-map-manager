@@ -294,7 +294,7 @@ router.get("/stationlists", async (req, res) => {
 
     // 如果提供了 map_id，則添加過濾條件
     if (map_id) {
-      queryOptions.where.map_id = map_id; // 假設 StationList 有 map_id 屬性
+      queryOptions.where.map_id = map_id; // 假設 StationList �� map_id 屬性
     }
     if (stl_name) {
       queryOptions.where.name = stl_name; // 假設 StationList 有 name 屬性
@@ -551,7 +551,7 @@ router.get("/maps/:id/stationlists", async (req, res) => {
 router.get("/masks", async (req, res) => {
   try {
     const masks = await db.Mask.findAll({
-      attributes: { exclude: ["pgm", "yaml"] },
+      // attributes: { exclude: ["pgm", "yaml"] },
       include: [
         {
           model: db.Map,
@@ -680,6 +680,30 @@ router.post("/maps/:id/upload", upload.single("file"), async (req, res) => {
 
     // 根據欄位更新資料庫
     await db.Map.update(
+      { [column]: fileBuffer }, // 將 Buffer 存儲到資料庫
+      { where: { id } },
+    );
+
+    res.status(200).json({ message: "File uploaded and database updated." });
+  } catch (error) {
+    console.error("Error updating database:", error); // 輸出錯誤信息
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 新增路由來上傳 Mask 的 BLOB 數據
+router.post("/masks/:id/upload", upload.single("file"), async (req, res) => {
+  console.log("post masks/:id/upload");
+  const { column } = req.body; // 從請求的 body 中獲取 column
+  const id = req.params.id; // 從 URL 中獲取 id
+  const filePath = req.file.path; // 獲取上傳的文件路徑
+
+  try {
+    // 讀取文件並轉換為 Buffer
+    const fileBuffer = await fs.readFile(filePath);
+
+    // 根據欄位更新資料庫
+    await db.Mask.update(
       { [column]: fileBuffer }, // 將 Buffer 存儲到資料庫
       { where: { id } },
     );

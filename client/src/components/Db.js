@@ -3,8 +3,10 @@ import {
   fetchTable,
   fetchTableSchema,
   updateRobot,
-  deleteRobot,
   updateMap,
+  updateMask,
+  deleteRobot,
+  deleteMask,
   deleteMap,
   updateStation,
   deleteStation,
@@ -101,6 +103,10 @@ const Db = () => {
       await updateMap(id, updatedData);
       const fetchedData = await fetchTable("map");
       setDataMap(fetchedData);
+    } else if (table === "mask") {
+      await updateMask(id, updatedData);
+      const fetchedData = await fetchTable("mask");
+      setDataMask(fetchedData);
     } else if (table === "station") {
       await updateStation(id, updatedData);
       const fetchedData = await fetchTable("station");
@@ -128,6 +134,10 @@ const Db = () => {
       await deleteMap(id);
       const fetchedData = await fetchTable("map");
       setDataMap(fetchedData);
+    } else if (table === "mask") {
+      await deleteMask(id);
+      const fetchedData = await fetchTable("mask");
+      setDataMask(fetchedData);
     } else if (table === "station") {
       await deleteStation(id);
       const fetchedData = await fetchTable("station");
