@@ -688,7 +688,7 @@ router.get("/services", (req, res) => {
 
 
   // Using systemctl to list all services
-  exec("systemctl list-units --type=service --all --no-pager --plain", (error, stdout, stderr) => {
+  exec("systemctl list-units --type=service --all --no-pager --plain | head -n -6", (error, stdout, stderr) => {
     if (error) {
       return res.status(500).json({ error: error.message });
     }
