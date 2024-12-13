@@ -10,7 +10,6 @@ const DbTable = ({
   selectedTable,
   columnExcludes,
   dataLoading,
-  setDataLoading,
 }) => {
   const [editEntry, setEditEntry] = useState(null);
   const [pgmFileInput, setPgmFileInput] = useState(null);
@@ -212,7 +211,6 @@ const DbTable = ({
     if (data.length > 0) {
       console.log({ data });
       console.log("columns", columns);
-      // setDataLoaded(false);
     }
   }, [data]);
 

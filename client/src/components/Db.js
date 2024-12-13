@@ -19,13 +19,14 @@ const Db = () => {
   const [columnsRobot, setColumnsRobot] = useState([]);
   const [dataMap, setDataMap] = useState([]);
   const [columnsMap, setColumnsMap] = useState([]);
-  const [dataStation, setDataStation] = useState([]);
+  const [dataMask, setDataMask] = useState([]);
+  const [columnsMask, setColumnsMask] = useState([]);
   const [dataStationlist, setDataStationlist] = useState([]);
   const [columnsStationlist, setColumnsStationlist] = useState([]);
+  const [dataStation, setDataStation] = useState([]);
   const [columnsStation, setColumnsStation] = useState([]);
-  const [activeTab, setActiveTab] = useState("robot");
-  const [dataLoaded, setDataLoaded] = useState(false);
   const [dataLoading, setDataLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("robot");
 
   useEffect(() => {
     console.log(`activeTab: ${activeTab}`);
@@ -40,11 +41,12 @@ const Db = () => {
     console.log("loadData!!");
     const fetchedData = await fetchTable(table);
     const schema = await fetchTableSchema(table);
+    let dataWithBlobStatus = {};
 
     switch (table) {
       case "map":
         // 將 BLOB 轉換為狀態��述
-        const dataWithBlobStatus = fetchedData.map((item) => ({
+        dataWithBlobStatus = fetchedData.map((item) => ({
           ...item,
           pgm: item.pgm ? "BLOB" : "",
           yaml: item.yaml ? "BLOB" : "",
@@ -53,6 +55,16 @@ const Db = () => {
         console.log("dataWithBlobStatus", dataWithBlobStatus);
         setDataMap(dataWithBlobStatus);
         setColumnsMap(schema);
+        break;
+      case "mask":
+        dataWithBlobStatus = fetchedData.map((item) => ({
+          ...item,
+          pgm: item.pgm ? "BLOB" : "",
+          yaml: item.yaml ? "BLOB" : "",
+        }));
+        console.log("dataWithBlobStatus", dataWithBlobStatus);
+        setDataMask(dataWithBlobStatus);
+        setColumnsMask(schema);
         break;
       case "robot":
         setDataRobot(fetchedData);
@@ -101,8 +113,9 @@ const Db = () => {
     setActiveTab(table);
 
     if (table === "map") {
-      console.log("GHJ");
       await loadData("map");
+    } else if (table === "mask") {
+      await loadData("mask");
     }
   };
 
@@ -144,6 +157,12 @@ const Db = () => {
           Map
         </button>
         <button
+          className={`tab-button ${activeTab === "mask" ? "active" : ""}`}
+          onClick={() => setActiveTab("mask")}
+        >
+          Mask
+        </button>
+        <button
           className={`tab-button ${activeTab === "station" ? "active" : ""}`}
           onClick={() => setActiveTab("station")}
         >
@@ -182,6 +201,20 @@ const Db = () => {
           setDataLoading={setDataLoading}
         />
       )}
+      {activeTab === "mask" &&
+        dataMask.length > 0 &&
+        columnsMask.length > 0 && (
+          <DbTable
+            data={dataMask}
+            columns={columnsMask}
+            onUpdate={handleUpdate}
+            onDelete={handleDelete}
+            columnExcludes={["id"]}
+            selectedTable={"mask"}
+            dataLoading={dataLoading}
+            setDataLoading={setDataLoading}
+          />
+        )}
       {activeTab === "station" &&
         dataStation.length > 0 &&
         columnsStation.length > 0 && (
