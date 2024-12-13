@@ -15,12 +15,15 @@
 }
 
 .logs-column {
-  flex: 1; /* Each column takes equal space */
+  flex: 1 1;
   padding: 10px;
-  margin: 0 10px; /* Add some margin between columns */
-  background-color: #fff; /* Background for each column */
+  margin: 0 10px;
+  background-color: #333;
   border-radius: 4px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  font-size: smaller;
+  font-family: "MesloLGS NF", Menlo, Monaco, Consolas, "Courier New", monospace;
+  color: white;
 }
 
 .logs-column h1 {
