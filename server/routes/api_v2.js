@@ -139,6 +139,7 @@ router.delete("/maps/:id", async (req, res) => {
 
 // 新增路由來上傳 BLOB 數據
 router.post("/maps/:id/blob", async (req, res) => {
+  console.log("post maps/blob!!!");
   try {
     const map = await db.Map.findByPk(req.params.id);
     if (map) {
@@ -156,13 +157,19 @@ router.post("/maps/:id/blob", async (req, res) => {
 
 // 新增路由來獲取特定地圖的 BLOB 資料
 router.get("/maps/:id/blob", async (req, res) => {
+  console.log("get maps/blob!!!");
   try {
     const map = await db.Map.findByPk(req.params.id);
     if (map) {
+      const base64Pgm = map.pgm.toString("base64"); // 將 BLOB 轉換為 Base64
+      const base64Thumb = map.thumbnail.toString("base64"); // 將 BLOB 轉換為 Base64
+      console.log("Base64 PGM:", base64Pgm); // 日誌輸出
+      console.log("Base64 thumb:", base64Thumb); // 日誌輸出
       res.json({
-        pgm: map.pgm,
+        // pgm: map.pgm,
+        pgm: base64Pgm,
         yaml: map.yaml,
-        thumbnail: map.thumbnail,
+        thumbnail: base64Thumb,
       });
     } else {
       res.status(404).json({ error: "Map not found" });
@@ -294,7 +301,7 @@ router.get("/stationlists", async (req, res) => {
 
     // 如果提供了 map_id，則添加過濾條件
     if (map_id) {
-      queryOptions.where.map_id = map_id; // 假設 StationList �� map_id 屬性
+      queryOptions.where.map_id = map_id; // 假設 StationList 有 map_id 屬性
     }
     if (stl_name) {
       queryOptions.where.name = stl_name; // 假設 StationList 有 name 屬性

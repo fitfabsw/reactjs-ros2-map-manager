@@ -15,7 +15,7 @@ const DbTable = ({
   const [pgmFileInput, setPgmFileInput] = useState(null);
   const [thumbnailFileInput, setThumbnailFileInput] = useState(null);
   const [yamlFileInput, setYamlFileInput] = useState(null);
-  // const [dataLoaded, setDataLoaded] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
 
   const handleEditChange = (e, accessor) => {
     const { value } = e.target;
@@ -167,36 +167,22 @@ const DbTable = ({
   const handleUpdate = async (id) => {
     console.log("handleUpdate!");
     if (editEntry) {
-      console.log("AA");
       console.log("editEntry", editEntry);
+      ["pgm", "yaml", "thumbnail"].forEach((item) => delete editEntry[item]);
       if (pgmFileInput) {
-        console.log("AA-1");
         await uploadFile(selectedTable, id, "pgm", pgmFileInput);
-        console.log("AA-2");
-        ["pgm", "yaml", "thumbnail"].forEach((item) => delete editEntry[item]);
-        console.log("AA-3");
-        onUpdate(selectedTable, id, editEntry);
-        console.log("AA-4");
       }
-      console.log("BB");
       if (thumbnailFileInput) {
         await uploadFile(selectedTable, id, "thumbnail", thumbnailFileInput);
-        ["pgm", "yaml", "thumbnail"].forEach((item) => delete editEntry[item]);
-        onUpdate(selectedTable, id, editEntry);
       }
-      console.log("CC");
       if (yamlFileInput) {
         await uploadFile(selectedTable, id, "yaml", yamlFileInput);
-        ["pgm", "yaml", "thumbnail"].forEach((item) => delete editEntry[item]);
-        onUpdate(selectedTable, id, editEntry);
       }
-      console.log("DBT---1");
+      onUpdate(selectedTable, id, editEntry);
       setEditEntry(null);
-      console.log("DBT---2");
       setPgmFileInput(null);
       setThumbnailFileInput(null);
       setYamlFileInput(null);
-      console.log("DBT---3");
     }
   };
 
@@ -213,6 +199,28 @@ const DbTable = ({
     }
   };
 
+  const handleImagePreview = async (id, type) => {
+    const response = await fetch(`/api/maps/${id}/blob`);
+    const data = await response.json();
+
+    console.log("tpye", type);
+    console.log("data.pgm", data.pgm);
+    console.log("data.thumbnail", data.thumbnail);
+    const blobData = type === "pgm" ? data.pgm : data.thumbnail; // 根據類型選擇 BLOB 數據
+    console.log("blobData", blobData);
+
+    // const blob = new Blob([blobData], { type: "image/png" }); // 確保這裡的 MIME 類型正確
+    // const imageUrl = URL.createObjectURL(blob);
+    // setImagePreview(imageUrl); // 設置預覽圖片的 URL
+
+    const base64 = `data:image/png;base64,${blobData}`; // 假設 pgm 是 Base64 字符串
+    setImagePreview(base64); // 設置預覽圖片的 URL
+  };
+
+  const handleClosePreview = () => {
+    setImagePreview(null);
+  };
+
   useEffect(() => {
     if (data.length > 0) {
       console.log({ data });
@@ -222,6 +230,11 @@ const DbTable = ({
 
   return (
     <div>
+      {imagePreview && (
+        <div className="image-preview" onClick={handleClosePreview}>
+          <img src={imagePreview} alt="Preview" />
+        </div>
+      )}
       <h2>{columns.length > 0 ? columns[0].Header : "Table"}</h2>
       <div className="db-table">
         <table>
@@ -254,7 +267,12 @@ const DbTable = ({
                           row[col.column]
                         )
                       ) : col.type === "BLOB" ? (
-                        row[col.column]
+                        <span
+                          style={{ cursor: "pointer", color: "blue" }}
+                          onClick={() => handleImagePreview(row.id, col.column)}
+                        >
+                          BLOB
+                        </span>
                       ) : (
                         row[col.column]
                       )}
