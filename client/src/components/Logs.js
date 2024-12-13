@@ -79,6 +79,7 @@ const Logs = () => {
                         <Button 
                             variant="contained" 
                             onClick={handleMenuClick}
+                            style={{ textTransform: 'none' }}
                         >
                             {selectedService || 'Select Service'}
                         </Button>
