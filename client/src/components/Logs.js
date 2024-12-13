@@ -11,7 +11,7 @@ const Logs = () => {
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [services, setServices] = useState([]);
-    const [selectedService, setSelectedService] = useState('SELECT SERVICE');
+    const [selectedService, setSelectedService] = useState('SELECT_SERVICE');
     const [anchorEl, setAnchorEl] = useState(null);
 
     const fetchServices = async () => {
@@ -33,7 +33,7 @@ const Logs = () => {
             console.log("fetching logs");
             const formattedStart = startDate ? startDate.format('YYYY-MM-DDTHH:mm:ss') : "";
             const formattedEnd = endDate ? endDate.format('YYYY-MM-DDTHH:mm:ss') : "";
-            const response = await fetch(`/api/logs?start=${formattedStart}&end=${formattedEnd}`);
+            const response = await fetch(`/api/logs?service=${selectedService}&start=${formattedStart}&end=${formattedEnd}`);
             const data = await response.json();
             setLogs(data.results);
         } catch (error) {
@@ -42,10 +42,10 @@ const Logs = () => {
     };
 
     useEffect(() => {
-        if (startDate || endDate) {
+        if (startDate || endDate || selectedService) {
             fetchLogs();
         }
-    }, [startDate, endDate]);
+    }, [startDate, endDate, selectedService]);
 
     const handleStartDateChange = (newValue) => {
         setStartDate(newValue);
@@ -68,6 +68,7 @@ const Logs = () => {
     const handleServiceSelect = (service) => {
         setSelectedService(service);
         handleMenuClose();
+        fetchLogs();
     };
 
     return (

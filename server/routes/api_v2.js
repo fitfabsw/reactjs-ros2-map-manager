@@ -664,12 +664,11 @@ router.get("/tables/:tableName/schema", async (req, res) => {
 });
 
 router.get("/logs", (req, res) => {
-  const service = "fitrobot.central.service";
-  const { start, end } = req.query;
+  const { service, start, end } = req.query;
 
   const since = start ? start.replace('T', ' ') : undefined;
   const until = end ? end.replace('T', ' ') : undefined;
-  const cmd = `journalctl -u ${service} ${since ? `--since '${since}'` : ''} ${until ? `--until '${until}'` : ''} -n 1000`;
+  const cmd = `journalctl ${service ? `-u ${service}` : ''} ${since ? `--since '${since}'` : ''} ${until ? `--until '${until}'` : ''} -n 1000`;
   
   exec(cmd, (error, stdout, stderr) => {
     if (error) {
