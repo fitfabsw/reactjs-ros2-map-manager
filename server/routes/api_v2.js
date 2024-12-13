@@ -665,13 +665,11 @@ router.get("/tables/:tableName/schema", async (req, res) => {
 
 router.get("/logs", (req, res) => {
   const service = "fitrobot.central.service";
-  const { start, end } = req.query; // Get start and end from query parameters
+  const { start, end } = req.query;
 
-  // Set default values if start or end are not provided
-  const since = start.replace('T', ' '); // Default start date
-  const until = end.replace('T', ' '); // Default end date
-  console.log(since, until);
-  const cmd = `journalctl -u ${service} --since '${since}' --until '${until}' -n 1000`;
+  const since = start ? start.replace('T', ' ') : undefined;
+  const until = end ? end.replace('T', ' ') : undefined;
+  const cmd = `journalctl -u ${service} ${since ? `--since '${since}'` : ''} ${until ? `--until '${until}'` : ''} -n 1000`;
   
   exec(cmd, (error, stdout, stderr) => {
     if (error) {
