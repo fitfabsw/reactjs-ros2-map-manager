@@ -683,4 +683,34 @@ router.get("/logs", (req, res) => {
   });
 });
 
+// Add this route to get all system services
+router.get("/services", (req, res) => {
+
+
+  // Using systemctl to list all services
+  exec("systemctl list-units --type=service --all --no-pager --plain", (error, stdout, stderr) => {
+    if (error) {
+      return res.status(500).json({ error: error.message });
+    }
+    if (stderr) {
+      return res.status(500).json({ error: stderr });
+    }
+
+    // Parse the output to extract service names
+    const services = stdout
+      .split('\n')
+      .slice(1) // Skip the header line
+      .filter(line => line.trim()) // Remove empty lines
+      .map(line => {
+        const parts = line.split(/\s+/);
+        if (parts[0]) {
+          return parts[0].replace('.service', ''); // Remove .service suffix
+        }
+      })
+      .filter(Boolean); // Remove undefined entries
+
+    res.json({ services });
+  });
+});
+
 module.exports = router;
