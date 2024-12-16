@@ -9,10 +9,18 @@ import "./Logs.css";
 const Logs = () => {
     const defaultService = 'SELECT_SERVICE';
     const [logs, setLogs] = useState([]);
-    const [startDate, setStartDate] = useState(null);
-    const [endDate, setEndDate] = useState(null);
+    const [startDate, setStartDate] = useState(() => {
+        const saved = sessionStorage.getItem('logsStartDate');
+        return saved ? dayjs(saved) : null;
+    });
+    const [endDate, setEndDate] = useState(() => {
+        const saved = sessionStorage.getItem('logsEndDate');
+        return saved ? dayjs(saved) : null;
+    });
     const [services, setServices] = useState([]);
-    const [selectedService, setSelectedService] = useState(defaultService);
+    const [selectedService, setSelectedService] = useState(() => {
+        return sessionStorage.getItem('logsSelectedService') || defaultService;
+    });
     const [anchorEl, setAnchorEl] = useState(null);
 
     const fetchServices = async () => {
@@ -43,18 +51,14 @@ const Logs = () => {
         }
     };
 
-    useEffect(() => {
-        if (startDate || endDate || selectedService !== defaultService) {
-            fetchLogs();
-        }
-    }, [startDate, endDate, selectedService]);
-
     const handleStartDateChange = (newValue) => {
         setStartDate(newValue);
+        sessionStorage.setItem('logsStartDate', newValue ? newValue.toISOString() : '');
     };
 
     const handleEndDateChange = (newValue) => {
         setEndDate(newValue);
+        sessionStorage.setItem('logsEndDate', newValue ? newValue.toISOString() : '');
     };
 
     const handleMenuClick = (event) => {
@@ -67,8 +71,15 @@ const Logs = () => {
 
     const handleServiceSelect = (service) => {
         setSelectedService(service);
+        sessionStorage.setItem('logsSelectedService', service);
         handleMenuClose();
     };
+
+    useEffect(() => {
+        if (startDate || endDate || selectedService !== defaultService) {
+            fetchLogs();
+        }
+    }, [startDate, endDate, selectedService]);
 
     return (
         <div className="logs-container">
