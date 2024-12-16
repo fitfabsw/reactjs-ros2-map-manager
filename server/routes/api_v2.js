@@ -686,4 +686,31 @@ router.get("/services", (req, res) => {
   res.json({ services: ["fitrobot.bringup", "fitrobot.master", "fitrobot.central"] });
 });
 
+router.get("/devices", (req, res) => {
+  exec("ls /var/log/journal/remote/", (error, stdout, stderr) => {
+    if (error) {
+      return res.status(500).json({ error: error.message });
+    }
+    if (stderr) {
+      return res.status(500).json({ error: stderr });
+    }
+
+    // Parse filenames and extract IPs
+    const devices = stdout
+      .split('\n')
+      .filter(filename => filename.startsWith('remote-'))
+      .map(filename => {
+        const match = filename.match(/remote-(.+)\.journal/);
+        return match ? match[1] : null;
+      })
+      .filter((ip, index, self) => 
+        Boolean(ip) && 
+        /^[0-9.]+$/.test(ip) && 
+        self.indexOf(ip) === index
+      );
+
+    res.json({ devices });
+  });
+});
+
 module.exports = router;
