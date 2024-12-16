@@ -7,11 +7,12 @@ import dayjs from 'dayjs';
 import "./Logs.css";
 
 const Logs = () => {
+    const defaultService = 'SELECT_SERVICE';
     const [logs, setLogs] = useState([]);
     const [startDate, setStartDate] = useState(null);
     const [endDate, setEndDate] = useState(null);
     const [services, setServices] = useState([]);
-    const [selectedService, setSelectedService] = useState('SELECT_SERVICE');
+    const [selectedService, setSelectedService] = useState(defaultService);
     const [anchorEl, setAnchorEl] = useState(null);
 
     const fetchServices = async () => {
@@ -33,7 +34,8 @@ const Logs = () => {
             console.log("fetching logs");
             const formattedStart = startDate ? startDate.format('YYYY-MM-DDTHH:mm:ss') : "";
             const formattedEnd = endDate ? endDate.format('YYYY-MM-DDTHH:mm:ss') : "";
-            const response = await fetch(`/api/logs?service=${selectedService}&start=${formattedStart}&end=${formattedEnd}`);
+            const service = selectedService !== defaultService ? selectedService : '';
+            const response = await fetch(`/api/logs?service=${service}&start=${formattedStart}&end=${formattedEnd}`);
             const data = await response.json();
             setLogs(data.results);
         } catch (error) {
@@ -42,19 +44,17 @@ const Logs = () => {
     };
 
     useEffect(() => {
-        if (startDate || endDate || selectedService) {
+        if (startDate || endDate || selectedService !== defaultService) {
             fetchLogs();
         }
     }, [startDate, endDate, selectedService]);
 
     const handleStartDateChange = (newValue) => {
         setStartDate(newValue);
-        fetchLogs();
     };
 
     const handleEndDateChange = (newValue) => {
         setEndDate(newValue);
-        fetchLogs();
     };
 
     const handleMenuClick = (event) => {
@@ -68,7 +68,6 @@ const Logs = () => {
     const handleServiceSelect = (service) => {
         setSelectedService(service);
         handleMenuClose();
-        fetchLogs();
     };
 
     return (
