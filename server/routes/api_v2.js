@@ -664,11 +664,11 @@ router.get("/tables/:tableName/schema", async (req, res) => {
 });
 
 router.get("/logs", (req, res) => {
-  const { service, start, end } = req.query;
+  const { ip, service, start, end } = req.query;
 
   const since = start ? start.replace('T', ' ') : undefined;
   const until = end ? end.replace('T', ' ') : undefined;
-  const cmd = `journalctl ${service ? `-u ${service}` : ''} ${since ? `--since '${since}'` : ''} ${until ? `--until '${until}'` : ''} -n 1000`;
+  const cmd = `journalctl ${ip ? `--file /var/log/journal/remote/remote-${ip}.journal` : ''} ${service ? `-u ${service}` : ''} ${since ? `--since '${since}'` : ''} ${until ? `--until '${until}'` : ''} -n 1000`;
   
   exec(cmd, (error, stdout, stderr) => {
     if (error) {
