@@ -668,8 +668,14 @@ router.get("/logs", (req, res) => {
 
   const since = start ? start.replace('T', ' ') : undefined;
   const until = end ? end.replace('T', ' ') : undefined;
-  const cmd = `journalctl ${ip ? `--file /var/log/journal/remote/remote-${ip}.journal` : ''} ${service ? `-u ${service}` : ''} ${since ? `--since '${since}'` : ''} ${until ? `--until '${until}'` : ''} -n 1000`;
-  
+  // Type "vim /etc/sudoers" and add "parallels ALL=(ALL) NOPASSWD: /usr/bin/journalctl" at the end of the file to make sudo work
+  const cmd = `sudo journalctl` +
+              `${ip ? ` --file /var/log/journal/remote/remote-${ip}.journal` : ''}` +
+              `${service ? ` -u ${service}` : ''}` +
+              `${since ? ` --since '${since}'` : ''}` +
+              `${until ? ` --until '${until}'` : ''}` +
+              ` -n 1000`;
+
   exec(cmd, (error, stdout, stderr) => {
     if (error) {
       return res.status(500).json({ error: error.message });
@@ -696,7 +702,7 @@ router.get("/devices", (req, res) => {
     }
 
     // Parse filenames and extract IPs
-    const devices = stdout
+    const devices = ['central', ...stdout
       .split('\n')
       .filter(filename => filename.startsWith('remote-'))
       .map(filename => {
@@ -707,7 +713,7 @@ router.get("/devices", (req, res) => {
         Boolean(ip) && 
         /^[0-9.]+$/.test(ip) && 
         self.indexOf(ip) === index
-      );
+      )];
 
     res.json({ devices });
   });

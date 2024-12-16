@@ -22,6 +22,11 @@ const Logs = () => {
         return sessionStorage.getItem('logsSelectedService') || defaultService;
     });
     const [anchorEl, setAnchorEl] = useState(null);
+    const [devices, setDevices] = useState([]);
+    const [selectedDevice, setSelectedDevice] = useState(() => {
+        return sessionStorage.getItem('logsSelectedDevice') || '';
+    });
+    const [deviceAnchorEl, setDeviceAnchorEl] = useState(null);
 
     const fetchServices = async () => {
         try {
@@ -33,8 +38,19 @@ const Logs = () => {
         }
     };
 
+    const fetchDevices = async () => {
+        try {
+            const response = await fetch('/api/devices');
+            const data = await response.json();
+            setDevices(data.devices);
+        } catch (error) {
+            console.error('Error fetching devices:', error);
+        }
+    };
+
     useEffect(() => {
         fetchServices();
+        fetchDevices();
     }, []);
 
     const fetchLogs = async () => {
@@ -43,7 +59,8 @@ const Logs = () => {
             const formattedStart = startDate ? startDate.format('YYYY-MM-DDTHH:mm:ss') : "";
             const formattedEnd = endDate ? endDate.format('YYYY-MM-DDTHH:mm:ss') : "";
             const service = selectedService !== defaultService ? selectedService : '';
-            const response = await fetch(`/api/logs?service=${service}&start=${formattedStart}&end=${formattedEnd}`);
+            const ip = (selectedDevice === "central" || selectedDevice === undefined) ? '' : selectedDevice;
+            const response = await fetch(`/api/logs?ip=${ip}&service=${service}&start=${formattedStart}&end=${formattedEnd}`);
             const data = await response.json();
             setLogs(data.results);
         } catch (error) {
@@ -75,11 +92,25 @@ const Logs = () => {
         handleMenuClose();
     };
 
+    const handleDeviceMenuClick = (event) => {
+        setDeviceAnchorEl(event.currentTarget);
+    };
+
+    const handleDeviceMenuClose = () => {
+        setDeviceAnchorEl(null);
+    };
+
+    const handleDeviceSelect = (device) => {
+        setSelectedDevice(device);
+        sessionStorage.setItem('logsSelectedDevice', device);
+        handleDeviceMenuClose();
+    };
+
     useEffect(() => {
-        if (startDate || endDate || selectedService !== defaultService) {
+        if (startDate || endDate || selectedService !== defaultService || selectedDevice) {
             fetchLogs();
         }
-    }, [startDate, endDate, selectedService]);
+    }, [startDate, endDate, selectedService, selectedDevice]);
 
     return (
         <div className="logs-container">
@@ -87,6 +118,28 @@ const Logs = () => {
                 <h2>Logs Filters</h2>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '16px' }}>
+                        <Button 
+                            variant="contained" 
+                            onClick={handleDeviceMenuClick}
+                            style={{ textTransform: 'none' }}
+                        >
+                            {selectedDevice || 'Select Device'}
+                        </Button>
+                        <Menu
+                            anchorEl={deviceAnchorEl}
+                            open={Boolean(deviceAnchorEl)}
+                            onClose={handleDeviceMenuClose}
+                        >
+                            {devices.map((device) => (
+                                <MenuItem 
+                                    key={device} 
+                                    onClick={() => handleDeviceSelect(device)}
+                                    selected={device === selectedDevice}
+                                >
+                                    {device}
+                                </MenuItem>
+                            ))}
+                        </Menu>
                         <Button 
                             variant="contained" 
                             onClick={handleMenuClick}
