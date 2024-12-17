@@ -5,9 +5,10 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Button, Menu, MenuItem } from '@mui/material';
 import dayjs from 'dayjs';
 import "./Logs.css";
+import ReplayIcon from '@mui/icons-material/Replay';
 
 const Logs = () => {
-    const defaultService = 'SELECT_SERVICE';
+    const defaultService = 'Select Service';
     const [logs, setLogs] = useState([]);
     const [startDate, setStartDate] = useState(() => {
         const saved = sessionStorage.getItem('logsStartDate');
@@ -106,6 +107,19 @@ const Logs = () => {
         handleDeviceMenuClose();
     };
 
+    const handleReset = () => {
+        setStartDate(null);
+        setEndDate(null);
+        setSelectedService(defaultService);
+        setSelectedDevice('');
+        
+        sessionStorage.removeItem('logsStartDate');
+        sessionStorage.removeItem('logsEndDate');
+        sessionStorage.removeItem('logsSelectedService');
+        sessionStorage.removeItem('logsSelectedDevice');
+        fetchLogs();
+    };
+
     useEffect(() => {
         if (startDate || endDate || selectedService !== defaultService || selectedDevice) {
             fetchLogs();
@@ -115,7 +129,16 @@ const Logs = () => {
     return (
         <div className="logs-container">
             <div className="logs-filter">
-                <h2>Logs Filters</h2>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                    <h2>Logs Filters</h2>
+                    <Button
+                        startIcon={<ReplayIcon />}
+                        onClick={handleReset}
+                        size="small"
+                    >
+                        Reset
+                    </Button>
+                </div>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '16px' }}>
                         <Button 
