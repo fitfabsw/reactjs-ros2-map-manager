@@ -43,7 +43,7 @@ const Logs = () => {
         try {
             const response = await fetch('/api/devices');
             const data = await response.json();
-            setDevices(data.devices);
+            setDevices(Object.keys(data));
         } catch (error) {
             console.error('Error fetching devices:', error);
         }
@@ -60,8 +60,8 @@ const Logs = () => {
             const formattedStart = startDate ? startDate.format('YYYY-MM-DDTHH:mm:ss') : "";
             const formattedEnd = endDate ? endDate.format('YYYY-MM-DDTHH:mm:ss') : "";
             const service = selectedService !== defaultService ? selectedService : '';
-            const ip = (selectedDevice === "central" || selectedDevice === undefined) ? '' : selectedDevice;
-            const response = await fetch(`/api/logs?ip=${ip}&service=${service}&start=${formattedStart}&end=${formattedEnd}`);
+            const robotInfo = (selectedDevice === "central" || selectedDevice === undefined) ? '' : selectedDevice;
+            const response = await fetch(`/api/logs?robot_info=${robotInfo}&service=${service}&start=${formattedStart}&end=${formattedEnd}`);
             const data = await response.json();
             setLogs(data.results);
         } catch (error) {

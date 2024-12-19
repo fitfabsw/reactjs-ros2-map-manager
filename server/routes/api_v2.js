@@ -3,6 +3,62 @@ const router = express.Router();
 const db = require("../models");
 const { exec } = require("child_process"); // Import exec from child_process
 
+
+var robot_info_to_ip = [];
+function fetch_robot_info() {
+  exec("ls /var/log/journal/remote/", (error, stdout, stderr) => {
+    if (error) {
+      console.log(error);
+    }
+    if (stderr) {
+      console.log(stderr);
+    }
+    const filenames = stdout.split('\n')
+        .filter(filename => filename.endsWith('.journal') && filename.length < 31);
+    const ip_array = filenames.map(filename => {
+      const match = filename.match(/remote-(\d+\.\d+\.\d+\.\d+)\.journal/);
+      return match ? match[1] : null;
+    }).filter(ip => ip !== null);
+
+    const promises = filenames.map(filename => {
+      return new Promise((resolve, reject) => {
+        exec(`sudo journalctl --file /var/log/journal/remote/${filename} -u fitrobot.robot-info.service | grep 'ROBOT_INFO' | tail -n 1 | awk -F'ROBOT_INFO=' '{print $2}'`, (error, stdout, stderr) => {
+          if (error) {
+            return reject(error);
+          }
+          if (stderr) {
+            return reject(stderr);
+          }
+          resolve(stdout.trim()||"unknown_robot");
+        });
+      });
+    });
+
+    Promise.all(promises)
+      .then(results => {
+        robot_info_array = results;
+        robot_data = ip_array.map((ip, index) => ({ ip, info: robot_info_array[index] }));
+
+        robot_info_to_ip = robot_data.reduce((acc, { ip, info }) => {
+          if (!acc[info]) {
+            acc[info] = [];
+          }
+          acc[info].push(ip);
+          return acc;
+        }, {});
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  });
+}
+
+fetch_robot_info();
+setInterval(() => {
+  fetch_robot_info();
+}, 10000);
+
+
 // Robottype CRUD
 router.get("/robottypes", async (req, res) => {
   console.log("get robottypes");
@@ -664,13 +720,17 @@ router.get("/tables/:tableName/schema", async (req, res) => {
 });
 
 router.get("/logs", (req, res) => {
-  const { ip, service, start, end } = req.query;
+  const { robot_info, service, start, end } = req.query;
 
   const since = start ? start.replace('T', ' ') : undefined;
   const until = end ? end.replace('T', ' ') : undefined;
+  const robot_ip_array = robot_info_to_ip[robot_info];
+  console.log(robot_ip_array);
+  const file_param = robot_ip_array.map(ip => `--file /var/log/journal/remote/remote-${ip}.journal`).join(' ');
+
   // Type "vim /etc/sudoers" and add "parallels ALL=(ALL) NOPASSWD: /usr/bin/journalctl" at the end of the file to make sudo work
-  const cmd = `sudo journalctl` +
-              `${ip ? ` --file /var/log/journal/remote/remote-${ip}.journal` : ''}` +
+  const cmd = `sudo journalctl ` +
+              `${file_param}` +
               `${service ? ` -u ${service}` : ''}` +
               `${since ? ` --since '${since}'` : ''}` +
               `${until ? ` --until '${until}'` : ''}` +
@@ -693,30 +753,7 @@ router.get("/services", (req, res) => {
 });
 
 router.get("/devices", (req, res) => {
-  exec("ls /var/log/journal/remote/", (error, stdout, stderr) => {
-    if (error) {
-      return res.status(500).json({ error: error.message });
-    }
-    if (stderr) {
-      return res.status(500).json({ error: stderr });
-    }
-
-    // Parse filenames and extract IPs
-    const devices = ['central', ...stdout
-      .split('\n')
-      .filter(filename => filename.startsWith('remote-'))
-      .map(filename => {
-        const match = filename.match(/remote-(.+)\.journal/);
-        return match ? match[1] : null;
-      })
-      .filter((ip, index, self) => 
-        Boolean(ip) && 
-        /^[0-9.]+$/.test(ip) && 
-        self.indexOf(ip) === index
-      )];
-
-    res.json({ devices });
-  });
+  res.json(robot_info_to_ip);
 });
 
 module.exports = router;
