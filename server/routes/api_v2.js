@@ -725,7 +725,7 @@ router.get("/logs", (req, res) => {
   const since = start ? start.replace('T', ' ') : undefined;
   const until = end ? end.replace('T', ' ') : undefined;
   const robot_ip_array = robot_info_to_ip[robot_info];
-  const file_param = robot_ip_array.map(ip => `--file ${REMOTE_LOG_DIR}/remote-${ip}.journal`).join(' ');
+  const file_param = robot_ip_array ? robot_ip_array.map(ip => `--file ${REMOTE_LOG_DIR}/remote-${ip}.journal`).join(' ') : '';
 
   // Type "vim /etc/sudoers" and add "parallels ALL=(ALL) NOPASSWD: /usr/bin/journalctl" at the end of the file to make sudo work
   const cmd = `sudo journalctl ` +
@@ -752,7 +752,8 @@ router.get("/services", (req, res) => {
 });
 
 router.get("/devices", (req, res) => {
-  res.json(robot_info_to_ip);
+  const devices = Object.keys(robot_info_to_ip);
+  res.json(["central", ...devices]);
 });
 
 module.exports = router;
