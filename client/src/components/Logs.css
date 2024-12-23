@@ -20,6 +20,7 @@
   color: #fff;
   padding: 16px;
   font-family: "MesloLGS NF", Menlo, Monaco, Consolas, "Courier New", monospace;
+  position: relative;
 }
 
 .log-entry {

@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { Button, Menu, MenuItem } from '@mui/material';
+import { Button, Menu, MenuItem, Fab, Tooltip } from '@mui/material';
 import dayjs from 'dayjs';
 import "./Logs.css";
 import ReplayIcon from '@mui/icons-material/Replay';
+import DownloadIcon from '@mui/icons-material/Download';
 
 const Logs = () => {
     const defaultService = 'Select Service';
@@ -126,6 +127,22 @@ const Logs = () => {
         }
     }, [startDate, endDate, selectedService, selectedDevice]);
 
+    const handleDownload = () => {
+        const timestamp = dayjs().format('YYYY-MM-DD_HH-mm-ss');
+        const content = logs.join('\n');
+        
+        // Create blob and download
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${timestamp}.log`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+    };
+
     return (
         <div className="logs-container">
             <div className="logs-filter">
@@ -209,6 +226,19 @@ const Logs = () => {
                 ) : (
                     <p>No logs available.</p>
                 )}
+                <Tooltip title="Save Logs">
+                    <Fab 
+                        color="primary"
+                        style={{
+                            position: 'fixed',
+                            bottom: '2rem',
+                            right: '2rem'
+                        }}
+                        onClick={handleDownload}
+                    >
+                        <DownloadIcon />
+                    </Fab>
+                </Tooltip>
             </div>
         </div>
     );
