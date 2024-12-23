@@ -1,42 +1,35 @@
 .logs-container {
-  display: flex; /* Use flexbox for the two-column layout */
+  display: flex;
+  gap: 20px;
   padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: calc(100vh - 107px);
 }
 
 .logs-filter {
-  width: 300px; /* Set the same width as the file-list in MapEditor */
-  padding: 10px;
-  background-color: #f5f5f5; /* Match the background color of the file-list */
-  border-radius: 4px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  flex: 0 0 300px;
+  background-color: #f5f5f5; 
 }
 
 .logs-column {
-  flex: 1 1;
-  padding: 10px;
-  margin: 0 10px;
-  background-color: #333;
+  flex: 1;
+  overflow-y: auto;
+  height: calc(100vh - 120px);
+  border: 1px solid #ddd;
   border-radius: 4px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  font-size: smaller;
+  background-color: #333;
+  color: #fff;
+  padding: 16px;
   font-family: "MesloLGS NF", Menlo, Monaco, Consolas, "Courier New", monospace;
-  color: white;
 }
 
-.logs-column h1 {
-  color: #333;
+.log-entry {
+  font-family: monospace;
+  white-space: pre-wrap;
+  word-break: break-all;
 }
 
-.logs-column h2 {
-  color: #444;
-}
-
-.logs-column p {
-  color: #666;
-  font-size: 1.1em;
+.log-entry:last-child {
+  border-bottom: none;
 }
 
 input[type="text"],
