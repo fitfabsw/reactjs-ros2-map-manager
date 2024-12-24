@@ -34,6 +34,18 @@ function Navigation() {
       >
         Logs
       </Link>
+      <Link
+        to="/db"
+        className={location.pathname.startsWith("/db") ? "active" : ""}
+      >
+        DB
+      </Link>
+      <Link
+        to="/roslib"
+        className={location.pathname.startsWith("/roslib") ? "active" : ""}
+      >
+        Roslib
+      </Link>
     </nav>
   );
 }
