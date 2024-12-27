@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { Button, Menu, MenuItem, Fab, Tooltip } from '@mui/material';
+import { Button, Menu, MenuItem, Fab, Tooltip, Checkbox, FormControlLabel } from '@mui/material';
 import dayjs from 'dayjs';
 import "./Logs.css";
 import ReplayIcon from '@mui/icons-material/Replay';
-import DownloadIcon from '@mui/icons-material/Download';
+import DownloadIcon from '@mui/icons-material/CloudDownload';
 
 const Logs = () => {
     const defaultService = 'Select Service';
@@ -29,6 +29,10 @@ const Logs = () => {
         return sessionStorage.getItem('logsSelectedDevice') || '';
     });
     const [deviceAnchorEl, setDeviceAnchorEl] = useState(null);
+    const [autoScroll, setAutoScroll] = useState(() => {
+        return sessionStorage.getItem('logsAutoScroll') === 'true';
+    });
+    const logsColumnRef = useRef(null);
 
     const fetchServices = async () => {
         try {
@@ -143,10 +147,44 @@ const Logs = () => {
         window.URL.revokeObjectURL(url);
     };
 
+    const scrollToBottom = () => {
+        if (logsColumnRef.current) {
+            logsColumnRef.current.scrollTo({
+                top: logsColumnRef.current.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+    };
+
+    const scrollToTop = () => {
+        if (logsColumnRef.current) {
+            logsColumnRef.current.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+    };
+
+    useEffect(() => {
+        if (autoScroll) {
+            scrollToBottom();
+        }
+    }, [logs]);
+
+    const handleAutoScrollChange = (event) => {
+        setAutoScroll(event.target.checked);
+        sessionStorage.setItem('logsAutoScroll', event.target.checked);
+        if (event.target.checked) {
+            scrollToBottom();
+        } else {
+            scrollToTop();
+        }
+    };
+
     return (
         <div className="logs-container">
             <div className="logs-filter">
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                <div className="logs-filter-header">
                     <h2>Logs Filters</h2>
                     <Button
                         startIcon={<ReplayIcon />}
@@ -157,11 +195,11 @@ const Logs = () => {
                     </Button>
                 </div>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '16px' }}>
+                    <div className="logs-filter-content">
                         <Button 
                             variant="contained" 
                             onClick={handleDeviceMenuClick}
-                            style={{ textTransform: 'none' }}
+                            className="menu-button"
                         >
                             {selectedDevice || 'Select Device'}
                         </Button>
@@ -183,7 +221,7 @@ const Logs = () => {
                         <Button 
                             variant="contained" 
                             onClick={handleMenuClick}
-                            style={{ textTransform: 'none' }}
+                            className="menu-button"
                         >
                             {selectedService || 'Select Service'}
                         </Button>
@@ -217,23 +255,33 @@ const Logs = () => {
                 </LocalizationProvider>
             </div>
             <div className="logs-column">
-                {logs && logs.length > 0 ? (
-                    logs.map((log, index) => (
-                        <div key={index} className="log-entry">
-                            {log}
-                        </div>
-                    ))
-                ) : (
-                    <p>No logs available.</p>
-                )}
-                <Tooltip title="Save Logs">
+                <div className="logs-auto-scroll">
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={autoScroll}
+                                onChange={handleAutoScrollChange}
+                                size="small"
+                            />
+                        }
+                        label="Scroll to Bottom"
+                    />
+                </div>
+                <div className="logs-content" ref={logsColumnRef}>
+                    {logs && logs.length > 0 ? (
+                        logs.map((log, index) => (
+                            <div key={index} className="log-entry">
+                                {log}
+                            </div>
+                        ))
+                    ) : (
+                        <p>No logs available.</p>
+                    )}
+                </div>
+                <Tooltip title="Save logs">
                     <Fab 
                         color="primary"
-                        style={{
-                            position: 'fixed',
-                            bottom: '2rem',
-                            right: '2rem'
-                        }}
+                        className="download-fab"
                         onClick={handleDownload}
                     >
                         <DownloadIcon />
