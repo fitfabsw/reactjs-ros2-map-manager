@@ -720,13 +720,14 @@ router.get("/tables/:tableName/schema", async (req, res) => {
 });
 
 router.get("/logs", (req, res) => {
-  const { robot_info, service, start, end, lines } = req.query;
+  const { robot_info, service, start, end, lines, search } = req.query;
 
   const since = start ? start.replace('T', ' ') : undefined;
   const until = end ? end.replace('T', ' ') : undefined;
   const n = lines ? lines : 1000;
   const robot_ip_array = robot_info_to_ip[robot_info];
   const file_param = robot_ip_array ? robot_ip_array.map(ip => `--file ${REMOTE_LOG_DIR}/remote-${ip}.journal`).join(' ') : '';
+  const search_param = search=="undefined" ? undefined : search;
 
   // Type "vim /etc/sudoers" and add "parallels ALL=(ALL) NOPASSWD: /usr/bin/journalctl" at the end of the file to make sudo work
   const cmd = `sudo journalctl ` +
@@ -734,13 +735,15 @@ router.get("/logs", (req, res) => {
               `${service ? ` -u ${service}` : ''}` +
               `${since ? ` --since '${since}'` : ''}` +
               `${until ? ` --until '${until}'` : ''}` +
-              ` -n ${n}`;
+              ` -n ${n}` +
+              `${search_param ? ` | grep -i '${search_param}'` : ''}`;
+
   exec(cmd, (error, stdout, stderr) => {
     if (error) {
-      return res.status(500).json({ error: error.message });
+      return res.status(200).json({ results: [error.message] });
     }
     if (stderr) {
-      return res.status(500).json({ error: stderr });
+      return res.status(200).json({ results: [error.message] });
     }
     const escapedResults = stdout.split("\n").filter(Boolean);
     res.json({ results: escapedResults });

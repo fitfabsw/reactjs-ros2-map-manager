@@ -1,12 +1,25 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { Button, Menu, MenuItem, Fab, Tooltip, Checkbox, FormControlLabel, Radio, RadioGroup, FormControl, FormLabel } from '@mui/material';
+import { Button, Menu, MenuItem, Fab, Tooltip, Checkbox, FormControlLabel, Radio, RadioGroup, FormControl, FormLabel, TextField } from '@mui/material';
 import dayjs from 'dayjs';
 import "./Logs.css";
 import ReplayIcon from '@mui/icons-material/Replay';
 import DownloadIcon from '@mui/icons-material/CloudDownload';
+
+// Move debounce function outside component to prevent recreation
+const debounce = (func, wait) => {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+};
 
 const Logs = () => {
     const defaultService = 'Select Service';
@@ -36,6 +49,16 @@ const Logs = () => {
         return sessionStorage.getItem('logsLineCount') || '1000';
     });
     const logsColumnRef = useRef(null);
+    const [searchKey, setSearchKey] = useState('');
+
+    // Create debounced fetch using useCallback
+    const debouncedFetchLogs = useCallback(
+        debounce((value) => {
+            // setSearchKey(value);
+            fetchLogs(value);
+        }, 500),
+        []  // Empty dependency array
+    );
 
     const fetchServices = async () => {
         try {
@@ -62,14 +85,15 @@ const Logs = () => {
         fetchDevices();
     }, []);
 
-    const fetchLogs = async () => {
+    const fetchLogs = async (k) => {
         try {
-            console.log("fetching logs");
             const formattedStart = startDate ? startDate.format('YYYY-MM-DDTHH:mm:ss') : "";
             const formattedEnd = endDate ? endDate.format('YYYY-MM-DDTHH:mm:ss') : "";
             const service = selectedService !== defaultService ? selectedService : '';
             const robotInfo = (selectedDevice === "central" || selectedDevice === undefined) ? '' : selectedDevice;
-            const response = await fetch(`/api/logs?robot_info=${robotInfo}&service=${service}&start=${formattedStart}&end=${formattedEnd}&lines=${lineCount}`);
+            const response = await fetch(
+                `/api/logs?robot_info=${robotInfo}&service=${service}&start=${formattedStart}&end=${formattedEnd}&lines=${lineCount}&search=${k}`
+            );
             const data = await response.json();
             setLogs(data.results);
         } catch (error) {
@@ -121,6 +145,7 @@ const Logs = () => {
         setSelectedService(defaultService);
         setSelectedDevice('');
         setLineCount('1000');
+        setSearchKey('');
         
         sessionStorage.removeItem('logsStartDate');
         sessionStorage.removeItem('logsEndDate');
@@ -190,6 +215,12 @@ const Logs = () => {
         const newValue = event.target.value;
         setLineCount(newValue);
         sessionStorage.setItem('logsLineCount', newValue);
+    };
+
+    const handleSearch = (event) => {
+        const newValue = event.target.value;
+        setSearchKey(newValue);
+        debouncedFetchLogs(newValue);
     };
 
     return (
@@ -277,39 +308,50 @@ const Logs = () => {
                     </div>
                 </LocalizationProvider>
             </div>
-            <div className="logs-column">
-                <div className="logs-auto-scroll">
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                checked={autoScroll}
-                                onChange={handleAutoScrollChange}
-                                size="small"
-                            />
-                        }
-                        label="Scroll to Bottom"
-                    />
+            <div className="logs-right-panel">
+                <TextField
+                    fullWidth
+                    variant="outlined"
+                    placeholder="Search logs..."
+                    value={searchKey}
+                    onChange={handleSearch}
+                    size="small"
+                    className="logs-search"
+                />
+                <div className="logs-column">
+                    <div className="logs-auto-scroll">
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    checked={autoScroll}
+                                    onChange={handleAutoScrollChange}
+                                    size="small"
+                                />
+                            }
+                            label="Scroll to Bottom"
+                        />
+                    </div>
+                    <div className="logs-content" ref={logsColumnRef}>
+                        {logs && logs.length > 0 ? (
+                            logs.map((log, index) => (
+                                <div key={index} className="log-entry">
+                                    {log}
+                                </div>
+                            ))
+                        ) : (
+                            <p>No logs available.</p>
+                        )}
+                    </div>
+                    <Tooltip title="Save logs">
+                        <Fab 
+                            color="primary"
+                            className="download-fab"
+                            onClick={handleDownload}
+                        >
+                            <DownloadIcon />
+                        </Fab>
+                    </Tooltip>
                 </div>
-                <div className="logs-content" ref={logsColumnRef}>
-                    {logs && logs.length > 0 ? (
-                        logs.map((log, index) => (
-                            <div key={index} className="log-entry">
-                                {log}
-                            </div>
-                        ))
-                    ) : (
-                        <p>No logs available.</p>
-                    )}
-                </div>
-                <Tooltip title="Save logs">
-                    <Fab 
-                        color="primary"
-                        className="download-fab"
-                        onClick={handleDownload}
-                    >
-                        <DownloadIcon />
-                    </Fab>
-                </Tooltip>
             </div>
         </div>
     );
