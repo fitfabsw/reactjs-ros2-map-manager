@@ -44,7 +44,7 @@
 .logs-auto-scroll {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 8px;
+  margin: 8px;
   position: absolute;
   padding: 10px;
   border-radius: 15px;
