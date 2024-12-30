@@ -120,11 +120,13 @@ const Logs = () => {
         setEndDate(null);
         setSelectedService(defaultService);
         setSelectedDevice('');
+        setLineCount('1000');
         
         sessionStorage.removeItem('logsStartDate');
         sessionStorage.removeItem('logsEndDate');
         sessionStorage.removeItem('logsSelectedService');
         sessionStorage.removeItem('logsSelectedDevice');
+        sessionStorage.removeItem('logsLineCount');
         fetchLogs();
     };
 
