@@ -3,7 +3,7 @@ const router = express.Router();
 const db = require("../models");
 const { exec } = require("child_process"); // Import exec from child_process
 
-const REMOTE_LOG_DIR = "/var/log/journal/remote/";
+const REMOTE_LOG_DIR = "/var/log/journal/remote";
 var robot_info_to_ip = [];
 function fetch_robot_info() {
   exec(`ls ${REMOTE_LOG_DIR}`, (error, stdout, stderr) => {
