@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { Button, Menu, MenuItem, Fab, Tooltip, Checkbox, FormControlLabel } from '@mui/material';
+import { Button, Menu, MenuItem, Fab, Tooltip, Checkbox, FormControlLabel, Radio, RadioGroup, FormControl, FormLabel } from '@mui/material';
 import dayjs from 'dayjs';
 import "./Logs.css";
 import ReplayIcon from '@mui/icons-material/Replay';
@@ -31,6 +31,9 @@ const Logs = () => {
     const [deviceAnchorEl, setDeviceAnchorEl] = useState(null);
     const [autoScroll, setAutoScroll] = useState(() => {
         return sessionStorage.getItem('logsAutoScroll') === 'true';
+    });
+    const [lineCount, setLineCount] = useState(() => {
+        return sessionStorage.getItem('logsLineCount') || '1000';
     });
     const logsColumnRef = useRef(null);
 
@@ -66,7 +69,7 @@ const Logs = () => {
             const formattedEnd = endDate ? endDate.format('YYYY-MM-DDTHH:mm:ss') : "";
             const service = selectedService !== defaultService ? selectedService : '';
             const robotInfo = (selectedDevice === "central" || selectedDevice === undefined) ? '' : selectedDevice;
-            const response = await fetch(`/api/logs?robot_info=${robotInfo}&service=${service}&start=${formattedStart}&end=${formattedEnd}`);
+            const response = await fetch(`/api/logs?robot_info=${robotInfo}&service=${service}&start=${formattedStart}&end=${formattedEnd}&lines=${lineCount}`);
             const data = await response.json();
             setLogs(data.results);
         } catch (error) {
@@ -126,10 +129,10 @@ const Logs = () => {
     };
 
     useEffect(() => {
-        if (startDate || endDate || selectedService !== defaultService || selectedDevice) {
+        if (startDate || endDate || selectedService !== defaultService || selectedDevice || lineCount) {
             fetchLogs();
         }
-    }, [startDate, endDate, selectedService, selectedDevice]);
+    }, [startDate, endDate, selectedService, selectedDevice, lineCount]);
 
     const handleDownload = () => {
         const timestamp = dayjs().format('YYYY-MM-DD_HH-mm-ss');
@@ -179,6 +182,12 @@ const Logs = () => {
         } else {
             scrollToTop();
         }
+    };
+
+    const handleLineCountChange = (event) => {
+        const newValue = event.target.value;
+        setLineCount(newValue);
+        sessionStorage.setItem('logsLineCount', newValue);
     };
 
     return (
@@ -250,7 +259,19 @@ const Logs = () => {
                             value={endDate}
                             onChange={handleEndDateChange}
                         />
-                        
+                        <FormControl component="fieldset">
+                            <FormLabel component="legend">Lines</FormLabel>
+                            <RadioGroup
+                                row
+                                name="lines"
+                                value={lineCount}
+                                onChange={handleLineCountChange}
+                            >
+                                <FormControlLabel value="500" control={<Radio size="small" />} label="500" />
+                                <FormControlLabel value="1000" control={<Radio size="small" />} label="1000" />
+                                <FormControlLabel value="5000" control={<Radio size="small" />} label="5000" />
+                            </RadioGroup>
+                        </FormControl>
                     </div>
                 </LocalizationProvider>
             </div>

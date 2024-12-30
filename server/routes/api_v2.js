@@ -720,10 +720,11 @@ router.get("/tables/:tableName/schema", async (req, res) => {
 });
 
 router.get("/logs", (req, res) => {
-  const { robot_info, service, start, end } = req.query;
+  const { robot_info, service, start, end, lines } = req.query;
 
   const since = start ? start.replace('T', ' ') : undefined;
   const until = end ? end.replace('T', ' ') : undefined;
+  const n = lines ? lines : 1000;
   const robot_ip_array = robot_info_to_ip[robot_info];
   const file_param = robot_ip_array ? robot_ip_array.map(ip => `--file ${REMOTE_LOG_DIR}/remote-${ip}.journal`).join(' ') : '';
 
@@ -733,8 +734,7 @@ router.get("/logs", (req, res) => {
               `${service ? ` -u ${service}` : ''}` +
               `${since ? ` --since '${since}'` : ''}` +
               `${until ? ` --until '${until}'` : ''}` +
-              ` -n 1000`;
-
+              ` -n ${n}`;
   exec(cmd, (error, stdout, stderr) => {
     if (error) {
       return res.status(500).json({ error: error.message });
