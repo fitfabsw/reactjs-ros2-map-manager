@@ -34,7 +34,6 @@ function Roslibjs() {
     if (!ros) {
       return;
     }
-    console.log("111111111111");
     const listRobotsClient = new ROSLIB.Service({
       ros: ros,
       name: "/listrobot",
@@ -43,31 +42,24 @@ function Roslibjs() {
     listRobotsClient.callService(
       new ROSLIB.ServiceRequest(),
       function (result) {
-        console.log("SERVICE! listrobot");
         if (result && Array.isArray(result.robot_info_list)) {
-          console.log("JJ1");
-          console.log(result.robot_info_list);
           setRobotInfo(result.robot_info_list);
           setRobotNamespaces(
             result.robot_info_list.map((robot) => robot.robot_namespace),
           );
         } else {
-          console.log("JJ2");
           setRobotInfo([]);
         }
       },
     );
 
-    console.log("444444444444");
     const topicsClient = new ROSLIB.Service({
       ros: ros,
       name: "/rosapi/topics",
       serviceType: "rosapi/Topics",
     });
     topicsClient.callService(new ROSLIB.ServiceRequest({}), function (result) {
-      console.log("ASSSSS");
       if (result && Array.isArray(result.topics)) {
-        console.log(result.topics);
         setTopicInfo(result.topics);
       } else {
         setTopicInfo([]);
