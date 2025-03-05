@@ -3,6 +3,15 @@ const router = express.Router();
 const db = require("../models");
 const { exec } = require("child_process"); // Import exec from child_process
 
+const app = express();
+
+// 設定 json 請求體的大小限制為 50MB
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+const yaml = require("js-yaml");
+
+
 const REMOTE_LOG_DIR = "/var/log/journal/remote";
 var robot_info_to_ip = [];
 function fetch_robot_info() {
@@ -644,6 +653,10 @@ router.get("/masks/:id", async (req, res) => {
 
 router.post("/masks", async (req, res) => {
   try {
+    req.body.pgm = Buffer.from(req.body.pgm, 'base64');
+    yamlContent = yaml.dump(req.body.yaml);
+    req.body.yaml = Buffer.from(yamlContent, "utf8");
+
     const mask = await db.Mask.create(req.body);
     res.status(201).json(mask);
   } catch (error) {
@@ -695,6 +708,33 @@ router.get("/maps/:id/masks", async (req, res) => {
     });
     res.json(masks);
   } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 根據地圖 ID 更新Mask
+router.put("/masks/mapid/:map_id", async (req, res) => {
+  try {
+    console.log(`正在尋找 map_id = ${req.params.map_id}`);
+    const mask = await db.Mask.findOne({ where: { map_id: req.params.map_id } });
+    if (mask) {
+      console.log(`錯誤0: `, req.body.yaml);
+      // 將收到的 base64 字串轉換成 Buffer
+      const pgmBuffer = Buffer.from(req.body.pgm, 'base64');
+
+      yamlContent = yaml.dump(req.body.yaml);
+      const yamlBuffer = Buffer.from(yamlContent, "utf8");
+      // 更新 pgm 欄位（假設該欄位為 BLOB 或 binary 類型）
+      await mask.update({ pgm: pgmBuffer });
+      await mask.update({ yaml: yamlBuffer });
+      res.json(mask);
+      console.log(`更新完成，回傳資料: `, mask);
+    } else {
+      console.log(`1111 `, mask);
+      res.status(404).json({ error: "Mask not found" });
+    }
+  } catch (error) {
+    console.log(`2222 `, mask);
     res.status(500).json({ error: error.message });
   }
 });

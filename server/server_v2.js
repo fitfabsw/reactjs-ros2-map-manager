@@ -15,7 +15,7 @@ const apiRoutes = require("./routes/api_v2");
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
 
 let imageBuffer = null;
 let compressedImageBuffer = null;
@@ -134,6 +134,79 @@ app.post("/convert-pgm", async (req, res) => {
         scale: scale,
         resolution: mapYamlInfo.resolution,
       },
+      yaml:yamlData,
+    };
+    
+    res.json(responseData);
+  } catch (error) {
+    console.error("Conversion error:", error);
+    res.status(500).json({
+      error: "Image conversion failed",
+      details: error.message,
+    });
+  }
+});
+
+app.post("/maskconvert-pgm", async (req, res) => {
+  try {
+    const { mapId } = req.body; // 從請求中獲取 mapId
+    console.log("mapId", mapId);
+    console.log(typeof mapId);
+    if (!mapId) {
+      throw new Error("Map ID is required");
+    }
+    const map = await db.Mask.findOne({ where: { map_id: mapId } });
+    if (!map) {
+      throw new Error("Map not found");
+    }
+    const pgmBuffer = map.pgm; // 獲取 pgm BLOB 數據
+    const yamlBuffer = map.yaml; // 獲取 yaml BLOB 數據
+    if (!pgmBuffer) {
+      throw new Error("PGM data is missing");
+    }
+
+    // 將 BLOB 數據寫入臨時文件以進行處理
+    const tempPgmPath = path.join(CONVERTED_PATH, `${mapId}.pgm`);
+    await fs.writeFile(tempPgmPath, pgmBuffer); // 將 BLOB 寫入臨時文件
+
+    const yamlData = yamlBuffer ? yaml.load(yamlBuffer.toString("utf8")) : null; // 讀取 YAML 數據
+    const baseName = path.basename(tempPgmPath, ".pgm");
+    const outputFileName = `${baseName}.png`;
+    const processedFileName = `${baseName}_processed.png`;
+    outputPath = path.join(CONVERTED_PATH, outputFileName);
+    processedPath = path.join(CONVERTED_PATH, processedFileName);
+
+    await convertBtwPngPgm(tempPgmPath, outputPath);
+    const metadata = await sharp(outputPath).metadata();
+    let { scaledWidth, scaledHeight, scale } = resizeImage(metadata);
+    scaleProcessed = scale;
+    imageBuffer = await sharp(outputPath).toBuffer();
+    processedBuffer = imageBuffer;
+    compressedImageBuffer = await sharp(imageBuffer)
+      .resize(scaledWidth, scaledHeight, {
+        fit: "inside",
+        withoutEnlargement: true,
+      })
+      .toBuffer();
+
+    await sharp(compressedImageBuffer).toFile(processedPath);
+    console.log("Processed image saved to:", processedPath);
+
+    mapYamlInfo.width = metadata.width; // in pixel
+    mapYamlInfo.height = metadata.height;
+    mapYamlInfo.resolution = yamlData?.resolution;
+    mapYamlInfo.origin = yamlData?.origin;
+    mapYamlInfoProcessed = { ...mapYamlInfo };
+
+    const responseData = {
+      image: compressedImageBuffer.toString("base64"),
+      metadata: {
+        mapWidth: metadata.width,
+        mapHeight: metadata.height,
+        origin: mapYamlInfo.origin.map((v) => -v),
+        scale: scale,
+        resolution: mapYamlInfo.resolution,
+      },
     };
 
     res.json(responseData);
@@ -144,6 +217,14 @@ app.post("/convert-pgm", async (req, res) => {
       details: error.message,
     });
   }
+});
+
+app.get("/example/:test1", async(req, res) =>{
+  var p1v = req.query.p1;
+  var p2v = req.query.p2;
+  var p = req.params.test1;
+  console.log(p1v, p2v, p);
+  res.json({'a':'aa'});
 });
 
 app.post("/rotate", async (req, res) => {

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Navigation from "./components/Navigation";
 import MapEditor from "./components/MapEditor";
 import StationManager from "./components/StationManager";
+import MaskManager from "./components/MaskManager";
 import Db from "./components/Db";
 import Roslibjs from "./components/Roslib";
 import Logs from "./components/Logs";
@@ -49,6 +50,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/map-editor" element={<MapEditor />} />
           <Route path="/stations" element={<StationManager />} />
+          <Route path="/masks" element={<MaskManager />} />
           <Route path="/db" element={<Db />} />
           <Route path="/roslib" element={<Roslibjs />} />
           <Route path="/logs" element={<Logs />} />

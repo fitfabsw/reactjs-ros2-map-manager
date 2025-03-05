@@ -14,6 +14,7 @@ module.exports = function (app) {
   app.use(
     [
       "/files",
+      "/maskconvert-pgm",
       "/convert-pgm",
       "/save-image",
       "/crop-image",
